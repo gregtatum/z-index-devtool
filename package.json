@@ -1,0 +1,17 @@
+{
+  "name": "z-index-devtool",
+  "version": "1.0.0",
+  "description": "A UCOSP project for building a Z-Index Devtool",
+  "main": "index.js",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gregtatum/z-index-devtool.git"
+  },
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://github.com/gregtatum/z-index-devtool/issues"
+  },
+  "homepage": "https://github.com/gregtatum/z-index-devtool#readme"
+}
