@@ -13,4 +13,6 @@ will be a useful starting point for this project.
 
 The [sandbox](./sandbox) folder contains examples of z-index issues and uses. It has
 potential problems that the user will want to be able to fix, and provides a good base
-of examples for problems this tool will want to solve.
+of examples for problems this tool will want to solve. To run the examples locally
+type the command `npm run start:sandbox`. To build your changes to the sandbox and
+output the bundle.js run `npm run build:sandbox`.
