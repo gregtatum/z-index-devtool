@@ -2,9 +2,47 @@
   <head>
     <meta charset="utf-8">
     <title>Stacking Context 1</title>
-	<link rel="stylesheet" href="stacking-context-1.css" />
   </head>
   <body>
+  <style>
+	.bold {
+		font-weight: bold;
+		font: 12px Arial;
+	}
+	#div1,
+	#div3 {
+		height: 80px;
+		position: relative;
+		border: 1px dashed #669966;
+		background-color: #ccffcc;
+		padding-left: 5px;
+	}
+	#div2 {
+		opacity: 0.8;
+		z-index: 1;
+		position: absolute;
+		width: 150px;
+		height: 200px;
+		top: 20px;
+		left: 170px;
+		border: 1px dashed #990000;
+		background-color: #ffdddd;
+		text-align: center;
+	}
+	#div4 {
+		opacity: 0.8;
+		z-index: 2;
+		position: absolute;
+		width: 200px;
+		height: 70px;
+		top: 65px;
+		left: 50px;
+		border: 1px dashed #000099;
+		background-color: #ddddff;
+		text-align: left;
+		padding-left: 10px;
+	}
+  </style>
     <div id="div1">
 <br /><span class="bold">DIV #1</span>
 <br />position: relative;
