@@ -18,6 +18,7 @@
   "homepage": "https://github.com/gregtatum/z-index-devtool#readme",
   "devDependencies": {
     "@tatumcreative/get": "1.0.0",
+    "browserify": "^13.1.0",
     "budo": "^9.2.0"
   }
 }
