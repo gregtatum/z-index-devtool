@@ -181,10 +181,21 @@ function compareNodes(tree, node1, node2) {
   console.log(subParents2.map(outputNode).join(" --> "));
 }
 
+function flattenTreeWithDepth(tree = [], depth = 0) {
+  return tree.reduce((previousValue, node) => {
+    return [
+      ...previousValue,
+      Object.assign({depth}, node),
+      ...flattenTreeWithDepth(node.nodes, depth + 1)
+    ];
+  }, [])
+}
+
 module.exports = {
   getStackingContextTree,
   outputNode,
   outputTree,
   findNode,
-  compareNodes
+  compareNodes,
+  flattenTreeWithDepth
 };
