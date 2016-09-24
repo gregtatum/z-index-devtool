@@ -1,0 +1,9 @@
+.DS_Store
+build
+node_modules
+environment.json
+npm-debug.log
+
+# IntelliJ / IDEA
+*.iml
+.idea/*
