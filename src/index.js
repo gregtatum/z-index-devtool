@@ -1,8 +1,22 @@
 const React = require("react");
 const ReactDOM = require("react-dom");
 const {createFactory} = require("react");
-const StackingContextTree = createFactory(require("./components/stacking-context-tree"));
 const {getText} = require("@tatumcreative/get");
+const {Provider} = require("react-redux");
+const createStore = require("./store.js");
+
+const app = React.createElement(require("./components/app"))
+
+function main() {
+  const reduxApp = React.createElement(Provider, {store: createStore()}, app);
+  ReactDOM.render(reduxApp, document.querySelector("#app"));
+};
+
+main();
+
+// TODO - Migrate this into an action and reducer.
+
+/*
 
 const {
   getStackingContextTree,
@@ -42,5 +56,4 @@ function main() {
   }, console.error.bind(console));
 
 }
-
-main();
+*/
