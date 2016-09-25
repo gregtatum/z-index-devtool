@@ -1,0 +1,13 @@
+#tree-view {
+  width: 45%;
+  float: right;
+  border-style: solid;
+  margin: 0
+
+}
+
+#container {
+  width: 45%;
+  float left;
+  border-style: solid;
+}
