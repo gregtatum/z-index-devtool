@@ -1,6 +1,8 @@
 const {DOM, createClass, createFactory} = require("react");
 const {connect} = require("react-redux");
 
+const {addStackingContext} = require("../actions/stacking-context");
+
 const StackingContextTree = createFactory(require("./stacking-context-tree"));
 const { todo } = require("../actions/stacking-context");
 
@@ -9,7 +11,7 @@ const App = createFactory(createClass({
 
   componentWillMount() {
     const {dispatch} = this.props;
-    // dispatch(loadInitialState());
+    dispatch(addStackingContext("../sandbox/absolute-occluded-by-relative.html"));
   },
 
   render() {
@@ -18,7 +20,7 @@ const App = createFactory(createClass({
       stackingContext
     } = this.props;
 
-    return StackingContextTree({});
+    return StackingContextTree({tree: stackingContext.tree});
   }
 }));
 
