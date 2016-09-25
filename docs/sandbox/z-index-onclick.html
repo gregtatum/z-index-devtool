@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Z-Index OnClick Example</title>
+    <style type="text/css">
+        * {
+            margin: 0;
+        }
+
+        html {
+            padding: 20px;
+            font: 12px/20px Arial, sans-serif;
+        }
+
+        div {
+            opacity: 0.7;
+            position: relative;
+        }
+
+        h1 {
+            font: inherit;
+            font-weight: bold;
+        }
+
+        #div1 {
+            z-index: 5;
+            background-color: red;
+            height: 200px;
+            padding: 40px 20px 20px;
+        }
+
+        #div2 {
+            z-index: -5;
+            background-color: blue;
+            height: 200px;
+            padding: 40px 20px 20px;
+        }
+
+        #div3 {
+            z-index: 4;
+            opacity: 1;
+            position: absolute;
+            top: 80px;
+            left: 180px;
+            width: 330px;
+            height: 230px;
+            background-color: green;
+            padding: 150px 20px 20px;
+        }
+
+        #divclick {
+            z-index: 1;
+            margin-top: 15px;
+            padding: 5px 10px;
+            background-color: lime;
+        }
+
+        #div6 {
+            z-index: 3;
+            position: absolute;
+            top: 80px;
+            left: 180px;
+            width: 150px;
+            height: 125px;
+            padding-top: 125px;
+            background-color: lime;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- divs etc go here -->
+    <div id="div1">
+        <h1>Division Element #1</h1>
+        <code>position: relative;<br/>
+      z-index: 5;</code>
+    </div>
+    <div id="div2">
+        <h1>Division Element #2</h1>
+        <code>position: relative;<br/>
+      z-index: -5;</code>
+    </div>
+    <div id="div3">
+      <div id="divclick" onclick="console.log('click test')">
+          <h1>Clickable Division Element #5</h1>
+          <code>position: relative;<br/>
+      z-index: 1;</code>
+      </div>
+        <h1>Division Element #3</h1>
+        <code>position: absolute;<br/>
+      z-index: 4;</code>
+        <div id="div6">
+            <h1>Division Element #6</h1>
+            <code>position: absolute;<br/>
+        z-index: 3;</code>
+        </div>
+    </div>
+    <!-- TODO: divs blocking the selection of items -->
+</body>
+
+</html>

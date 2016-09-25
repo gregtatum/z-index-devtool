@@ -4,6 +4,10 @@
   "description": "A UCOSP project for building a Z-Index Devtool",
   "main": "index.js",
   "scripts": {
+    "start:sandbox": "budo src/stacking-context/load-example.js --serve bundle.js --dir docs/sandbox",
+    "build:sandbox": "browserify src/stacking-context/load-example.js > docs/sandbox/bundle.js",
+    "start:ui": "budo src --serve ui/bundle.js --dir docs",
+    "build:ui": "browserify src > docs/ui/bundle.js"
   },
   "repository": {
     "type": "git",
@@ -13,5 +17,16 @@
   "bugs": {
     "url": "https://github.com/gregtatum/z-index-devtool/issues"
   },
-  "homepage": "https://github.com/gregtatum/z-index-devtool#readme"
+  "homepage": "https://github.com/gregtatum/z-index-devtool#readme",
+  "devDependencies": {
+    "@tatumcreative/get": "1.0.0",
+    "browserify": "^13.1.0",
+    "budo": "^9.2.0",
+    "react": "15.3.2",
+    "react-dom": "15.3.2",
+    "react-redux": "4.4.5",
+    "redux": "3.6.0",
+    "redux-logger": "2.6.1",
+    "redux-thunk": "2.1.0"
+  }
 }

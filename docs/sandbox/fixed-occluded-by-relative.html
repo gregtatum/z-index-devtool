@@ -1,0 +1,58 @@
+<style>
+  .red {
+    position: relative;
+    width:600px;
+    background-color: #e33;
+    padding:1em;
+    z-index:0;
+  }
+  .green-relative {
+    margin: 1em;
+    background-color: #3e3;
+  }
+  .blue {
+    position: relative;
+    width:600px;
+    background-color: #33e;
+    padding:1em;
+    z-index:1;
+  }
+  .red-absolute {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    bottom: -75px;
+    right: -75px;
+    background-color: #e3e;
+  }
+  .fixed {
+    width: 100px;
+    height: 100px;
+    position: fixed;
+    top: 200px;
+    left: 100px;
+    background-color: #e3e;
+    z-index:1000;
+  }
+  .scroll {
+    width: 100px;
+    border: 1px dashed #999;
+    height:2000px;
+  }
+</style>
+
+<div class='red'>
+  .red
+  <div class="green-relative">.green-relative</div>
+  <div class="green-relative">.green-relative</div>
+  <div class="fixed" style='background-color:#f66; left: 300px;'>.fixed</div>
+</div>
+<div class='blue'>
+  .blue
+  <div class="green-relative">.green-relative</div>
+  <div class="green-relative">.green-relative</div>
+  <div class="fixed" style='background-color:#66f;'>.fixed</div>
+</div>
+<div class='scroll'>
+  .scroll
+</div>
