@@ -8,7 +8,7 @@ const app = React.createElement(require("./components/app"))
 
 function main() {
   const reduxApp = React.createElement(Provider, {store: createStore()}, app);
-  ReactDOM.render(reduxApp, document.querySelector("#app"));
+  ReactDOM.render(reduxApp, document.querySelector("#whole-app"));
 };
 
 main();
