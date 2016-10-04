@@ -1,13 +1,15 @@
+//TODO: use flexbox
 #tree-view {
-  width: 45%;
+  width: 50%;
   float: right;
-  border-style: solid;
-  margin: 0
-
+  margin: 0;
+  overflow: scroll;
 }
 
 #container {
-  width: 45%;
+  width: 50%;
   float left;
-  border-style: solid;
+  border-left: 1px solid var(#dde1e4);
+  background-color: var(white);
+  overflow: scroll;
 }
