@@ -1,15 +1,35 @@
-//TODO: use flexbox
+html, body, #whole-app
+{
+    height: 100%;
+    margin: 0;
+}
+
+#splitter {
+  height: 100%;
+  display: flex;
+  align-items: stretch;
+}
+
 #tree-view {
   width: 50%;
   float: right;
   margin: 0;
-  overflow: scroll;
+  order: 1;
+  border-left: 2px solid #dde1e4;
+  background-color: #fff;
+  overflow: hidden;
 }
 
 #container {
   width: 50%;
   float left;
-  border-left: 1px solid var(#dde1e4);
-  background-color: var(white);
+  order: 0;
+  overflow: hidden;
+}
+
+#container:hover, #tree-view:hover {
   overflow: scroll;
+}
+.stacking-context-node:nth-child(even){
+  background-color: #00f;
 }
