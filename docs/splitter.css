@@ -18,7 +18,6 @@ html, body, #app
   border-left: 2px solid #dde1e4;
   background-color: #fff;
   overflow: hidden;
-  overflow: scroll
 }
 
 #container {
