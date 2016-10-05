@@ -1,4 +1,4 @@
-html, body, #whole-app
+html, body, #app
 {
     height: 100%;
     margin: 0;
@@ -10,7 +10,7 @@ html, body, #whole-app
   align-items: stretch;
 }
 
-#tree-view {
+.sidebar {
   width: 50%;
   float: right;
   margin: 0;
@@ -27,9 +27,6 @@ html, body, #whole-app
   overflow: hidden;
 }
 
-#container:hover, #tree-view:hover {
+#container:hover, #sidebar:hover {
   overflow: scroll;
-}
-.stacking-context-node:nth-child(even){
-  background-color: #00f;
 }

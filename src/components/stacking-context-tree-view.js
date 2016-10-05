@@ -1,4 +1,5 @@
 const {DOM, createClass, createFactory} = require("react");
+const {div} = DOM;
 const {connect} = require("react-redux");
 
 const {addStackingContext} = require("../actions/stacking-context");
@@ -20,7 +21,10 @@ const StackingContextTreeView= createFactory(createClass({
       stackingContext
     } = this.props;
 
-    return StackingContextTree({tree: stackingContext.tree});
+    return div(
+      {className: "sidebar"},
+      StackingContextTree({tree: stackingContext.tree})
+    );
   }
 }));
 
