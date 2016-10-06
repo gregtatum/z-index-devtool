@@ -21,10 +21,10 @@ const App = createFactory(createClass({
 
     return div(
         {}, // props
-        // App will only render SplitView, which will render the Tree on one side
-        //  and the DomContainer + select dropdown in another
-        StackingContextTree({tree: stackingContext.tree}),
-        DomContainer({html: "(DOM Container goes here)"})
+        // App will only render SplitView, which will render DomContainer + dropdown on left
+        //  and the TreeView on right
+        DomContainer({html: "(DOM Container goes here)"}),
+        StackingContextTree({tree: stackingContext.tree})
     );
   }
 }));

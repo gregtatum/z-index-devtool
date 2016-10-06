@@ -10,7 +10,7 @@ const DomContainer = createClass({
 
         return div(
             {className: "dom-container"},
-            // not sure how DOM will be passed in yet
+            // DOM will be passed in via Redux's store
             html
         );
     }
