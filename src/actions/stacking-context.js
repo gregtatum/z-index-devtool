@@ -2,23 +2,27 @@ const {getText} = require("@tatumcreative/get");
 const constants = require("../constants");
 const {getStackingContextTree} = require("../stacking-context")
 
-function addStackingContext(url) {
-  return function(dispatch, getState) {
-
-    getText(url).then(text => {
-      // Set the container to have that HTML
-      console.warn("Uh oh, we're touching the DOM without using React :(");
-      const containerElement = document.querySelector("#container");
-      containerElement.innerHTML = text;
-
-      const tree = getStackingContextTree(containerElement);
-
+function fetchNewDomText (url) {
+  getText(url).then(
+    text => {
       dispatch({
-        type: constants.ADD_STACKING_CONTEXT,
-        containerElement,
-        tree
+        type: constants.NEW_DOM_TEXT,
+        text: text
       });
-    }, console.error.bind(console));
+    },
+    console.error.bind(console)
+  );
+}
+
+function getStackingContext(containerElement) {
+  return function(dispatch, getState) {
+    const tree = getStackingContextTree(containerElement);
+
+    dispatch({
+      type: constants.ADD_STACKING_CONTEXT,
+      containerElement,
+      tree
+    });
   }
 }
 

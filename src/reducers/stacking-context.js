@@ -1,10 +1,18 @@
 const constants = require("../constants");
 
 const DEFAULT_STATE = {
-  tree: undefined
+  tree: undefined,
+  containerElement: undefined,
+  text: undefined
 }
 
 const handlers = {};
+
+handlers[constants.NEW_DOM_TEXT] = function(state, action) {
+  return Object.assign({}, state, {
+    text: action.text
+  });
+};
 
 handlers[constants.ADD_STACKING_CONTEXT] = function(state, action) {
   return Object.assign({}, state, {
