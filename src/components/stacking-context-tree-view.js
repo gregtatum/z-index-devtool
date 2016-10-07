@@ -2,8 +2,6 @@ const {DOM, createClass, createFactory} = require("react");
 const {div} = DOM;
 const {connect} = require("react-redux");
 
-const {addStackingContext} = require("../actions/stacking-context");
-
 const StackingContextTree = createFactory(require("./stacking-context-tree"));
 const { todo } = require("../actions/stacking-context");
 
@@ -12,18 +10,16 @@ const StackingContextTreeView= createFactory(createClass({
 
   componentWillMount() {
     const {dispatch} = this.props;
-    dispatch(addStackingContext("../sandbox/absolute-occluded-by-relative.html"));
   },
 
   render() {
     const {
-      dispatch,
-      stackingContext
+      tree
     } = this.props;
 
     return div(
       {className: "sidebar"},
-      StackingContextTree({tree: stackingContext.tree})
+      StackingContextTree({tree: tree})
     );
   }
 }));

@@ -20,13 +20,13 @@ html, body, #app
   overflow: hidden;
 }
 
-#container {
+.dom-container {
   width: 50%;
   float left;
   order: 0;
   overflow: hidden;
 }
 
-#container:hover, #sidebar:hover {
+.dom-container:hover, .sidebar:hover {
   overflow: scroll;
 }
