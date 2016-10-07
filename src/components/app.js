@@ -4,6 +4,7 @@ const {connect} = require("react-redux");
 const {addStackingContext} = require("../actions/stacking-context");
 
 const StackingContextTree = createFactory(require("./stacking-context-tree"));
+const ExamplesDropdown = createFactory(require("./examples-dropdown"));
 const { todo } = require("../actions/stacking-context");
 
 const App = createFactory(createClass({
@@ -20,7 +21,10 @@ const App = createFactory(createClass({
       stackingContext
     } = this.props;
 
-    return StackingContextTree({tree: stackingContext.tree});
+    return DOM.div({},
+      ExamplesDropdown(),
+      StackingContextTree({tree: stackingContext.tree})
+    )
   }
 }));
 
