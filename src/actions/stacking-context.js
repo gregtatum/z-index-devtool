@@ -28,12 +28,17 @@ function getStackingContext(containerElement) {
   }
 }
 
-function getNewExampleHtml() {
-  console.log('wtf am i doing here');
+function changeDisplayedExampleHtml(url) {
+  return function(dispatch, getState) {
+    dispatch({
+      type: constants.CHANGE_EXAMPLE_HTML,
+      htmlURL: url
+    });
+  }
 }
 
 module.exports = {
   fetchNewDomText,
   getStackingContext,
-  getNewExampleHtml
+  changeDisplayedExampleHtml
 }
