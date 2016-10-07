@@ -6,7 +6,7 @@ const ExamplesDropdown = createClass({
   displayName: "ExamplesDropdown",
 
   getInitialState() {
-    return { selectValue: 'stacking-context-1.html' };
+    return { selectValue: "stacking-context-1.html" };
   },
 
   handleChange(e) {
@@ -15,11 +15,13 @@ const ExamplesDropdown = createClass({
   },
 
   render() {
-    return select(
-      {value: this.state.selectValue,
-      onChange: this.handleChange
-      },
-      this.renderDropdownItems()
+    return div({className: "examples-dropdown"},
+      select(
+        {value: this.state.selectValue,
+          onChange: this.handleChange
+        },
+        this.renderDropdownItems()
+      )
     );
   },
 
