@@ -28,7 +28,12 @@ const App = createFactory(createClass({
         {}, // props
         // App will only render SplitView, which will render DomContainer + dropdown on left
         //  and the TreeView on right
-        ExamplesDropdown(),
+        ExamplesDropdown({
+
+          getNewExampleHtml: (url) => {
+            dispatch(fetchNewDomText(url))
+          },
+        }),
         DomContainer({
           text: stackingContext.text,
           newTextReceived: (div) => {

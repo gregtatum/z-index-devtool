@@ -3,6 +3,7 @@ const constants = require("../constants");
 const DEFAULT_STATE = {
   tree: undefined,
   containerElement: undefined,
+  htmlURL: undefined,
   text: undefined
 }
 
@@ -18,6 +19,12 @@ handlers[constants.ADD_STACKING_CONTEXT] = function(state, action) {
   return Object.assign({}, state, {
     containerElement: action.containerElement,
     tree: action.tree
+  });
+};
+
+handlers[constants.CHANGE_EXAMPLE_HTML] = function(state, action) {
+  return object.assign({}, state, {
+    htmlURL: action.htmlURL
   });
 };
 

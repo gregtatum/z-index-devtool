@@ -11,11 +11,7 @@ const ExamplesDropdown = createClass({
 
   handleChange(e) {
     this.setState({selectValue: e.target.value});
-    const container = document.querySelector("#container");
-    // Get the text at the url.
-    getText(e.target.value).then(text => {
-      container.innerHTML = text;
-    });
+    this.props.getNewExampleHtml(e.target.value);
   },
 
   render() {
