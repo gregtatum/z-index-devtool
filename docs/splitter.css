@@ -4,15 +4,15 @@ html, body, #app
     margin: 0;
 }
 
-#splitter {
+#split-view {
   height: 100%;
   display: flex;
   align-items: stretch;
+  flex-direction: row;
 }
 
 .sidebar {
   width: 50%;
-  float: right;
   margin: 0;
   order: 1;
   border-left: 2px solid #dde1e4;
@@ -20,10 +20,15 @@ html, body, #app
   overflow: hidden;
 }
 
-.dom-container {
+.main-view {
   width: 50%;
-  float left;
   order: 0;
+  display:flex;
+  align-items: stretch;
+  flex-direction: column;
+}
+
+.dom-container {
   overflow: hidden;
 }
 
