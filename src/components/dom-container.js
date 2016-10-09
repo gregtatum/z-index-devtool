@@ -6,8 +6,8 @@ const {div} = DOM;
  */
 const DomContainer = createClass({
 
-    componentWillReceiveProps(nextProps) {
-      if (this.props.text !== nextProps.text) {
+    componentDidUpdate(prevProps, prevState) {
+      if (this.props.text !== prevProps.text) {
         this.props.newTextReceived(this._div);
       }
     },
