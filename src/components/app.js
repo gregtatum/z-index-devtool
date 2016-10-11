@@ -35,7 +35,7 @@ const App = createFactory(createClass({
           text: stackingContext.text,
           newTextReceived: (div) => {
             dispatch(getStackingContext(div))
-          }
+          },
           //props for example dropdown
           fetchNewExampleHtml: (url) => {
             dispatch(fetchNewDomText(url))

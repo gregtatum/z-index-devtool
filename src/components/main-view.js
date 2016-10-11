@@ -7,6 +7,7 @@ const {
   getStackingContext
 } = require("../actions/stacking-context");
 const DomContainer = createFactory(require("./dom-container"));
+const ExamplesDropdown = createFactory(require("./examples-dropdown"));
 
 const MainView = createClass({
   displayName: "MainView",
@@ -14,16 +15,16 @@ const MainView = createClass({
     render() {
       const {
         text,
-        newTextReceived
+        newTextReceived,
+        fetchNewExampleHtml
       } = this.props;
 
       return div(
         {className: "main-view"},
         //Examples dropdown goes here,
-        div(
-          {className: "placeholder"},
-          "Placeholder for Dropdown"
-        ),
+        ExamplesDropdown({
+          fetchNewExampleHtml: fetchNewExampleHtml
+        }),
         DomContainer({
           text: text,
           newTextReceived: newTextReceived
