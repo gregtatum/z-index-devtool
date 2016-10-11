@@ -6,6 +6,7 @@ const {
 } = require("../actions/stacking-context");
 const DomContainer = createFactory(require("./dom-container"));
 const StackingContextTree = createFactory(require("./stacking-context-tree"));
+const ExamplesDropdown = createFactory(require("./examples-dropdown"));
 const { todo } = require("../actions/stacking-context");
 const {div} = DOM;
 
@@ -27,6 +28,11 @@ const App = createFactory(createClass({
         {}, // props
         // App will only render SplitView, which will render DomContainer + dropdown on left
         //  and the TreeView on right
+        ExamplesDropdown({
+          fetchNewExampleHtml: (url) => {
+            dispatch(fetchNewDomText(url))
+          },
+        }),
         DomContainer({
           text: stackingContext.text,
           newTextReceived: (div) => {
