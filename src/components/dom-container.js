@@ -14,7 +14,6 @@ const DomContainer = createClass({
 
     render() {
       const {text} = this.props;
-
       return div({
         className: "dom-container",
         ref: (div) => this._div = div,

@@ -1,14 +1,16 @@
 const {DOM, createClass, createFactory} = require("react");
+const {div} = DOM;
 const {connect} = require("react-redux");
+
 const {
   fetchNewDomText,
   getStackingContext
 } = require("../actions/stacking-context");
-const DomContainer = createFactory(require("./dom-container"));
-const StackingContextTree = createFactory(require("./stacking-context-tree"));
-const ExamplesDropdown = createFactory(require("./examples-dropdown"));
+
+const MainView = createFactory(require("./main-view"));
+const StackingContextTreeView = createFactory(require("./stacking-context-tree-view"));
+
 const { todo } = require("../actions/stacking-context");
-const {div} = DOM;
 
 const App = createFactory(createClass({
   displayName: "App",
@@ -25,21 +27,21 @@ const App = createFactory(createClass({
     } = this.props;
 
     return div(
-        {}, // props
+        {id:"split-view"},
         // App will only render SplitView, which will render DomContainer + dropdown on left
         //  and the TreeView on right
-        ExamplesDropdown({
-          fetchNewExampleHtml: (url) => {
-            dispatch(fetchNewDomText(url))
-          },
-        }),
-        DomContainer({
+        MainView({
+          //props for dom container
           text: stackingContext.text,
           newTextReceived: (div) => {
             dispatch(getStackingContext(div))
           },
+          //props for example dropdown
+          fetchNewExampleHtml: (url) => {
+            dispatch(fetchNewDomText(url))
+          }
         }),
-        StackingContextTree({tree: stackingContext.tree})
+        StackingContextTreeView({tree: stackingContext.tree})
     );
   }
 }));
