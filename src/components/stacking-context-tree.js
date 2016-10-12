@@ -9,7 +9,7 @@ const StackingContextTree = createClass({
     const nodes = flattenTreeWithDepth(tree);
 
     return div(
-        {className: "app"},
+        {id: "tree"},
         ...nodes.map((node) => StackingContextNode({node}))
         );
   }
