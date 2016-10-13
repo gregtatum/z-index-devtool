@@ -8,7 +8,9 @@ const StackingContextNode = createClass({
     return div(
         {className: "stacking-context-node",
         style: {paddingLeft: node.depth * 10 + "px"},
-        onClick: node.onClickFct
+        onClick: (event) => {
+          //dispatch action?
+        }
         },
         nodeToString(node.el),
         getStackingContextInfo(node)
