@@ -1,5 +1,5 @@
 const {DOM, createClass} = require("react");
-const {div, select, option} = DOM;
+const {div, select, option, label, span} = DOM;
 const {getText} = require("@tatumcreative/get");
 
 const ExamplesDropdown = createClass({
@@ -15,30 +15,21 @@ const ExamplesDropdown = createClass({
   },
 
   render() {
-    return div({className: "examples-dropdown"},
-      select(
-        {value: this.state.selectValue,
-          onChange: this.handleChange
-        },
-        this.renderDropdownItems()
-      )
-    );
-  },
-
-  renderDropdownItems() {
-    var options = [];
-
-    for (var file of files) {
-      options.push(
-        option(
-          {key:file.name,
-          value: file.path
+    return div({className: "examples-dropdown devtools-toolbar"},
+      label({title: "Change the markup example"},
+        span({}, "Example: "),
+        select(
+          {
+            value: this.state.selectValue,
+            onChange: this.handleChange
           },
-          file.name
+          files.map(file => option(
+            {key:file.name, value: file.path},
+            file.name
+          ))
         )
       )
-    }
-    return options;
+    );
   }
 })
 

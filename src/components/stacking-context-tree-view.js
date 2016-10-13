@@ -19,6 +19,7 @@ const StackingContextTreeView= createFactory(createClass({
 
     return div(
       {className: "sidebar"},
+      div({className: "devtools-toolbar"}, "Stacking Context Tree"),
       StackingContextTree({tree: tree})
     );
   }
