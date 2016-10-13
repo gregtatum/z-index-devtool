@@ -10,6 +10,7 @@ const ExamplesDropdown = createClass({
   },
 
   handleChange(e) {
+    // TODO, remove any state from component, do this from Redux
     this.setState({selectValue: e.target.value});
     this.props.fetchNewExampleHtml(e.target.value);
   },
@@ -36,34 +37,34 @@ const ExamplesDropdown = createClass({
 // No native JavaScript way to get the list of html files
 const files = [{
     name: "absolute-occluded-by-relative",
-    path: "../sandbox/absolute-occluded-by-relative.html"
+    path: "examples/absolute-occluded-by-relative.html"
 }, {
     name: "adding-z-index",
-    path: "../sandbox/adding-z-index.html"
+    path: "examples/adding-z-index.html"
 }, {
     name: "fixed-occluded-by-relative",
-    path: "../sandbox/fixed-occluded-by-relative.html"
+    path: "examples/fixed-occluded-by-relative.html"
 }, {
     name: "stacking-and-float",
-    path: "../sandbox/stacking-and-float.html"
+    path: "examples/stacking-and-float.html"
 }, {
     name: "stacking-context-1",
-    path: "../sandbox/stacking-context-1.html"
+    path: "examples/stacking-context-1.html"
 }, {
     name: "stacking-context-2",
-    path: "../sandbox/stacking-context-2.html"
+    path: "examples/stacking-context-2.html"
 }, {
     name: "stacking-context-3",
-    path: "../sandbox/stacking-context-3.html"
+    path: "examples/stacking-context-3.html"
 }, {
     name: "stacking-context",
-    path: "../sandbox/stacking-context.html"
+    path: "examples/stacking-context.html"
 }, {
     name: "stacking-without-z-index",
-    path: "../sandbox/stacking-without-z-index.html"
+    path: "examples/stacking-without-z-index.html"
 }, {
     name: "z-index-onclick",
-    path: "../sandbox/z-index-onclick.html"
+    path: "examples/z-index-onclick.html"
 }];
 
 module.exports = ExamplesDropdown;

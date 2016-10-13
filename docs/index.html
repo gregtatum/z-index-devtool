@@ -1,10 +1,25 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <script>
+      // LOL, hack to make it either light or dark themed
+      document.documentElement.className = Math.random() > 0.5 ? "theme-dark" : "theme-light"
+    </script>
     <meta charset="utf-8">
-    <title></title>
+    <title>React</title>
+    <!-- devtools stylesheets -->
+    <link rel="stylesheet" href="lib/css/devtools/variables.css"/>
+    <link rel="stylesheet" href="lib/css/devtools/dark-theme.css"/>
+    <link rel="stylesheet" href="lib/css/devtools/light-theme.css"/>
+    <link rel="stylesheet" href="lib/css/devtools/common.css"/>
+    <link rel="stylesheet" href="lib/css/devtools/toolbars.css"/>
+    <link rel="stylesheet" href="lib/css/devtools/splitters.css"/>
+
+    <!-- app stylesheets -->
+    <link rel="stylesheet" href="lib/css/z-index.css"/>
   </head>
-  <body>
-    <a href='ui'>Load the Tool</a>
+  <body class="theme-body">
+    <div id="app"></div>
+    <script src="bundle.js"></script>
   </body>
 </html>
