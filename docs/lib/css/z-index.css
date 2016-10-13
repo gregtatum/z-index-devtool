@@ -1,7 +1,6 @@
-html, body, #app
-{
-    height: 100%;
-    margin: 0;
+html, body, #app {
+  height: 100%;
+  margin: 0;
 }
 
 #split-view {
@@ -15,9 +14,10 @@ html, body, #app
   width: 50%;
   margin: 0;
   order: 1;
-  border-left: 2px solid #dde1e4;
+  border-left: 1px solid var(--theme-splitter-color);
   background-color: #fff;
   overflow: hidden;
+  background-color: var(--theme-body-background);
 }
 
 .main-view {
@@ -29,9 +29,9 @@ html, body, #app
 }
 
 .dom-container {
-  overflow: hidden;
-}
-
-.dom-container:hover, .sidebar:hover {
   overflow: scroll;
+  flex: 1;
+  position:relative;
+  background-color: #fff;
+  color: #000;
 }
