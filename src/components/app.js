@@ -17,7 +17,7 @@ const App = createFactory(createClass({
 
   componentWillMount() {
     const {dispatch} = this.props;
-    dispatch(fetchNewDomText("../sandbox/absolute-occluded-by-relative.html"));
+    dispatch(fetchNewDomText("examples/absolute-occluded-by-relative.html"));
   },
 
   render() {
