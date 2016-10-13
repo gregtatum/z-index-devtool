@@ -85,6 +85,9 @@ function getStackingContextTree(root, treeNodes = [], parent) {
         index: isChildStacked ? parseInt(getComputedStyle(child).zIndex, 10) : undefined,
         isStackingContext: isChildStackingContext,
         nodes: [],
+        onClickFct: function(event){
+          console.log(child);
+        },
         parent
       };
       treeNodes.push(newNode);
