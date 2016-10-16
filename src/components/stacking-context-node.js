@@ -2,13 +2,15 @@ const {DOM, createClass} = require("react");
 const {div} = DOM;
 
 const StackingContextNode = createClass({
-  render: function() {
+    render: function() {
     const {node} = this.props;
-
     console.log(node);
     return div(
         {className: "stacking-context-node",
-        style: {paddingLeft: node.depth * 10 + "px"}
+        style: {paddingLeft: node.depth * 10 + "px"},
+        onClick: (event) => {
+          //dispatch action?
+        }
         },
         nodeToString(node.el),
         getStackingContextInfo(node)
