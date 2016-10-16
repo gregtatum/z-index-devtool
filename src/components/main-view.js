@@ -8,6 +8,7 @@ const {
 } = require("../actions/stacking-context");
 const DomContainer = createFactory(require("./dom-container"));
 const ExamplesDropdown = createFactory(require("./examples-dropdown"));
+const DisplayRectangle = createFactory(require("./display-rectangle"));
 
 const MainView = createClass({
   displayName: "MainView",
@@ -28,7 +29,8 @@ const MainView = createClass({
         DomContainer({
           text: text,
           newTextReceived: newTextReceived
-        })
+        }),
+        DisplayRectangle({})
       );
     }
 });
