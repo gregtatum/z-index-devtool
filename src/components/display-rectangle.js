@@ -1,24 +1,21 @@
 const {DOM, createClass} = require("react");
-const {div} = DOM;
+const {div, canvas} = DOM;
 const React = require("react");
-//const {selectStackingContextNode} = require("../actions/stacking-context");
 
 const DisplayRectangle = createClass({
     render: function() {
       const {store} = this.context;
-      const st = store.getState().stackingContext;
       const {selNode} = store.getState().stackingContext;
       var boundingRect = undefined;
-      debugger;
       if (selNode){
+        //Won't adapt responsively, i think....
         boundingRect = selNode.el.getBoundingClientRect();
         console.log(boundingRect);
       }
-      const displayValue = (boundingRect) ? 'block' : 'none';
-      return div(
+      const hasNodeClass = (boundingRect) ? 'has-node' : 'no-node';
+      return canvas(
         {
-            className: "display-rectangle",
-            style: {display: displayValue}
+            className: "display-rectangle "+hasNodeClass
         }
       );
   }

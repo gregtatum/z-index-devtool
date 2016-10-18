@@ -29,8 +29,7 @@ const MainView = createClass({
         DomContainer({
           text: text,
           newTextReceived: newTextReceived
-        }),
-        DisplayRectangle({})
+        })
       );
     }
 });

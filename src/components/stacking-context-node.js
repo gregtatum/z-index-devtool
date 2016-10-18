@@ -7,10 +7,15 @@ const StackingContextNode = createClass({
     render: function() {
     const {node} = this.props;
     const {store} = this.context;
+    const {selNode} = store.getState().stackingContext;
     return div(
         {className: "stacking-context-node",
         style: {paddingLeft: node.depth * 10 + "px"},
         onClick: (event) => {
+          if(selNode){
+            selNode.el.classList.remove("selected-node");
+          }
+          node.el.classList.add("selected-node");
           store.dispatch(selectStackingContextNode(node));
         }
         },
