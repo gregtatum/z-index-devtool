@@ -22,12 +22,12 @@ const StackingContextTree = createClass({
           getChildren: () => [],
           getParent: item => item.parent,
           getKey: () => {},
-          renderItem: (item, depth, isFocused, arrow, isExpanded) => {
+          renderItem: (item, depth, focused, arrow, expanded) => {
             console.log(item);
             console.log(depth);
-            console.log(isFocused);
+            console.log(focused);
             console.log(arrow);
-            console.log(isExpanded);
+            console.log(expanded);
             return div(
               {
                 // Apply 10px nesting per expansion depth.
