@@ -1,14 +1,23 @@
 const {DOM, createClass} = require("react");
 const {div} = DOM;
+const React = require("react");
+const {selectStackingContextNode} = require("../actions/stacking-context");
 
 const StackingContextNode = createClass({
-  render: function() {
+    render: function() {
     const {node} = this.props;
-
-    console.log(node);
+    const {store} = this.context;
+    const {selNode} = store.getState().stackingContext;
     return div(
         {className: "stacking-context-node",
-        style: {paddingLeft: node.depth * 10 + "px"}
+        style: {paddingLeft: node.depth * 10 + "px"},
+        onClick: (event) => {
+          if(selNode){
+            selNode.el.classList.remove("selected-node");
+          }
+          node.el.classList.add("selected-node");
+          store.dispatch(selectStackingContextNode(node));
+        }
         },
         nodeToString(node.el),
         getStackingContextInfo(node)
@@ -25,6 +34,10 @@ function nodeToString(el) {
 function getStackingContextInfo(node) {
   return (node.isStackingContext ? " [CONTEXT] " : "") +
       (node.isStacked ? "[z-index: " + node.index + "]": "");
+};
+
+StackingContextNode.contextTypes = {
+  store: React.PropTypes.object
 };
 
 module.exports = StackingContextNode;

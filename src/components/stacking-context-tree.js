@@ -7,7 +7,6 @@ const StackingContextTree = createClass({
   render: function() {
     const {tree} = this.props;
     const nodes = flattenTreeWithDepth(tree);
-
     return div(
         {id: "tree"},
         ...nodes.map((node) => StackingContextNode({node}))

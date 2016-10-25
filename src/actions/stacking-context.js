@@ -28,7 +28,17 @@ function getStackingContext(containerElement) {
   }
 }
 
+function selectStackingContextNode(node) {
+  return function(dispatch, getState) {
+    dispatch({
+      type: constants.SELECT_NODE,
+      selNode: node
+    });
+  }
+}
+
 module.exports = {
   fetchNewDomText,
-  getStackingContext
+  getStackingContext,
+  selectStackingContextNode
 }
