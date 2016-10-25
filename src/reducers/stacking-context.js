@@ -3,7 +3,8 @@ const constants = require("../constants");
 const DEFAULT_STATE = {
   tree: undefined,
   containerElement: undefined,
-  text: undefined
+  text: undefined,
+  selNode: undefined
 }
 
 const handlers = {};
@@ -18,6 +19,12 @@ handlers[constants.ADD_STACKING_CONTEXT] = function(state, action) {
   return Object.assign({}, state, {
     containerElement: action.containerElement,
     tree: action.tree
+  });
+};
+
+handlers[constants.SELECT_NODE] = function(state, action) {
+  return Object.assign({}, state, {
+    selNode: action.selNode
   });
 };
 
