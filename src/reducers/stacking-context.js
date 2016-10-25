@@ -4,14 +4,16 @@ const DEFAULT_STATE = {
   tree: undefined,
   containerElement: undefined,
   text: undefined,
-  selNode: undefined
+  selNode: undefined,
+  url: "stacking-context-1.html"
 }
 
 const handlers = {};
 
 handlers[constants.NEW_DOM_TEXT] = function(state, action) {
   return Object.assign({}, state, {
-    text: action.text
+    text: action.text,
+    url: action.url
   });
 };
 
