@@ -5,10 +5,11 @@ const StackingContextNode = createClass({
   render: function() {
     const {node} = this.props;
 
-    console.log(node);
     return div(
-        {className: "stacking-context-node",
-        style: {paddingLeft: node.depth * 10 + "px"}
+        {
+            className: "stacking-context-node-" + node.key,
+            style: {paddingLeft: node.depth * 10 + "px"},
+            key: node.key
         },
         nodeToString(node.el),
         getStackingContextInfo(node)

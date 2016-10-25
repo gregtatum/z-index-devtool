@@ -1,6 +1,6 @@
 const {getText} = require("@tatumcreative/get");
 const constants = require("../constants");
-const {getStackingContextTree} = require("../stacking-context")
+const {getStackingContextTree} = require("../stacking-context");
 
 function fetchNewDomText (url) {
   return function(dispatch, getState) {
