@@ -17,7 +17,6 @@ const ExamplesDropdown = createClass({
             value: url,
             onChange: (event) => {
               this.props.fetchNewExampleHtml(event.target.value);
-              //store.dispatch(fetchNewDomText(event.target.value));
             }
           },
           files.map(file => option(
