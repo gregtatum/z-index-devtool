@@ -6,10 +6,6 @@ const {getText} = require("@tatumcreative/get");
 const ExamplesDropdown = createClass({
   displayName: "ExamplesDropdown",
 
-  handleChange(e) {
-    this.props.fetchNewExampleHtml(e.target.value);
-  },
-
   render() {
     const {store} = this.context;
     const {url} = store.getState().stackingContext;
@@ -19,7 +15,10 @@ const ExamplesDropdown = createClass({
         select(
           {
             value: url,
-            onChange: this.handleChange
+            onChange: (event) => {
+              this.props.fetchNewExampleHtml(event.target.value);
+              //store.dispatch(fetchNewDomText(event.target.value));
+            }
           },
           files.map(file => option(
             {key:file.name, value: file.path},
