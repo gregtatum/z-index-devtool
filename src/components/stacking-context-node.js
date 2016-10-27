@@ -1,5 +1,5 @@
 const {DOM, createClass} = require("react");
-const {div} = DOM;
+const {div, button} = DOM;
 const React = require("react");
 const {selectStackingContextNode} = require("../actions/stacking-context");
 
@@ -11,6 +11,7 @@ const StackingContextNode = createClass({
       focused,
       arrow,
       isExpanded,
+      toggleNode,
     } = this.props;
     const {store} = this.context;
     const {selNode} = store.getState().stackingContext;
@@ -23,16 +24,23 @@ const StackingContextNode = createClass({
     return div(
       {
         className: "stacking-context-node",
-        style: {paddingLeft: node.depth * 10 + "px"},
+        style: {paddingLeft: depth * 10 + "px"},
         key: node.key,
         onClick: (event) => {
-          if (selNode) {
-            selNode.el.classList.remove("selected-node");
-          }
-          node.el.classList.add("selected-node");
-          store.dispatch(selectStackingContextNode(node));
+          // if (selNode) {
+          //   selNode.el.classList.remove("selected-node");
+          // }
+          // node.el.classList.add("selected-node");
+          // store.dispatch(selectStackingContextNode(node));
         }
       },
+      button({
+        className: "arrow",
+        onClick: () => {
+          console.log('toggle')
+          toggleNode(node)
+        }
+      }, "+"),
       nodeToString(node.el),
       getStackingContextInfo(node)
     );

@@ -6,7 +6,7 @@ const {flattenTreeWithDepth} = require("./../stacking-context/");
 
 const StackingContextTree = createClass({
     render() {
-      const {tree} = this.props;
+      const {tree, expandedNodes, toggleNode} = this.props;
       const nodes = flattenTreeWithDepth(tree);
 
       if (tree != undefined) {
@@ -14,28 +14,28 @@ const StackingContextTree = createClass({
         // console.info(nodes);
         return Tree({
           // all top-level nodes
-          getRoots: () => [tree], // all top-level nodes
-          // returns list of nodes if the item is an array (ie top-level, looking at roots)
-          getChildren: item => (item.length > 0) ? item : item.nodes,
-          getParent: item => item.parent,
-          getKey: item => item.key,
+          getRoots: () => tree, // all top-level nodes
+          getChildren: node => node.nodes,
+          getParent: node => node.parent,
+          getKey: node => node.key,
           /*
           until arrow and expanding/collapsed is implemented, all nodes will be considered
           "collapsed" (if they are expanded, they will show in duplicate)
            */
-          isExpanded: () => false,
-          renderItem: (item, depth, focused, arrow, isExpanded) => {
-            // console.warn(item);
+          isExpanded: node => expandedNodes.has(node),
+          renderItem: (node, depth, focused, arrow, isExpanded) => {
+            // console.warn(node);
             return StackingContextNode(
               {
-                node: item,
+                node: node,
                 depth,
                 focused,
                 arrow,
                 isExpanded,
+                toggleNode,
               }
-              // And here is the label for this item.
-              // span({ className: "stacking-context-node-label" }, item.label)
+              // And here is the label for this node.
+              // span({ className: "stacking-context-node-label" }, node.label)
               // ...nodes.map(node => StackingContextNode({node}))
             );
           },
