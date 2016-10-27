@@ -1,5 +1,5 @@
 const {DOM, createClass, createFactory} = require("react");
-const {div} = DOM;
+const {div, span} = DOM;
 const StackingContextNode = createFactory(require("./stacking-context-node"));
 const Tree = createFactory(require("./tree"));
 const {flattenTreeWithDepth} = require("./../stacking-context/");
@@ -10,6 +10,8 @@ const StackingContextTree = createClass({
       const nodes = flattenTreeWithDepth(tree);
 
       if (tree != undefined) {
+        // console.info(tree);
+        // console.info(nodes);
         return Tree({
           // all top-level nodes
           getRoots: () => [tree], // all top-level nodes
@@ -17,17 +19,24 @@ const StackingContextTree = createClass({
           getChildren: item => (item.length > 0) ? item : item.nodes,
           getParent: item => item.parent,
           getKey: item => item.key,
-          isExpanded: () => {},
-          renderItem: (item, depth, focused, arrow, expanded) => {
-            return div(
+          /*
+          until arrow and expanding/collapsed is implemented, all nodes will be considered
+          "collapsed" (if they are expanded, they will show in duplicate)
+           */
+          isExpanded: () => false,
+          renderItem: (item, depth, focused, arrow, isExpanded) => {
+            // console.warn(item);
+            return StackingContextNode(
               {
-                className: "stacking-context-tree",
-              },
-              // Here is the expando arrow so users can toggle expansion and
-              // collapse state.
-              arrow,
+                node: item,
+                depth,
+                focused,
+                arrow,
+                isExpanded,
+              }
               // And here is the label for this item.
-              ...nodes.map(node => StackingContextNode({node}))
+              // span({ className: "stacking-context-node-label" }, item.label)
+              // ...nodes.map(node => StackingContextNode({node}))
             );
           },
           itemHeight: 20
@@ -36,7 +45,6 @@ const StackingContextTree = createClass({
         return div({id: "tree"});
       }
     }
-  })
-  ;
+  });
 
 module.exports = StackingContextTree;

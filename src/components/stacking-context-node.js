@@ -4,13 +4,25 @@ const React = require("react");
 const {selectStackingContextNode} = require("../actions/stacking-context");
 
 const StackingContextNode = createClass({
-  render: function () {
-    const {node} = this.props;
+  render() {
+    let {
+      node,
+      depth,
+      focused,
+      arrow,
+      isExpanded,
+    } = this.props;
     const {store} = this.context;
     const {selNode} = store.getState().stackingContext;
+
+    // console.log("node: " + node);
+    // console.log("depth: " + depth);
+    // console.log("focused: " + focused);
+    // console.log("arrow: " + arrow);
+    // console.log("isExpanded: " + isExpanded);
     return div(
       {
-        className: "stacking-context-node-" + node.key,
+        className: "stacking-context-node",
         style: {paddingLeft: node.depth * 10 + "px"},
         key: node.key,
         onClick: (event) => {
