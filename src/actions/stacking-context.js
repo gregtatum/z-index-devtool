@@ -1,6 +1,6 @@
 const {getText} = require("@tatumcreative/get");
 const constants = require("../constants");
-const {getStackingContextTree} = require("../stacking-context")
+const {getStackingContextTree} = require("../stacking-context");
 
 function fetchNewDomText (url) {
   return function(dispatch, getState) {
@@ -37,8 +37,36 @@ function selectStackingContextNode(node) {
   }
 }
 
+function toggleNode(node) {
+  return function(dispatch, getState) {
+    const {expandedNodes} = getState().stackingContext;
+    return dispatch(
+      expandedNodes.has(node)
+        ? collapseNode(node)
+        : expandNode(node)
+    );
+  }
+}
+
+function expandNode(node) {
+  return {
+    type: constants.EXPAND_NODE,
+    node: node
+  }
+}
+
+function collapseNode(node) {
+  return {
+    type: constants.COLLAPSE_NODE,
+    node: node
+  }
+}
+
 module.exports = {
   fetchNewDomText,
   getStackingContext,
-  selectStackingContextNode
+  selectStackingContextNode,
+  toggleNode,
+  expandNode,
+  collapseNode,
 }
