@@ -14,13 +14,13 @@ const StackingContextTreeView= createFactory(createClass({
 
   render() {
     const {
-      tree
+      tree, expandedNodes, toggleNode
     } = this.props;
 
     return div(
       {className: "sidebar"},
       div({className: "devtools-toolbar"}, "Stacking Context Tree"),
-      StackingContextTree({tree: tree})
+      StackingContextTree({tree, expandedNodes, toggleNode})
     );
   }
 }));

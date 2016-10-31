@@ -5,6 +5,8 @@ const DEFAULT_STATE = {
   containerElement: undefined,
   text: undefined,
   selNode: undefined,
+  expandedNodes: new Set(),
+  reasons: [],
   url: "stacking-context-1.html"
 }
 
@@ -27,6 +29,22 @@ handlers[constants.ADD_STACKING_CONTEXT] = function(state, action) {
 handlers[constants.SELECT_NODE] = function(state, action) {
   return Object.assign({}, state, {
     selNode: action.selNode
+  });
+};
+
+handlers[constants.EXPAND_NODE] = function(state, action) {
+  const expandedNodes = new Set(state.expandedNodes);
+  expandedNodes.add(action.node);
+  return Object.assign({}, state, {
+    expandedNodes
+  });
+};
+
+handlers[constants.COLLAPSE_NODE] = function(state, action) {
+  const expandedNodes = new Set(state.expandedNodes);
+  expandedNodes.delete(action.node);
+  return Object.assign({}, state, {
+    expandedNodes
   });
 };
 
