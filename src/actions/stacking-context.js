@@ -8,7 +8,8 @@ function fetchNewDomText (url) {
       text => {
         dispatch({
           type: constants.NEW_DOM_TEXT,
-          text: text
+          text: text,
+          url: url
         });
       },
       console.error.bind(console)

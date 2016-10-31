@@ -1,28 +1,23 @@
 const {DOM, createClass} = require("react");
 const {div, select, option, label, span} = DOM;
+const React = require("react");
 const {getText} = require("@tatumcreative/get");
 
 const ExamplesDropdown = createClass({
   displayName: "ExamplesDropdown",
 
-  getInitialState() {
-    return { selectValue: "stacking-context-1.html" };
-  },
-
-  handleChange(e) {
-    // TODO, remove any state from component, do this from Redux
-    this.setState({selectValue: e.target.value});
-    this.props.fetchNewExampleHtml(e.target.value);
-  },
-
   render() {
+    const {store} = this.context;
+    const {url} = store.getState().stackingContext;
     return div({className: "examples-dropdown devtools-toolbar"},
       label({title: "Change the markup example"},
         span({}, "Example: "),
         select(
           {
-            value: this.state.selectValue,
-            onChange: this.handleChange
+            value: url,
+            onChange: (event) => {
+              this.props.fetchNewExampleHtml(event.target.value);
+            }
           },
           files.map(file => option(
             {key:file.name, value: file.path},
@@ -66,5 +61,9 @@ const files = [{
     name: "z-index-onclick",
     path: "examples/z-index-onclick.html"
 }];
+
+ExamplesDropdown.contextTypes = {
+  store: React.PropTypes.object
+};
 
 module.exports = ExamplesDropdown;
