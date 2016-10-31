@@ -12,11 +12,6 @@ const StackingContextNode = createClass({
         {className: "stacking-context-node",
         style: {paddingLeft: node.depth * 10 + "px"},
         onClick: (event) => {
-          //make some kind of toggling behaviour
-          if(selNode){
-            selNode.el.classList.remove("selected-node");
-          }
-          node.el.classList.add("selected-node");
           store.dispatch(selectStackingContextNode(node));
         }
         },

@@ -30,6 +30,14 @@ function getStackingContext(containerElement) {
 
 function selectStackingContextNode(node) {
   return function(dispatch, getState) {
+    const currState = getState();
+    const prevSelNode = currState.stackingContext.selNode;
+    //if i use inline style, it becomes much more complicated to
+    //remove without losing any borders that were originally in place
+    if (prevSelNode){
+      prevSelNode.el.classList.remove("selected-node");
+    }
+    node.el.classList.add("selected-node");
     dispatch({
       type: constants.SELECT_NODE,
       selNode: node
