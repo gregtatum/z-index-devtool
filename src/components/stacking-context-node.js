@@ -26,13 +26,20 @@ const StackingContextNode = createClass({
         className: "stacking-context-node",
         style: {paddingLeft: depth * 10 + "px"},
         key: node.key,
+        title: getStackingContextInfo(node),
         onClick: (event) => {
           // if (selNode) {
           //   selNode.el.classList.remove("selected-node");
           // }
           // node.el.classList.add("selected-node");
           // store.dispatch(selectStackingContextNode(node));
-        }
+        },
+        // onMouseOver: (event) => {
+        //   document.getElementById("popup" + node.key).style.display = "block";
+        // },
+        // onMouseOut: (event) => {
+        //   document.getElementById("popup" + node.key).style.display = "none";
+        // }
       },
       button({
         className: "arrow",
@@ -41,8 +48,14 @@ const StackingContextNode = createClass({
           toggleNode(node)
         }
       }, "+"),
-      nodeToString(node.el),
-      getStackingContextInfo(node)
+      // div({
+      //   id: "popup" + node.key,
+      //   className: "popup",
+      //   style: {display: "none", position: "absolute"}
+      //   },
+      //   getStackingContextInfo(node)
+      // ),
+      nodeToString(node.el)
     );
   }
 });
@@ -54,9 +67,18 @@ function nodeToString(el) {
 };
 
 function getStackingContextInfo(node) {
-  // TODO edit this to display the properties and remove unnecessary isstacked stuff
-  return (node.isStackingContext ? " [CONTEXT] " : "") +
-    (node.isStacked ? "[z-index: " + node.index + "]" : "");
+  let properties = node.properties;
+  return ("Z-Index: " + properties.zindex + "\n" +
+          "Filter: " + properties.filter + "\n" +
+          "Mix-Blend-Mode: " + properties.mixBlendMode + "\n" +
+          "Opacity: " + properties.opacity + "\n" +
+          "Perspective: " + properties.perspective + "\n" +
+          "Position: " + properties.position + "\n" +
+          "Transform: " + properties.transform + "\n" +
+          "Will-Change: " + properties.willChange + "\n"+
+          "Has Touch Overflow-Scrolling: " + properties.hasTouchOverflowScrolling + "\n" +
+          "Is a Flex Item: " + properties.isFlexItem + "\n" +
+          "Is Isolated: " + properties.isIsolated + "\n")
 };
 
 StackingContextNode.contextTypes = {

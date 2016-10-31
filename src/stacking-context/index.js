@@ -46,7 +46,6 @@ function getStackingContextProperties(el) {
     filter: style.filter,
     perspective: style.perspective,
     isIsolated: style.isolation === "isolate",
-    position: style.position,
     willChange: style.willChange,
     hasTouchOverflowScrolling: style.WebkitOverflowScrolling === "touch"
   }
