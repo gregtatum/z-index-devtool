@@ -18,6 +18,7 @@ html, body, #app {
   background-color: #fff;
   overflow: hidden;
   background-color: var(--theme-body-background);
+  z-index: 0;
 }
 
 .main-view {
@@ -26,6 +27,7 @@ html, body, #app {
   display:flex;
   align-items: stretch;
   flex-direction: column;
+  z-index: 0;
 }
 
 .dom-container {
@@ -43,9 +45,13 @@ html, body, #app {
 }
 
 .display-rectangle {
-  width:100%;
-  position:fixed;
-  top:0;
-  left:0;
+  position:absolute;
   pointer-events: none;
+  opacity: 0.8;
+  z-index: 1;
+  background-color: orange;
+}
+
+.no-node{
+  display:none;
 }

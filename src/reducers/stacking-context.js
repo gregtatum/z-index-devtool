@@ -4,7 +4,8 @@ const DEFAULT_STATE = {
   tree: undefined,
   containerElement: undefined,
   text: undefined,
-  selNode: undefined
+  selNode: undefined,
+  selElt: undefined
 }
 
 const handlers = {};
@@ -24,7 +25,8 @@ handlers[constants.ADD_STACKING_CONTEXT] = function(state, action) {
 
 handlers[constants.SELECT_NODE] = function(state, action) {
   return Object.assign({}, state, {
-    selNode: action.selNode
+    selNode: action.selNode,
+    selElt: action.selElt
   });
 };
 
