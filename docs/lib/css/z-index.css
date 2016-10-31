@@ -36,8 +36,12 @@ html, body, #app {
   color: #000;
 }
 
-.selected-node {
+.selected-node-dom {
   border-style: solid;
   border-width: 3px;
   border-color: #00f;
+}
+
+.selected-node {
+  font-weight: bold;
 }

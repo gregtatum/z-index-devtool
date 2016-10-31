@@ -45,6 +45,7 @@ const App = createFactory(createClass({
         StackingContextTreeView({
           tree: stackingContext.tree,
           expandedNodes: stackingContext.expandedNodes,
+          selNode: stackingContext.selNode,
           toggleNode: node => dispatch(toggleNode(node))
         })
     );

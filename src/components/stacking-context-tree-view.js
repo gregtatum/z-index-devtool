@@ -14,15 +14,15 @@ const StackingContextTreeView= createFactory(createClass({
 
   render() {
     const {
-      tree, expandedNodes, toggleNode
+      tree, expandedNodes, selNode, toggleNode
     } = this.props;
 
     return div(
       {className: "sidebar"},
       div({className: "devtools-toolbar"}, "Stacking Context Tree"),
-      StackingContextTree({tree, expandedNodes, toggleNode})
+      StackingContextTree({tree, expandedNodes, selNode, toggleNode})
     );
   }
 }));
 
-module.exports = StackingContextTreeView
+module.exports = StackingContextTreeView;
