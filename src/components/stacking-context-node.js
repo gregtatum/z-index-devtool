@@ -54,6 +54,7 @@ function nodeToString(el) {
 };
 
 function getStackingContextInfo(node) {
+  // TODO edit this to display the properties and remove unnecessary isstacked stuff
   return (node.isStackingContext ? " [CONTEXT] " : "") +
     (node.isStacked ? "[z-index: " + node.index + "]" : "");
 };

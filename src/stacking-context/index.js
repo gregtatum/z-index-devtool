@@ -20,12 +20,40 @@ function getWin(el) {
   return el.ownerDocument.defaultView;
 }
 
-function isStacked(el) {
-  return getWin(el).getComputedStyle(el).zIndex !== "auto";
-}
-
 function isElement(el) {
   return el.nodeType && el.nodeType === Node.ELEMENT_NODE;
+}
+
+function getStackingContextProperties(el) {
+  if (!isElement(el)) {
+    return undefined;
+  }
+
+  let win = getWin(el);
+  let style = win.getComputedStyle(el);
+  let parentEl = el.parentNode;
+  let parentStyle = parentEl && isElement(parentEl)
+                    ? win.getComputedStyle(parentEl)
+                    : {};
+  return {
+    zindex: style.zIndex,
+    isRoot: el === el.ownerDocument.documentElement,
+    position: style.position,
+    isFlexItem: parentStyle.display === "flex" || parentStyle.display === "inline-flex",
+    opacity: style.opacity,
+    transform: style.transform,
+    mixBlendMode: style.mixBlendMode,
+    filter: style.filter,
+    perspective: style.perspective,
+    isIsolated: style.isolation === "isolate",
+    position: style.position,
+    willChange: style.willChange,
+    hasTouchOverflowScrolling: style.WebkitOverflowScrolling === "touch"
+  }
+}
+
+function isStacked(el) {
+  return getWin(el).getComputedStyle(el).zIndex !== "auto";
 }
 
 function isStackingContext(el) {
@@ -77,6 +105,7 @@ function getStackingContextTree(root, treeNodes = [], parent) {
   for (let child of root.children) {
     let isChildStacked = isStacked(child);
     let isChildStackingContext = isStackingContext(child);
+    let stackingContextProperties = getStackingContextProperties(child);
     let newNode;
 
     if (isChildStacked || isChildStackingContext) {
@@ -87,7 +116,8 @@ function getStackingContextTree(root, treeNodes = [], parent) {
         index: isChildStacked ? parseInt(getComputedStyle(child).zIndex, 10) : undefined,
         isStackingContext: isChildStackingContext,
         nodes: [],
-        parent
+        parent,
+        properties: stackingContextProperties
       };
       treeNodes.push(newNode);
     }
