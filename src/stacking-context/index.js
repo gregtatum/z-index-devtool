@@ -73,6 +73,7 @@ function isStackingContext(el) {
 }
 
 function getStackingContextTree(root, treeNodes = [], parent) {
+  let counter = 0;
   for (let child of root.children) {
     let isChildStacked = isStacked(child);
     let isChildStackingContext = isStackingContext(child);
@@ -81,6 +82,7 @@ function getStackingContextTree(root, treeNodes = [], parent) {
     if (isChildStacked || isChildStackingContext) {
       newNode = {
         el: child,
+        key: (parent === undefined) ? counter++ : parent.key + "-" + counter++,
         isStacked: isChildStacked,
         index: isChildStacked ? parseInt(getComputedStyle(child).zIndex, 10) : undefined,
         isStackingContext: isChildStackingContext,

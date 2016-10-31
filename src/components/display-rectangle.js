@@ -19,7 +19,6 @@ const DisplayRectangle = createClass({
             }
         }
       );
-
   }
 });
 

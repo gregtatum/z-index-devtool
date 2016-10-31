@@ -4,7 +4,8 @@ const {connect} = require("react-redux");
 
 const {
   fetchNewDomText,
-  getStackingContext
+  getStackingContext,
+  toggleNode,
 } = require("../actions/stacking-context");
 
 const MainView = createFactory(require("./main-view"));
@@ -44,7 +45,11 @@ const App = createFactory(createClass({
           //props for display rectangle
           elt: stackingContext.selElt
         }),
-        StackingContextTreeView({tree: stackingContext.tree})
+        StackingContextTreeView({
+          tree: stackingContext.tree,
+          expandedNodes: stackingContext.expandedNodes,
+          toggleNode: node => dispatch(toggleNode(node))
+        })
     );
   }
 }));
