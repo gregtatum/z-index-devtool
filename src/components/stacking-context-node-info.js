@@ -1,5 +1,5 @@
 const {DOM, createClass, createFactory} = require("react");
-const {div, span} = DOM;
+const {div} = DOM;
 const React = require("react");
 
 const StackingContextNodeInfo = createClass({
