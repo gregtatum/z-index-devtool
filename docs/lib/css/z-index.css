@@ -41,3 +41,14 @@ html, body, #app {
   border-width: 3px;
   border-color: #00f;
 }
+
+.node-info {
+  position: absolute;
+  bottom: 0;
+  padding: 5px;
+  white-space: pre;
+  border-width: thin 0 0 0;
+  border-color: grey;
+  border-style: solid;
+  width: 100%;
+}

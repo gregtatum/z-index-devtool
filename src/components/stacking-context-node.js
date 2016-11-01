@@ -32,14 +32,10 @@ const StackingContextNode = createClass({
           //   selNode.el.classList.remove("selected-node");
           // }
           // node.el.classList.add("selected-node");
-          // store.dispatch(selectStackingContextNode(node));
+
+          // USING selNode TO DISPLAY THE STACKING CONTEXT INFO BASED ON SELECTED NODE
+          store.dispatch(selectStackingContextNode(node));
         },
-        // onMouseOver: (event) => {
-        //   document.getElementById("popup" + node.key).style.display = "block";
-        // },
-        // onMouseOut: (event) => {
-        //   document.getElementById("popup" + node.key).style.display = "none";
-        // }
       },
       button({
         className: "arrow",
@@ -48,13 +44,6 @@ const StackingContextNode = createClass({
           toggleNode(node)
         }
       }, "+"),
-      // div({
-      //   id: "popup" + node.key,
-      //   className: "popup",
-      //   style: {display: "none", position: "absolute"}
-      //   },
-      //   getStackingContextInfo(node)
-      // ),
       nodeToString(node.el)
     );
   }
@@ -66,6 +55,8 @@ function nodeToString(el) {
     (el.className && el.className.trim && el.className.trim() !== "" ? "." + el.className.trim().split(" ").join(".") : "");
 };
 
+// Duplicated code from stacking-context-node-info just to showcase what a
+// popup would look like. Can remove if not needed.
 function getStackingContextInfo(node) {
   let properties = node.properties;
   return ("Z-Index: " + properties.zindex + "\n" +
