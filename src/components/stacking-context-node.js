@@ -1,5 +1,5 @@
 const {DOM, createClass} = require("react");
-const {div, span, button} = DOM;
+const {div, span} = DOM;
 const React = require("react");
 const {selectStackingContextNode} = require("../actions/stacking-context");
 
@@ -10,8 +10,7 @@ const StackingContextNode = createClass({
       depth,
       focused,
       arrow,
-      isExpanded,
-      toggleNode,
+      isExpanded // used automagically in 'arrow'
     } = this.props;
     const {store} = this.context;
 
@@ -25,28 +24,20 @@ const StackingContextNode = createClass({
         className,
         style: {paddingLeft: depth * 10 + "px"},
         key: node.key,
-        onClick: (event) => {
-          // if (selNode) {
-          //   selNode.el.classList.remove("selected-node-dom");
-          // }
-          // node.el.classList.add("selected-node-dom");
-          // store.dispatch(selectStackingContextNode(node));
-        }
       },
-      button({
-        className: "arrow",
-        onClick: () => {
-          toggleNode(node)
-        }
-      }, isExpanded ? "-" : "+"),
-      span({
-        className: "label",
-        onClick: () => {
-          store.dispatch(selectStackingContextNode(node));
-        }
-      },
+      span({},
+        arrow,
         nodeToString(node.el),
-        getStackingContextInfo(node)
+        getStackingContextInfo(node),
+        // temporary solution for selecting a node
+        // (to allow testing of node selection)
+        span({
+          style: {marginLeft: "5px", cursor: "pointer"},
+          className: "select-icon",
+          onClick: () => {
+            store.dispatch(selectStackingContextNode(node));
+          }
+        }, "☚") // dat unicode tho
       )
     );
   }

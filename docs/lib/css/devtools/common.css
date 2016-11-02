@@ -704,7 +704,7 @@ checkbox:-moz-focusring {
   width: 14px;
   height: 14px;
   background-repeat: no-repeat;
-  background-image: url("chrome://devtools/skin/images/controls.png");
+  background-image: url("../../img/controls.png");
   background-size: 56px 28px;
 }
 
@@ -755,7 +755,7 @@ checkbox:-moz-focusring {
 
 @media (min-resolution: 1.1dppx) {
   .theme-twisty, .theme-checkbox {
-    background-image: url("chrome://devtools/skin/images/controls@2x.png");
+    background-image: url("../../img/controls@2x.png");
   }
 }
 

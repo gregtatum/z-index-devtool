@@ -43,5 +43,10 @@ html, body, #app {
 }
 
 .selected-node {
+  background-color: rgba(0, 0, 0, 0.04);
   font-weight: bold;
+}
+/* not sure why this isn't automatically included in tree.js... */
+.arrow {
+  display: inline-block;
 }
