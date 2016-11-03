@@ -5,20 +5,19 @@ const {selectStackingContextNode} = require("../actions/stacking-context");
 
 const StackingContextNode = createClass({
   render() {
-    let {
+    const {
       node,
       depth,
-      focused,
+      isFocused,
       arrow,
       isExpanded // used automagically in 'arrow'
     } = this.props;
     const {store} = this.context;
 
     let className = "stacking-context-node";
-    if (focused) {
+    if (isFocused) {
       className += " selected-node";
     }
-
     return div(
       {
         className,
@@ -27,17 +26,14 @@ const StackingContextNode = createClass({
       },
       span({},
         arrow,
-        nodeToString(node.el),
-        getStackingContextInfo(node),
-        // temporary solution for selecting a node
-        // (to allow testing of node selection)
         span({
-          style: {marginLeft: "5px", cursor: "pointer"},
-          className: "select-icon",
           onClick: () => {
             store.dispatch(selectStackingContextNode(node));
           }
-        }, "☚") // dat unicode tho
+        },
+        nodeToString(node.el),
+        getStackingContextInfo(node)
+        )
       )
     );
   }

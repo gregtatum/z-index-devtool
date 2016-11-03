@@ -5,7 +5,7 @@ const {connect} = require("react-redux");
 const StackingContextTree = createFactory(require("./stacking-context-tree"));
 const { todo } = require("../actions/stacking-context");
 
-const StackingContextTreeView= createFactory(createClass({
+const StackingContextTreeView = createFactory(createClass({
   displayName: "StackingContextTreeView",
 
   componentWillMount() {

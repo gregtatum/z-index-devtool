@@ -1,13 +1,16 @@
 const {DOM, createClass, createFactory} = require("react");
-const {div, span} = DOM;
+const {div} = DOM;
 const StackingContextNode = createFactory(require("./stacking-context-node"));
 const Tree = createFactory(require("./tree"));
-const {flattenTreeWithDepth} = require("./../stacking-context/");
 
 const StackingContextTree = createClass({
     render() {
-      const {tree, expandedNodes, selNode, toggleNode} = this.props;
-      const nodes = flattenTreeWithDepth(tree);
+      const {
+        tree,
+        expandedNodes,
+        selNode,
+        toggleNode
+      } = this.props;
 
       if (tree != undefined) {
         return Tree({
@@ -16,19 +19,20 @@ const StackingContextTree = createClass({
           getParent: node => node.parent,
           getKey: node => node.key,
           isExpanded: node => expandedNodes.has(node),
-          renderItem: (node, depth, focused, arrow, isExpanded) => {
+          renderItem: (node, depth, isFocused, arrow, isExpanded) => {
             return StackingContextNode(
               {
                 node,
                 depth,
-                focused: selNode === node, //: store.getState().stackingContext.
+                isFocused: selNode === node,
                 arrow,
                 isExpanded,
-                toggleNode,
               }
             );
           },
-          itemHeight: 20
+          onExpand: toggleNode,
+          onCollapse: toggleNode,
+          itemHeight: 10
         });
       } else {
         return div({id: "tree"});
