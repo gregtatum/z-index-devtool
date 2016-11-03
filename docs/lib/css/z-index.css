@@ -36,17 +36,55 @@ html, body, #app {
   color: #000;
 }
 
+.devtools-toolbar {
+  background-color: var(--theme-toolbar-background);
+}
+
 .selected-node-dom {
   border-style: solid;
   border-width: 3px;
   border-color: #00f;
 }
+/* CSS Variables specific to this panel that aren't defined by the themes */
+.theme-dark {
+  --cell-border-color: rgba(255,255,255,0.15);
+  --cell-border-color-light: rgba(255,255,255,0.1);
+  --focus-cell-border-color: rgba(255,255,255,0.5);
+  --row-alt-background-color: rgba(86, 117, 185, 0.15);
+  --row-hover-background-color: rgba(86, 117, 185, 0.25);
+}
 
-.selected-node {
-  background-color: rgba(0, 0, 0, 0.04);
-  font-weight: bold;
+.theme-light {
+  --cell-border-color: rgba(0,0,0,0.15);
+  --cell-border-color-light: rgba(0,0,0,0.1);
+  --focus-cell-border-color: rgba(0,0,0,0.3);
+  --row-alt-background-color: rgba(76,158,217,0.1);
+  --row-hover-background-color: rgba(76,158,217,0.2);
+}
+
+
+.tree-node {
+  background-color: var(--theme-body-background);
+  cursor: default;
+}
+.tree-node-odd {
+  background-color: var(--row-alt-background-color);
+}
+
+.tree-node:hover {
+  background-color: var(--row-hover-background-color);
+}
+.stacking-context-node.focused {
+  background-color: var(--theme-selection-background);
+  color: var(--theme-selection-color);
+}
+
+.stacking-context-node.focused ::-moz-selection {
+  background-color: var(--theme-selection-color);
+  color: var(--theme-selection-background);
 }
 /* not sure why this isn't automatically included in tree.js... */
 .arrow {
   display: inline-block;
 }
+

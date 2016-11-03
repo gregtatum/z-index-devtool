@@ -16,7 +16,7 @@ const StackingContextNode = createClass({
 
     let className = "stacking-context-node";
     if (isFocused) {
-      className += " selected-node";
+      className += " focused";
     }
     return div(
       {
