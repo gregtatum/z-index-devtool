@@ -4,7 +4,7 @@ const {getStackingContextTree} = require("../stacking-context");
 
 function fetchNewDomText (url, getText = getTextModule) {
   return function(dispatch, getState) {
-    getText(url).then(
+    return getText(url).then(
       text => {
         dispatch({
           type: constants.NEW_DOM_TEXT,
@@ -14,7 +14,7 @@ function fetchNewDomText (url, getText = getTextModule) {
       },
       console.error.bind(console)
     );
-  }
+  };
 }
 
 function getStackingContext(containerElement) {

@@ -5,21 +5,37 @@
 */
 var assert = require('assert');
 const {createStoreFixture} = require('./store-fixture');
-const textBits = require('./utils');
-//const {expandNode, collapseNode} = require('../src/actions/stacking-context');
+const {textMarkup, mockGetTextModule} = require('./utils');
+const {
+  fetchNewDomText,
+  getStackingContext,
+  expandNode,
+  collapseNode
+} = require('../src/actions/stacking-context');
 
 
+const store = createStoreFixture();
 
-  describe('store fixture', function() {
-    describe('dispatch fetchNewDomText', function() {
-      it('fills a mock store', function() {
-        return createStoreFixture().then(function(store){
-          assert.equal(store.getState().stackingContext.url, 'test/test.html');
-          assert.equal(store.getState().stackingContext.text, textBits.TEXT_MARKUP);
-        });
-      });
+describe('store fixture', function() {
+  it('updates store url & text', function() {
+    store.dispatch(
+      fetchNewDomText('test/test.html', mockGetTextModule)
+    ).then(() => {
+      assert.equal(store.getState().stackingContext.url, 'test/test.html');
+      assert.equal(store.getState().stackingContext.text, textMarkup);
     });
   });
+  //it('updates store tree', function() {
+    //parse store.getState().stackingContext.text?
+    //get the containerElement?????
+    //store.dispatch(
+      //getStackingContext(document)
+    //).then(()=>{
+    //  assert(.....)
+    //}
+  //});
+  //});
+});
 
 
 
