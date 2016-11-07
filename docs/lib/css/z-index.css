@@ -52,8 +52,17 @@ html, body, #app {
   width: 100%;
 }
 
+.stacking-context-info-table {
+  border-collapse: collapse;
+  text-align: left;
+}
+
 .stacking-context-info-value {
   padding-left: 8px;
   color: #00c1c1;
   font-weight: bold;
+}
+
+.stacking-context-info-header-value {
+  padding-left: 8px;
 }

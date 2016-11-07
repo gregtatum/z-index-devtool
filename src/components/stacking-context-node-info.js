@@ -17,12 +17,11 @@ const StackingContextNodeInfo = createClass({
 
 });
 
-function createTableRow(label, value) {
-  return tr({key: label,
+function createTableRow(property, value) {
+  return tr({key: property,
     className: "stacking-context-info-row"},
-    td({className: "stacking-context-info-label"}, label),
-    td({className: "stacking-context-info-value",
-      style: {paddingLeft: "8px"}}, value));
+    td({className: "stacking-context-info-label"}, property),
+    td({className: "stacking-context-info-value"}, value));
 }
 
 function getStackingContextInfo(node) {
@@ -44,10 +43,12 @@ function getStackingContextInfo(node) {
   if (properties.hasTouchOverflowScrolling) tableRows.push(createTableRow("Has Touch Overflow-Scrolling", properties.hasTouchOverflowScrolling));
   if (properties.isStacked && properties.isFlexItem) tableRows.push(createTableRow("Is a Flex Item:", properties.isFlexItem));
   if (properties.isIsolated) tableRows.push(createTableRow("Is Isolated", properties.isIsolated));
-  //if () tableRows.push(createTableRow("", ));
 
   return table({className: "stacking-context-info-table"},
     tbody({},
+      tr({},
+        th({className: "stacking-context-info-header-label"}, "Property"),
+        th({className: "stacking-context-info-header-value"}, "Value")),
       tableRows
     )
   );
