@@ -1,5 +1,5 @@
 const {DOM, createClass} = require("react");
-const {div, button} = DOM;
+const {div, button, span} = DOM;
 const React = require("react");
 const {selectStackingContextNode} = require("../actions/stacking-context");
 
@@ -16,6 +16,11 @@ const StackingContextNode = createClass({
     const {store} = this.context;
     const {selNode} = store.getState().stackingContext;
 
+    const notStackingContextStyle = {
+      style: {opacity: '0.7'},
+      title: "This element is not part of the stacking context."
+    }
+
     // console.log("node: " + node);
     // console.log("depth: " + depth);
     // console.log("focused: " + focused);
@@ -26,7 +31,6 @@ const StackingContextNode = createClass({
         className: "stacking-context-node",
         style: {paddingLeft: depth * 10 + "px"},
         key: node.key,
-        title: getStackingContextInfo(node),
         onClick: (event) => {
           // if (selNode) {
           //   selNode.el.classList.remove("selected-node");
@@ -44,7 +48,9 @@ const StackingContextNode = createClass({
           toggleNode(node)
         }
       }, "+"),
-      nodeToString(node.el)
+      span (node.properties.isStackingContext? {} : notStackingContextStyle,
+        nodeToString(node.el),
+        getStackingContextInfo(node))
     );
   }
 });
@@ -55,21 +61,10 @@ function nodeToString(el) {
     (el.className && el.className.trim && el.className.trim() !== "" ? "." + el.className.trim().split(" ").join(".") : "");
 };
 
-// Duplicated code from stacking-context-node-info just to showcase what a
-// popup would look like. Can remove if not needed.
 function getStackingContextInfo(node) {
   let properties = node.properties;
-  return ("Z-Index: " + properties.zindex + "\n" +
-          "Filter: " + properties.filter + "\n" +
-          "Mix-Blend-Mode: " + properties.mixBlendMode + "\n" +
-          "Opacity: " + properties.opacity + "\n" +
-          "Perspective: " + properties.perspective + "\n" +
-          "Position: " + properties.position + "\n" +
-          "Transform: " + properties.transform + "\n" +
-          "Will-Change: " + properties.willChange + "\n"+
-          "Has Touch Overflow-Scrolling: " + properties.hasTouchOverflowScrolling + "\n" +
-          "Is a Flex Item: " + properties.isFlexItem + "\n" +
-          "Is Isolated: " + properties.isIsolated + "\n")
+  return (properties.isStackingContext ? " [CONTEXT] " : " [NOT CONTEXT] ") +
+    (properties.isStacked ? "[z-index: " + properties.zindex + "]" : "");
 };
 
 StackingContextNode.contextTypes = {

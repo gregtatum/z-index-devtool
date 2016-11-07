@@ -1,5 +1,5 @@
 const {DOM, createClass, createFactory} = require("react");
-const {div} = DOM;
+const {div, table, tr, td, th, tbody} = DOM;
 const React = require("react");
 
 const StackingContextNodeInfo = createClass({
@@ -17,19 +17,40 @@ const StackingContextNodeInfo = createClass({
 
 });
 
+function createTableRow(label, value) {
+  return tr({key: label,
+    className: "stacking-context-info-row"},
+    td({className: "stacking-context-info-label"}, label),
+    td({className: "stacking-context-info-value",
+      style: {paddingLeft: "8px"}}, value));
+}
+
 function getStackingContextInfo(node) {
   let properties = node.properties;
-  return ("Z-Index: " + properties.zindex + "\n" +
-    "Filter: " + properties.filter + "\n" +
-    "Mix-Blend-Mode: " + properties.mixBlendMode + "\n" +
-    "Opacity: " + properties.opacity + "\n" +
-    "Perspective: " + properties.perspective + "\n" +
-    "Position: " + properties.position + "\n" +
-    "Transform: " + properties.transform + "\n" +
-    "Will-Change: " + properties.willChange + "\n"+
-    "Has Touch Overflow-Scrolling: " + properties.hasTouchOverflowScrolling + "\n" +
-    "Is a Flex Item: " + properties.isFlexItem + "\n" +
-    "Is Isolated: " + properties.isIsolated + "\n");
+  let tableRows = [];
+  let willChange = properties.willChange.split(", ").some(p => {
+    return p === "position" || p === "opacity" ||
+           p === "transform" || p === "filter" ||
+           p === "perspective" || p === "isolation";
+  });
+  if (properties.isStacked) tableRows.push(createTableRow("Z-Index", properties.zindex));
+  if (properties.filter !== "none") tableRows.push(createTableRow("Filter", properties.filter));
+  if (properties.mixBlendMode !== "normal") tableRows.push(createTableRow("Mix-Blend-Mode", properties.mixBlendMode));
+  if (properties.opacity !== "1") tableRows.push(createTableRow("Opacity", properties.opacity));
+  if (properties.perspective !== "none") tableRows.push(createTableRow("Perspective", properties.perspective));
+  if (properties.position !== "static") tableRows.push(createTableRow("Position", properties.position));
+  if (properties.transform !== "none") tableRows.push(createTableRow("Transform", properties.transform));
+  if (willChange) tableRows.push(createTableRow("Will-Change", properties.willChange));
+  if (properties.hasTouchOverflowScrolling) tableRows.push(createTableRow("Has Touch Overflow-Scrolling", properties.hasTouchOverflowScrolling));
+  if (properties.isStacked && properties.isFlexItem) tableRows.push(createTableRow("Is a Flex Item:", properties.isFlexItem));
+  if (properties.isIsolated) tableRows.push(createTableRow("Is Isolated", properties.isIsolated));
+  //if () tableRows.push(createTableRow("", ));
+
+  return table({className: "stacking-context-info-table"},
+    tbody({},
+      tableRows
+    )
+  );
 };
 
 StackingContextNodeInfo.contextTypes = {
