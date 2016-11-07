@@ -22,6 +22,9 @@ const StackingContextNode = createClass({
       {
         className,
         key: node.key,
+        onClick: () => {
+          store.dispatch(selectStackingContextNode(node));
+        }
       },
 
       span({className: "stacking-context-node-info2"},
@@ -39,9 +42,6 @@ const StackingContextNode = createClass({
         },
         arrow,
         span({
-          onClick: () => {
-            store.dispatch(selectStackingContextNode(node));
-          }
         },
         getNodeContainerName(node.el)
         )
