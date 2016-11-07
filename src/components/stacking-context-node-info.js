@@ -46,7 +46,7 @@ function getStackingContextInfo(node) {
 
   return table({className: "stacking-context-info-table"},
     tbody({},
-      tr({},
+      tr({className: "stacking-context-info-header-row"},
         th({className: "stacking-context-info-header-label"}, "Property"),
         th({className: "stacking-context-info-header-value"}, "Value")),
       tableRows
