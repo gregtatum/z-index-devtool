@@ -1,48 +1,40 @@
 const {DOM, createClass} = require("react");
-const {div, button} = DOM;
+const {div, span} = DOM;
 const React = require("react");
 const {selectStackingContextNode} = require("../actions/stacking-context");
 
 const StackingContextNode = createClass({
   render() {
-    let {
+    const {
       node,
       depth,
-      focused,
+      isFocused,
       arrow,
-      isExpanded,
-      toggleNode,
+      isExpanded // used automagically in 'arrow'
     } = this.props;
     const {store} = this.context;
-    const {selNode} = store.getState().stackingContext;
 
-    // console.log("node: " + node);
-    // console.log("depth: " + depth);
-    // console.log("focused: " + focused);
-    // console.log("arrow: " + arrow);
-    // console.log("isExpanded: " + isExpanded);
+    let className = "stacking-context-node";
+    if (isFocused) {
+      className += " selected-node";
+    }
     return div(
       {
-        className: "stacking-context-node",
+        className,
         style: {paddingLeft: depth * 10 + "px"},
         key: node.key,
-        onClick: (event) => {
-          // if (selNode) {
-          //   selNode.el.classList.remove("selected-node");
-          // }
-          // node.el.classList.add("selected-node");
-          // store.dispatch(selectStackingContextNode(node));
-        }
       },
-      button({
-        className: "arrow",
-        onClick: () => {
-          console.log('toggle')
-          toggleNode(node)
-        }
-      }, "+"),
-      nodeToString(node.el),
-      getStackingContextInfo(node)
+      span({},
+        arrow,
+        span({
+          onClick: () => {
+            store.dispatch(selectStackingContextNode(node));
+          }
+        },
+        nodeToString(node.el),
+        getStackingContextInfo(node)
+        )
+      )
     );
   }
 });
