@@ -21,25 +21,36 @@ const StackingContextNode = createClass({
     return div(
       {
         className,
-        style: {paddingLeft: depth * 10 + "px"},
         key: node.key,
       },
-      span({},
+
+      span({className: "stacking-context-node-info2"},
+        node.isStacked ? "(in stacking context)" : "(not in stacking context)"
+      ),
+
+      span({className: "stacking-context-node-info"},
+        "z: " + node.index
+      ),
+
+      span(
+        {
+          className: "stacking-context-node-name",
+          style: {paddingLeft: depth * 10 + "px"},
+        },
         arrow,
         span({
           onClick: () => {
             store.dispatch(selectStackingContextNode(node));
           }
         },
-        nodeToString(node.el),
-        getStackingContextInfo(node)
+        getNodeContainerName(node.el)
         )
       )
     );
   }
 });
 
-function nodeToString(el) {
+function getNodeContainerName(el) {
   return el.tagName.toLowerCase() +
     (el.id.trim() !== "" ? "#" + el.id.trim() : "") +
     (el.className && el.className.trim && el.className.trim() !== "" ? "." + el.className.trim().split(" ").join(".") : "");
