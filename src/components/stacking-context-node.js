@@ -1,5 +1,5 @@
 const {DOM, createClass} = require("react");
-const {div, span} = DOM;
+const {div, button, span} = DOM;
 const React = require("react");
 const {selectStackingContextNode} = require("../actions/stacking-context");
 
@@ -18,6 +18,7 @@ const StackingContextNode = createClass({
     if (isFocused) {
       className += " selected-node";
     }
+
     return div(
       {
         className,
@@ -29,11 +30,12 @@ const StackingContextNode = createClass({
         span({
           onClick: () => {
             store.dispatch(selectStackingContextNode(node));
-          }
+          },
+          style: node.properties.isStackingContext? {} : {opacity: '0.7'},
+          title: node.properties.isStackingContext? "" : "This element is not part of the stacking context."
         },
         nodeToString(node.el),
-        getStackingContextInfo(node)
-        )
+        getStackingContextInfo(node))
       )
     );
   }
@@ -46,8 +48,9 @@ function nodeToString(el) {
 };
 
 function getStackingContextInfo(node) {
-  return (node.isStackingContext ? " [CONTEXT] " : "") +
-    (node.isStacked ? "[z-index: " + node.index + "]" : "");
+  let properties = node.properties;
+  return (properties.isStackingContext ? " [CONTEXT] " : " [NOT CONTEXT] ") +
+    (properties.isStacked ? "[z-index: " + properties.zindex + "]" : "");
 };
 
 StackingContextNode.contextTypes = {
