@@ -19,6 +19,10 @@ const StackingContextNode = createClass({
       className += " selected-node";
     }
 
+    if (!node.properties.isStackingContext) {
+      className += " not-in-context";
+    }
+
     return div(
       {
         className,
@@ -28,12 +32,12 @@ const StackingContextNode = createClass({
         }
       },
 
-      span({className: "stacking-context-node-info2"},
-        node.isStacked ? "(in stacking context)" : "(not in stacking context)"
+      span({className: "stacking-context-node-context"},
+          node.properties.isStackingContext ? "✔" : "✘"
       ),
 
-      span({className: "stacking-context-node-info"},
-        "z: " + node.index
+      span({className: "stacking-context-node-z"},
+        node.index
       ),
 
       span(
@@ -46,11 +50,9 @@ const StackingContextNode = createClass({
           onClick: () => {
             store.dispatch(selectStackingContextNode(node));
           },
-          style: node.properties.isStackingContext? {} : {opacity: '0.7'},
           title: node.properties.isStackingContext? "" : "This element is not part of the stacking context."
         },
-        nodeToString(node.el),
-        getStackingContextInfo(node))
+        getNodeContainerName(node.el))
       )
     );
   }
@@ -60,12 +62,6 @@ function getNodeContainerName(el) {
   return el.tagName.toLowerCase() +
     (el.id.trim() !== "" ? "#" + el.id.trim() : "") +
     (el.className && el.className.trim && el.className.trim() !== "" ? "." + el.className.trim().split(" ").join(".") : "");
-};
-
-function getStackingContextInfo(node) {
-  let properties = node.properties;
-  return (properties.isStackingContext ? " [CONTEXT] " : " [NOT CONTEXT] ") +
-    (properties.isStacked ? "[z-index: " + properties.zindex + "]" : "");
 };
 
 StackingContextNode.contextTypes = {

@@ -95,36 +95,32 @@ html, body, #app {
 }
 /* FLEX */
 .stacking-context-node-name,
-.stacking-context-node-info,
-.stacking-context-node-info2 {
+.stacking-context-node-z,
+.stacking-context-node-context {
   display: inline-flex;
   text-align: end;
   align-items: center;
   border-left: var(--cell-border-color) 1px solid;
   padding-left: 5px;
 }
-.stacking-context-node-info {
-  width: 10%;
+.stacking-context-node-z {
+  width: 7ch;
 }
-.stacking-context-node-info2 {
-  width: 25%;
-  font-style: italic;
+.stacking-context-node-context {
+  width: 2ch;
 }
 .stacking-context-node-name {
   flex: 1; /* expand to occupy rest of row */
 }
-/* not sure why this isn't automatically included in tree.js... */
-.arrow {
-  display: inline-block;
+.not-in-context {
+  opacity: 0.7;
 }
 
 .node-info {
   position: absolute;
   bottom: 0;
   padding: 5px;
-  border-width: thin 0 0 0;
-  border-color: grey;
-  border-style: solid;
+  border-top: var(--cell-border-color) 1px solid;
   width: 100%;
 }
 
@@ -135,10 +131,18 @@ html, body, #app {
 
 .stacking-context-info-value {
   padding-left: 8px;
-  color: #00c1c1;
+  color: var(--theme-highlight-blue);
   font-weight: bold;
 }
 
 .stacking-context-info-header-value {
   padding-left: 8px;
+}
+
+.header {
+  display: flex;
+  color: var(--theme-body-color);
+  background-color: var(--theme-tab-toolbar-background);
+  border-bottom: 1px solid var(--cell-border-color);
+  flex: 0;
 }
