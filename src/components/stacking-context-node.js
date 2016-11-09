@@ -5,52 +5,38 @@ const {selectStackingContextNode} = require("../actions/stacking-context");
 
 const StackingContextNode = createClass({
   render() {
-    let {
+    const {
       node,
       depth,
-      focused,
+      isFocused,
       arrow,
-      isExpanded,
-      toggleNode,
+      isExpanded // used automagically in 'arrow'
     } = this.props;
     const {store} = this.context;
-    const {selNode} = store.getState().stackingContext;
 
-    const notStackingContextStyle = {
-      style: {opacity: '0.7'},
-      title: "This element is not part of the stacking context."
+    let className = "stacking-context-node";
+    if (isFocused) {
+      className += " selected-node";
     }
 
-    // console.log("node: " + node);
-    // console.log("depth: " + depth);
-    // console.log("focused: " + focused);
-    // console.log("arrow: " + arrow);
-    // console.log("isExpanded: " + isExpanded);
     return div(
       {
-        className: "stacking-context-node",
+        className,
         style: {paddingLeft: depth * 10 + "px"},
         key: node.key,
-        onClick: (event) => {
-          // if (selNode) {
-          //   selNode.el.classList.remove("selected-node");
-          // }
-          // node.el.classList.add("selected-node");
-
-          // USING selNode TO DISPLAY THE STACKING CONTEXT INFO BASED ON SELECTED NODE
-          store.dispatch(selectStackingContextNode(node));
-        },
       },
-      button({
-        className: "arrow",
-        onClick: () => {
-          console.log('toggle')
-          toggleNode(node)
-        }
-      }, "+"),
-      span (node.properties.isStackingContext? {} : notStackingContextStyle,
+      span({},
+        arrow,
+        span({
+          onClick: () => {
+            store.dispatch(selectStackingContextNode(node));
+          },
+          style: node.properties.isStackingContext? {} : {opacity: '0.7'},
+          title: node.properties.isStackingContext? "" : "This element is not part of the stacking context."
+        },
         nodeToString(node.el),
         getStackingContextInfo(node))
+      )
     );
   }
 });

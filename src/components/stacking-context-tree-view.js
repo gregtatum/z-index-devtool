@@ -6,7 +6,7 @@ const StackingContextTree = createFactory(require("./stacking-context-tree"));
 const StackingContextNodeInfo = createFactory(require("./stacking-context-node-info"));
 const { todo } = require("../actions/stacking-context");
 
-const StackingContextTreeView= createFactory(createClass({
+const StackingContextTreeView = createFactory(createClass({
   displayName: "StackingContextTreeView",
 
   componentWillMount() {
@@ -15,16 +15,16 @@ const StackingContextTreeView= createFactory(createClass({
 
   render() {
     const {
-      tree, expandedNodes, toggleNode
+      tree, expandedNodes, selNode, toggleNode
     } = this.props;
 
     return div(
       {className: "sidebar"},
       div({className: "devtools-toolbar"}, "Stacking Context Tree"),
-      StackingContextTree({tree, expandedNodes, toggleNode}),
+      StackingContextTree({tree, expandedNodes, selNode, toggleNode}),
       StackingContextNodeInfo()
     );
   }
 }));
 
-module.exports = StackingContextTreeView
+module.exports = StackingContextTreeView;
