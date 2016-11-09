@@ -20,17 +20,13 @@ function getWin(el) {
   return el.ownerDocument.defaultView;
 }
 
-function isStacked(el) {
-  return getWin(el).getComputedStyle(el).zIndex !== "auto";
-}
-
 function isElement(el) {
   return el.nodeType && el.nodeType === Node.ELEMENT_NODE;
 }
 
-function isStackingContext(el) {
+function getStackingContextProperties(el) {
   if (!isElement(el)) {
-    return false;
+    return undefined;
   }
 
   let win = getWin(el);
@@ -39,55 +35,63 @@ function isStackingContext(el) {
   let parentStyle = parentEl && isElement(parentEl)
                     ? win.getComputedStyle(parentEl)
                     : {};
+  let nodeProperties = {
+    isStacked: style.zIndex !== "auto",
+    zindex: style.zIndex,
+    isRoot: el === el.ownerDocument.documentElement,
+    position: style.position,
+    isFlexItem: parentStyle.display === "flex" || parentStyle.display === "inline-flex",
+    opacity: style.opacity,
+    transform: style.transform,
+    mixBlendMode: style.mixBlendMode,
+    filter: style.filter,
+    perspective: style.perspective,
+    isIsolated: style.isolation === "isolate",
+    willChange: style.willChange,
+    hasTouchOverflowScrolling: style.WebkitOverflowScrolling === "touch"
+  }
 
-  let isRoot = el === el.ownerDocument.documentElement;
-  let isPositioned = style.position === "relative" || style.position === "absolute";
-  let hasNonAutoZIndex = isStacked(el);
-  let isFlexItem = parentStyle.display === "flex" || parentStyle.display === "inline-flex";
-  let isNotOpaque = style.opacity !== "1";
-  let isTransformed = style.transform !== "none";
-  let hasMixBlendMode = style.mixBlendMode !== "normal";
-  let isFiltered = style.filter !== "none";
-  let hasPerspective = style.perspective !== "none";
-  let isIsolated = style.isolation === "isolate";
-  let isFixed = style.position === "fixed";
-  let willChange = style.willChange.split(", ").some(p => {
+  nodeProperties.isStackingContext = isStackingContext(nodeProperties);
+
+  return nodeProperties;
+}
+
+function isStackingContext(properties) {
+  let willChange = properties.willChange.split(", ").some(p => {
     return p === "position" || p === "opacity" ||
            p === "transform" || p === "filter" ||
            p === "perspective" || p === "isolation";
   });
-  let hasTouchOverflowScrolling = style.WebkitOverflowScrolling === "touch";
-
-  return isRoot ||
-         (hasNonAutoZIndex && isPositioned) ||
-         (hasNonAutoZIndex && isFlexItem) ||
-         isNotOpaque ||
-         isTransformed ||
-         hasMixBlendMode ||
-         isFiltered ||
-         hasPerspective ||
-         isIsolated ||
-         isFixed ||
+  return properties.isRoot ||
+         (properties.isStacked && (properties.position === "relative" || properties.position === "absolute")) ||
+         (properties.isStacked && properties.isFlexItem) ||
+         properties.opacity !== "1"||
+         properties.transform !== "none"||
+         properties.mixBlendMode !== "normal"||
+         properties.filter !== "none"||
+         properties.perspective !== "none"||
+         properties.isIsolated ||
+         properties.position === "fixed" ||
          willChange ||
-         hasTouchOverflowScrolling;
+         properties.hasTouchOverflowScrolling;
 }
 
 function getStackingContextTree(root, treeNodes = [], parent) {
   let counter = 0;
   for (let child of root.children) {
-    let isChildStacked = isStacked(child);
-    let isChildStackingContext = isStackingContext(child);
+    let stackingContextProperties = getStackingContextProperties(child);
     let newNode;
 
-    if (isChildStacked || isChildStackingContext) {
+    if (stackingContextProperties.isStacked ||
+      stackingContextProperties.isStackingContext ||
+      childrenElementsAreStacked(child)) {
       newNode = {
         el: child,
         key: (parent === undefined) ? counter++ : parent.key + "-" + counter++,
-        isStacked: isChildStacked,
-        index: isChildStacked ? parseInt(getComputedStyle(child).zIndex, 10) : undefined,
-        isStackingContext: isChildStackingContext,
+        index: stackingContextProperties.isStacked ? parseInt(getComputedStyle(child).zIndex, 10) : undefined,
         nodes: [],
-        parent
+        parent,
+        properties: stackingContextProperties
       };
       treeNodes.push(newNode);
     }
@@ -95,12 +99,24 @@ function getStackingContextTree(root, treeNodes = [], parent) {
     // Recurse through children.
     if (child.childElementCount) {
       getStackingContextTree(child,
-                             newNode && isChildStackingContext ? newNode.nodes : treeNodes,
+                             newNode ? newNode.nodes : treeNodes,
                              newNode || parent);
     }
   }
 
   return treeNodes;
+}
+
+function childrenElementsAreStacked(node) {
+  for (let child of node.children) {
+    let stackingContextProperties = getStackingContextProperties(child);
+    if (stackingContextProperties.isStacked || stackingContextProperties.isStackingContext) {
+      return true;
+    } else if (child.childElementCount) {
+      childrenElementsAreStacked(child);
+    }
+  }
+  return false;
 }
 
 function outputNode({el, isStackingContext, isStacked, index}) {
