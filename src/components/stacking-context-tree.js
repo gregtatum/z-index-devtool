@@ -1,45 +1,38 @@
 const {DOM, createClass, createFactory} = require("react");
-const {div, span} = DOM;
+const {div} = DOM;
 const StackingContextNode = createFactory(require("./stacking-context-node"));
 const Tree = createFactory(require("./tree"));
-const {flattenTreeWithDepth} = require("./../stacking-context/");
 
 const StackingContextTree = createClass({
     render() {
-      const {tree, expandedNodes, toggleNode} = this.props;
-      const nodes = flattenTreeWithDepth(tree);
+      const {
+        tree,
+        expandedNodes,
+        selNode,
+        toggleNode
+      } = this.props;
 
       if (tree != undefined) {
-        // console.info(tree);
-        // console.info(nodes);
         return Tree({
-          // all top-level nodes
           getRoots: () => tree, // all top-level nodes
           getChildren: node => node.nodes,
           getParent: node => node.parent,
           getKey: node => node.key,
-          /*
-          until arrow and expanding/collapsed is implemented, all nodes will be considered
-          "collapsed" (if they are expanded, they will show in duplicate)
-           */
           isExpanded: node => expandedNodes.has(node),
-          renderItem: (node, depth, focused, arrow, isExpanded) => {
-            // console.warn(node);
+          renderItem: (node, depth, isFocused, arrow, isExpanded) => {
             return StackingContextNode(
               {
-                node: node,
+                node,
                 depth,
-                focused,
+                isFocused: selNode === node,
                 arrow,
                 isExpanded,
-                toggleNode,
               }
-              // And here is the label for this node.
-              // span({ className: "stacking-context-node-label" }, node.label)
-              // ...nodes.map(node => StackingContextNode({node}))
             );
           },
-          itemHeight: 20
+          onExpand: toggleNode,
+          onCollapse: toggleNode,
+          itemHeight: 10
         });
       } else {
         return div({id: "tree"});
