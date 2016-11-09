@@ -36,8 +36,42 @@ html, body, #app {
   color: #000;
 }
 
-.selected-node {
+.selected-node-dom {
   border-style: solid;
   border-width: 3px;
   border-color: #00f;
+}
+
+.selected-node {
+  background-color: rgba(0, 0, 0, 0.04);
+  font-weight: bold;
+}
+/* not sure why this isn't automatically included in tree.js... */
+.arrow {
+  display: inline-block;
+}
+
+.node-info {
+  position: absolute;
+  bottom: 0;
+  padding: 5px;
+  border-width: thin 0 0 0;
+  border-color: grey;
+  border-style: solid;
+  width: 100%;
+}
+
+.stacking-context-info-table {
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.stacking-context-info-value {
+  padding-left: 8px;
+  color: #00c1c1;
+  font-weight: bold;
+}
+
+.stacking-context-info-header-value {
+  padding-left: 8px;
 }

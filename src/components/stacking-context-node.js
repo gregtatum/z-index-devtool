@@ -1,48 +1,42 @@
 const {DOM, createClass} = require("react");
-const {div, button} = DOM;
+const {div, button, span} = DOM;
 const React = require("react");
 const {selectStackingContextNode} = require("../actions/stacking-context");
 
 const StackingContextNode = createClass({
   render() {
-    let {
+    const {
       node,
       depth,
-      focused,
+      isFocused,
       arrow,
-      isExpanded,
-      toggleNode,
+      isExpanded // used automagically in 'arrow'
     } = this.props;
     const {store} = this.context;
-    const {selNode} = store.getState().stackingContext;
 
-    // console.log("node: " + node);
-    // console.log("depth: " + depth);
-    // console.log("focused: " + focused);
-    // console.log("arrow: " + arrow);
-    // console.log("isExpanded: " + isExpanded);
+    let className = "stacking-context-node";
+    if (isFocused) {
+      className += " selected-node";
+    }
+
     return div(
       {
-        className: "stacking-context-node",
+        className,
         style: {paddingLeft: depth * 10 + "px"},
         key: node.key,
-        onClick: (event) => {
-          // if (selNode) {
-          //   selNode.el.classList.remove("selected-node");
-          // }
-          // node.el.classList.add("selected-node");
-          // store.dispatch(selectStackingContextNode(node));
-        }
       },
-      button({
-        className: "arrow",
-        onClick: () => {
-          console.log('toggle')
-          toggleNode(node)
-        }
-      }, "+"),
-      nodeToString(node.el),
-      getStackingContextInfo(node)
+      span({},
+        arrow,
+        span({
+          onClick: () => {
+            store.dispatch(selectStackingContextNode(node));
+          },
+          style: node.properties.isStackingContext? {} : {opacity: '0.7'},
+          title: node.properties.isStackingContext? "" : "This element is not part of the stacking context."
+        },
+        nodeToString(node.el),
+        getStackingContextInfo(node))
+      )
     );
   }
 });
@@ -54,8 +48,9 @@ function nodeToString(el) {
 };
 
 function getStackingContextInfo(node) {
-  return (node.isStackingContext ? " [CONTEXT] " : "") +
-    (node.isStacked ? "[z-index: " + node.index + "]" : "");
+  let properties = node.properties;
+  return (properties.isStackingContext ? " [CONTEXT] " : " [NOT CONTEXT] ") +
+    (properties.isStacked ? "[z-index: " + properties.zindex + "]" : "");
 };
 
 StackingContextNode.contextTypes = {
