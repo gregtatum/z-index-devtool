@@ -1,7 +1,10 @@
 const {DOM, createClass} = require("react");
 const {div, span} = DOM;
 const React = require("react");
-const {selectStackingContextNode} = require("../actions/stacking-context");
+const {
+  selectStackingContextNode,
+  computeBoundingRect
+} = require("../actions/stacking-context");
 
 const StackingContextNode = createClass({
   render() {
@@ -29,6 +32,7 @@ const StackingContextNode = createClass({
         span({
           onClick: () => {
             store.dispatch(selectStackingContextNode(node));
+            store.dispatch(computeBoundingRect(node.el));
           }
         },
         nodeToString(node.el),
@@ -48,10 +52,6 @@ function nodeToString(el) {
 function getStackingContextInfo(node) {
   return (node.isStackingContext ? " [CONTEXT] " : "") +
     (node.isStacked ? "[z-index: " + node.index + "]" : "");
-};
-
-StackingContextNode.contextTypes = {
-  store: React.PropTypes.object
 };
 
 StackingContextNode.contextTypes = {

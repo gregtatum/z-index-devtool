@@ -31,18 +31,21 @@ function getStackingContext(containerElement) {
 
 function selectStackingContextNode(node) {
   return function(dispatch, getState) {
-    //const currState = getState();
-    //const prevSelElt = currState.stackingContext.selElt;
-    //if i use inline style, it becomes much more complicated to
-    //remove without losing any borders that were originally in place
-    //if (prevSelElt){
-    //  prevSelElt.classList.remove("selected-node");
-    //}
-    //node.el.classList.add("selected-node");
     dispatch({
       type: constants.SELECT_NODE,
       selNode: node,
       selElt: node.el
+    });
+  }
+}
+
+function computeBoundingRect(elt) {
+  return function(dispatch, getState) {
+    dispatch({
+      type: constants.COMPUTE_RECT,
+      //getBoundingClientRect is doing something strange
+      //for the z-index onclick example
+      rect: (elt) ? elt.getBoundingClientRect() : undefined
     });
   }
 }
@@ -78,5 +81,6 @@ module.exports = {
   selectStackingContextNode,
   toggleNode,
   expandNode,
-  collapseNode
+  collapseNode,
+  computeBoundingRect
 }

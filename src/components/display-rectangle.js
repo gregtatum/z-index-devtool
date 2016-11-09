@@ -1,44 +1,69 @@
 const {DOM, createClass} = require("react");
 const {div, canvas} = DOM;
 const React = require("react");
+const {computeBoundingRect} = require("../actions/stacking-context");
 
 const DisplayRectangle = createClass({
-
-    // TODO - The bounding rect needs to be updated if there are DOM mutation events
-    // on the page that is being targetted. See
-    // https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver for more
-    // information on correctly handling this.
-    computeBoundingRect(elt) {
+    getBoundingRect(elt) {
+      const {store} = this.context;
       this.setState({
-        boundingRect: (elt) ? elt.getBoundingClientRect() : undefined
+        boundingRect: store.getState().stackingContext.displayRect
       })
     },
 
-    getInitialState() {
-      return {
-        handleResize: this.handleResize.bind(this)
+    //experiments with using MutationObserver
+    //as yet unsuccessful
+    observeMutations(elt) {
+      //disconnect any old observer
+      if (this.state.observer){
+        this.state.observer.disconnect();
+      }
+      //if there is an element add a new observer
+      if (elt){
+        const observer = new MutationObserver(function(){
+          console.log("mutation observed!");
+          const {store} = this.context;
+          store.dispatch(computeBoundingRect(elt));
+        });
+        observer.observe(elt, {attributes:true, childList: true, subtree: true});
+        this.setState({
+          observer: observer
+        });
       }
     },
 
     handleResize() {
-      this.computeBoundingRect(this.props.elt);
+      const {store} = this.context;
+      store.dispatch(computeBoundingRect(this.props.elt));
+    },
+
+    getInitialState(){
+      return {
+        observer: undefined,
+        handleResize: this.handleResize.bind(this)
+      };
     },
 
     componentWillReceiveProps(props) {
-      this.computeBoundingRect(props.elt);
+      this.getBoundingRect(props.elt);
+      //this.observeMutations(props.elt);
     },
 
     componentWillMount() {
-      this.computeBoundingRect(this.props.elt);
       window.addEventListener('resize', this.state.handleResize);
+      this.getBoundingRect(this.props.elt);
+      //this.observeMutations(this.props.elt);
     },
 
     componentWillUnmount() {
-      window.removeEventListener('resize', this.state.handleResize);
+       window.removeEventListener('resize', this.state.handleResize);
+      //this.observeMutations(undefined);
     },
 
     render: function() {
       const boundingRect = this.state.boundingRect;
+      //not really used right now, but if introduce toggling behaviour could
+      //be useful...
       const hasNodeClass = (boundingRect) ? 'has-node' : 'no-node';
       return div(
         {
