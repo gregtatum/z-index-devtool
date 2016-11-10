@@ -19,38 +19,49 @@ const StackingContextNode = createClass({
       className += " selected-node";
     }
 
+    if (!node.properties.isStackingContext) {
+      className += " not-in-context";
+    }
+
     return div(
       {
         className,
-        style: {paddingLeft: depth * 10 + "px"},
         key: node.key,
+        onClick: () => {
+          store.dispatch(selectStackingContextNode(node));
+        }
       },
-      span({},
+
+      span({className: "stacking-context-node-context"},
+          node.properties.isStackingContext ? "✔" : "✘"
+      ),
+
+      span({className: "stacking-context-node-z"},
+        node.index
+      ),
+
+      span(
+        {
+          className: "stacking-context-node-name",
+          style: {paddingLeft: depth * 10 + "px"},
+        },
         arrow,
         span({
           onClick: () => {
             store.dispatch(selectStackingContextNode(node));
           },
-          style: node.properties.isStackingContext? {} : {opacity: '0.7'},
           title: node.properties.isStackingContext? "" : "This element is not part of the stacking context."
         },
-        nodeToString(node.el),
-        getStackingContextInfo(node))
+        getNodeContainerName(node.el))
       )
     );
   }
 });
 
-function nodeToString(el) {
+function getNodeContainerName(el) {
   return el.tagName.toLowerCase() +
     (el.id.trim() !== "" ? "#" + el.id.trim() : "") +
     (el.className && el.className.trim && el.className.trim() !== "" ? "." + el.className.trim().split(" ").join(".") : "");
-};
-
-function getStackingContextInfo(node) {
-  let properties = node.properties;
-  return (properties.isStackingContext ? " [CONTEXT] " : " [NOT CONTEXT] ") +
-    (properties.isStacked ? "[z-index: " + properties.zindex + "]" : "");
 };
 
 StackingContextNode.contextTypes = {
