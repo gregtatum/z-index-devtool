@@ -31,6 +31,7 @@ function getStackingContextProperties(el) {
 
   let win = getWin(el);
   let style = win.getComputedStyle(el);
+  //console.log(style);
   let parentEl = el.parentNode;
   let parentStyle = parentEl && isElement(parentEl)
                     ? win.getComputedStyle(parentEl)
@@ -79,6 +80,10 @@ function isStackingContext(properties) {
 function getStackingContextTree(root, treeNodes = [], parent) {
   let counter = 0;
   for (let child of root.children) {
+    console.log(child.nodeName);
+    if (child.nodeName == 'STYLE'){
+      continue;
+    }
     let stackingContextProperties = getStackingContextProperties(child);
     let newNode;
 
@@ -93,6 +98,7 @@ function getStackingContextTree(root, treeNodes = [], parent) {
         parent,
         properties: stackingContextProperties
       };
+      console.log("pushing new node");
       treeNodes.push(newNode);
     }
 

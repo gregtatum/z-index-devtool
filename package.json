@@ -25,6 +25,7 @@
     "babel-register": "^6.18.0",
     "browserify": "^13.1.0",
     "budo": "^9.2.0",
+    "jsdom": "^9.8.3",
     "mocha": "^3.1.2",
     "react": "15.3.2",
     "react-dom": "15.3.2",

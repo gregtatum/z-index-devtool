@@ -12,9 +12,11 @@ const {
   expandNode,
   collapseNode
 } = require('../src/actions/stacking-context');
+const {getDomElt, setupGlobals} = require('./dom');
 
 
 const store = createStoreFixture();
+setupGlobals();
 
 describe('store fixture', function() {
   it('updates store url & text', function() {
@@ -25,16 +27,13 @@ describe('store fixture', function() {
       assert.equal(store.getState().stackingContext.text, textMarkup);
     });
   });
-  //it('updates store tree', function() {
-    //parse store.getState().stackingContext.text?
-    //get the containerElement?????
-    //store.dispatch(
-      //getStackingContext(document)
-    //).then(()=>{
-    //  assert(.....)
-    //}
-  //});
-  //});
+  it('updates store tree', function() {
+    var node = getDomElt(store.getState().stackingContext.text);
+    store.dispatch(getStackingContext(node));
+    //console.log(store.getState().stackingContext.tree);
+    assert.notEqual(store.getState().stackingContext.tree, undefined);
+    //assert.equal(store.getState().stackingContext.tree.length, 2);
+  });
 });
 
 
