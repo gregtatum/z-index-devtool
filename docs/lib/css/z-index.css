@@ -146,7 +146,3 @@ html, body, #app {
   border-bottom: 1px solid var(--cell-border-color);
   flex: 0;
 }
-
-.arrow {
-  display: inline-block;
-}
