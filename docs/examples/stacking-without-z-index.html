@@ -1,16 +1,5 @@
-<!DOCTYPE html>
 <!-- See: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/Stacking_without_z-index -->
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Stacking without z-index</title>
-
     <style type="text/css">
-
-        .bold {
-            font-weight: bold;
-            font: 12px Arial;
-        }
 
         #normdiv {
             height: 70px;
@@ -67,27 +56,23 @@
             text-align: center;
         }
     </style>
-</head>
-<body>
 <div id="absdiv1">
-    <br/><span class="bold">DIV #1</span>
+    <br/><span><strong>DIV #1</strong></span>
     <br/>position: absolute;
 </div>
 <div id="reldiv1">
-    <br/><span class="bold">DIV #2</span>
+    <br/><span><strong>DIV #2</strong></span>
     <br/>position: relative;
 </div>
 <div id="reldiv2">
-    <br/><span class="bold">DIV #3</span>
+    <br/><span><strong>DIV #3</strong></span>
     <br/>position: relative;
 </div>
 <div id="absdiv2">
-    <br/><span class="bold">DIV #4</span>
+    <br/><span><strong>DIV #4</strong></span>
     <br/>position: absolute;
 </div>
 <div id="normdiv">
-    <br/><span class="bold">DIV #5</span>
+    <br/><span><strong>DIV #5</strong></span>
     <br/>no positioning
 </div>
-</body>
-</html>

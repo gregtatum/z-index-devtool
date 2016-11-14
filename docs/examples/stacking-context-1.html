@@ -1,14 +1,4 @@
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Stacking Context 1</title>
-  </head>
-  <body>
   <style>
-	.bold {
-		font-weight: bold;
-		font: 12px Arial;
-	}
 	#div1,
 	#div3 {
 		height: 80px;
@@ -43,11 +33,12 @@
 		padding-left: 10px;
 	}
   </style>
+
     <div id="div1">
-<br /><span class="bold">DIV #1</span>
+<br /><span><strong>DIV #1</strong></span>
 <br />position: relative;
    <div id="div2">
-   <br /><span class="bold">DIV #2</span>
+   <br /><span><strong>DIV #2</strong></span>
    <br />position: absolute;
    <br />z-index: 1;
    </div>
@@ -56,13 +47,11 @@
 <br />
 
 <div id="div3">
-<br /><span class="bold">DIV #3</span>
+<br /><span><strong>DIV #3</strong></span>
 <br />position: relative;
    <div id="div4">
-   <br /><span class="bold">DIV #4</span>
+   <br /><span><strong>DIV #4</strong></span>
    <br />position: absolute;
    <br />z-index: 2;
    </div>
 </div>
-  </body>
-</html>

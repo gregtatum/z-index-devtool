@@ -1,19 +1,5 @@
-<!DOCTYPE html>
 <!-- See: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/Stacking_and_float -->
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Stacking and float</title>
-
     <style type="text/css">
-        div {
-            font: 12px Arial;
-        }
-
-        span.bold {
-            font-weight: bold;
-        }
-
         #absdiv1 {
             opacity: 0.7;
             position: absolute;
@@ -69,38 +55,29 @@
             text-align: center;
         }
     </style>
-</head>
-<!-- CONTENT -->
-<body>
-<br/><br/>
-
 <div id="absdiv1">
-    <br/><span class="bold">DIV #1</span>
+    <br/><span><strong>DIV #1</strong></span>
     <br/>position: absolute;
 </div>
 
 <div id="flodiv1">
-    <br/><span class="bold">DIV #2</span>
+    <br/><span><strong>DIV #2</strong></span>
     <br/>float: left;
 </div>
 
 <div id="flodiv2">
-    <br/><span class="bold">DIV #3</span>
+    <br/><span><strong>DIV #3</strong></span>
     <br/>float: right;
 </div>
 
 <br/>
 
 <div id="normdiv">
-    <br/><span class="bold">DIV #4</span>
+    <br/><span><strong>DIV #4</strong></span>
     <br/>no positioning
 </div>
 
 <div id="absdiv2">
-    <br/><span class="bold">DIV #5</span>
+    <br/><span><strong>DIV #5</strong></span>
     <br/>position: absolute;
 </div>
-</body>
-</html>
-</body>
-</html>

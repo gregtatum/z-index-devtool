@@ -1,20 +1,5 @@
-<!DOCTYPE html>
 <!-- See: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/Stacking_without_z-index -->
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Stacking Context 3</title>
-
     <style type="text/css">
-
-        div {
-            font: 12px Arial;
-        }
-
-        span.bold {
-            font-weight: bold;
-        }
-
         div.lev1 {
             width: 250px;
             height: 70px;
@@ -58,39 +43,35 @@
         }
 
     </style>
-</head>
-<body>
-<br/>
-
 <div class="lev1">
-    <span class="bold">LEVEL #1</span>
+    <span><strong>LEVEL #1</strong></span>
 
     <div id="container1">
 
         <div class="lev2">
-            <br/><span class="bold">LEVEL #2</span>
+            <br/><span><strong>LEVEL #2</strong></span>
             <br/>z-index: 1;
 
             <div id="container2">
 
-                <div class="lev3"><span class="bold">LEVEL #3</span></div>
-                <div class="lev3"><span class="bold">LEVEL #3</span></div>
-                <div class="lev3"><span class="bold">LEVEL #3</span></div>
-                <div class="lev3"><span class="bold">LEVEL #3</span></div>
-                <div class="lev3"><span class="bold">LEVEL #3</span></div>
-                <div class="lev3"><span class="bold">LEVEL #3</span></div>
-                <div class="lev3"><span class="bold">LEVEL #3</span></div>
-                <div class="lev3"><span class="bold">LEVEL #3</span></div>
-                <div class="lev3"><span class="bold">LEVEL #3</span></div>
-                <div class="lev3"><span class="bold">LEVEL #3</span></div>
-                <div class="lev3"><span class="bold">LEVEL #3</span></div>
+                <div class="lev3"><span><strong>LEVEL #3</strong></span></div>
+                <div class="lev3"><span><strong>LEVEL #3</strong></span></div>
+                <div class="lev3"><span><strong>LEVEL #3</strong></span></div>
+                <div class="lev3"><span><strong>LEVEL #3</strong></span></div>
+                <div class="lev3"><span><strong>LEVEL #3</strong></span></div>
+                <div class="lev3"><span><strong>LEVEL #3</strong></span></div>
+                <div class="lev3"><span><strong>LEVEL #3</strong></span></div>
+                <div class="lev3"><span><strong>LEVEL #3</strong></span></div>
+                <div class="lev3"><span><strong>LEVEL #3</strong></span></div>
+                <div class="lev3"><span><strong>LEVEL #3</strong></span></div>
+                <div class="lev3"><span><strong>LEVEL #3</strong></span></div>
 
             </div>
 
         </div>
 
         <div class="lev2">
-            <br/><span class="bold">LEVEL #2</span>
+            <br/><span><strong>LEVEL #2</strong></span>
             <br/>z-index: 1;
         </div>
 
@@ -98,30 +79,30 @@
 </div>
 
 <div class="lev1">
-    <span class="bold">LEVEL #1</span>
+    <span><strong>LEVEL #1</strong></span>
 </div>
 
 <div class="lev1">
-    <span class="bold">LEVEL #1</span>
+    <span><strong>LEVEL #1</strong></span>
 </div>
 
 <div class="lev1">
-    <span class="bold">LEVEL #1</span>
+    <span><strong>LEVEL #1</strong></span>
 </div>
 <div id="reldiv1">
-    <br/><span class="bold">DIV #2</span>
+    <br/><span><strong>DIV #2</strong></span>
     <br/>position: relative;
 </div>
 <div id="reldiv2">
-    <br/><span class="bold">DIV #3</span>
+    <br/><span><strong>DIV #3</strong></span>
     <br/>position: relative;
 </div>
 <div id="absdiv2">
-    <br/><span class="bold">DIV #4</span>
+    <br/><span><strong>DIV #4</strong></span>
     <br/>position: absolute;
 </div>
 <div id="normdiv">
-    <br/><span class="bold">DIV #5</span>
+    <br/><span><strong>DIV #5</strong></span>
     <br/>no positioning
 </div>
 </body>

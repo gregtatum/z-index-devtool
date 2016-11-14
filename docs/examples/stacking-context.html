@@ -1,45 +1,25 @@
-<!DOCTYPE html>
-<html>
-
-<head>
-    <meta charset="utf-8">
-    <title>Stacking Context Example</title>
     <style type="text/css">
-        * {
-            margin: 0;
-        }
-
-        html {
-            padding: 20px;
-            font: 12px/20px Arial, sans-serif;
-        }
-
-        div {
-            position: relative;
-        }
-
-        h1 {
-            font: inherit;
-            font-weight: bold;
-        }
-
         #div1,
         #div2 {
+            position: relative;
             border: 1px dashed #696;
             padding: 10px;
             background-color: #cfc;
         }
 
         #div1 {
+            position: relative;
             z-index: 5;
             margin-bottom: 190px;
         }
 
         #div2 {
+            position: relative;
             z-index: 2;
         }
 
         #div3 {
+            position: relative;
             z-index: 4;
             opacity: 1;
             position: absolute;
@@ -53,17 +33,20 @@
 
         #div4,
         #div5 {
+            position: relative;
             border: 1px dashed #996;
             background-color: #ffc;
         }
 
         #div4 {
+            position: relative;
             z-index: 6;
             margin-bottom: 15px;
             padding: 25px 10px 5px;
         }
 
         #div5 {
+            position: relative;
             z-index: 1;
             margin-top: 15px;
             padding: 5px 10px;
@@ -86,13 +69,13 @@
 
 <body>
     <div id="div1">
-        <h1>Division Element #1</h1>
+        <span><strong>Division Element #1</strong></span>
         <code>position: relative;<br/>
       z-index: 5;</code>
     </div>
 
     <div id="div2">
-        <h1>Division Element #2</h1>
+        <span><strong>Division Element #2</strong></span>
         <code>position: relative;<br/>
       z-index: 2;</code>
     </div>
@@ -100,23 +83,23 @@
     <div id="div3">
 
         <div id="div4">
-            <h1>Division Element #4</h1>
+            <span><strong>Division Element #4</strong></span>
             <code>position: relative;<br/>
         z-index: 6;</code>
         </div>
 
-        <h1>Division Element #3</h1>
+        <span><strong>Division Element #3</strong></span>
         <code>position: absolute;<br/>
       z-index: 4;</code>
 
         <div id="div5">
-            <h1>Division Element #5</h1>
+            <span><strong>Division Element #5</strong></span>
             <code>position: relative;<br/>
         z-index: 1;</code>
         </div>
 
         <div id="div6">
-            <h1>Division Element #6</h1>
+            <span><strong>Division Element #6</strong></span>
             <code>position: absolute;<br/>
         z-index: 3;</code>
         </div>
