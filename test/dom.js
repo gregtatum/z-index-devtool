@@ -34,10 +34,13 @@ function getDomElt(htmlString){
   cont.innerHTML = htmlString;
   var divElt = cont.content.firstChild;
   divElt.id = "dom-container";
-  console.log(divElt.nodeName);
-  console.log(window.getComputedStyle(divElt)['zIndex']);
-  document.body.appendChild(divElt);
-  return document.getElementById("dom-container");
+   document.body.innerHTML = htmlString;
+   return document.body.children[0];
+
+  //document.body.appendChild(divElt);
+  //console.log(document.body.children.length);
+  //console.log(window.getComputedStyle(document.body.children[0].children[0]));
+  //return document.getElementById("dom-container");
 };
 
 module.exports = {getDomElt, setupGlobals};

@@ -1,14 +1,9 @@
-/*
-
-!!!!!!!!!!! This is pseudo-code only!
-
-*/
 var assert = require('assert');
-const {createStoreFixture} = require('./store-fixture');
-const {textMarkup, mockGetTextModule} = require('./utils');
+const {createStoreFixture} = require('./fixtures/store-fixture');
+const {textMarkup, mockGetTextModule} = require('./fixtures/utils');
 const {
   fetchNewDomText,
-  getStackingContext,
+  getMockStackingContext,
   expandNode,
   collapseNode
 } = require('../src/actions/stacking-context');
@@ -29,10 +24,9 @@ describe('store fixture', function() {
   });
   it('updates store tree', function() {
     var node = getDomElt(store.getState().stackingContext.text);
-    store.dispatch(getStackingContext(node));
-    //console.log(store.getState().stackingContext.tree);
+    store.dispatch(getMockStackingContext(node));
     assert.notEqual(store.getState().stackingContext.tree, undefined);
-    //assert.equal(store.getState().stackingContext.tree.length, 2);
+    assert.equal(store.getState().stackingContext.tree.length, 2);
   });
 });
 
