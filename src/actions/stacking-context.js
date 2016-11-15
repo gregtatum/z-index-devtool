@@ -1,7 +1,7 @@
 const {getText: getTextModule} = require("@tatumcreative/get");
 const constants = require("../constants");
 const {getStackingContextTree} = require("../stacking-context");
-const {getFakeTree} = require('../../test/fixtures/tree-fixture');
+const {getMockTree} = require('../../test/fixtures/tree-fixture');
 
 function fetchNewDomText (url, getText = getTextModule) {
   return function(dispatch, getState) {
@@ -31,7 +31,7 @@ function getStackingContext(containerElement) {
 
 function getMockStackingContext(containerElement) {
   return function(dispatch, getState) {
-    const tree = getFakeTree();
+    const tree = getMockTree();
     dispatch({
       type: constants.ADD_STACKING_CONTEXT,
       containerElement,

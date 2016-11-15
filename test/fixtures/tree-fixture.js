@@ -93,8 +93,8 @@ const child2 = {
 parent1.nodes.push(child1);
 parent2.nodes.push(child2);
 
-function getFakeTree(){
+function getMockTree(){
   return([parent1, parent2]);
 };
 
-module.exports = {getFakeTree};
+module.exports = {getMockTree};
