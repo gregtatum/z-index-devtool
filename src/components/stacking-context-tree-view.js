@@ -20,11 +20,10 @@ const StackingContextTreeView = createFactory(createClass({
     } = this.props;
 
     return div(
-      {className: "sidebar"},
+      {className: "tree-view"},
       div({className: "devtools-toolbar"}, "Stacking Context Tree"),
       StackingContextTreeHeader(),
-      StackingContextTree({tree, expandedNodes, selNode, toggleNode}),
-      StackingContextNodeInfo()
+      StackingContextTree({tree, expandedNodes, selNode, toggleNode})
     );
   }
 }));

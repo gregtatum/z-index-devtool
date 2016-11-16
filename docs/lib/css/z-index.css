@@ -96,12 +96,15 @@ html, body, #app {
 /* FLEX */
 .stacking-context-node-name,
 .stacking-context-node-z,
-.stacking-context-node-context {
+.stacking-context-node-context,
+.stacking-context-info-label,
+.stacking-context-info-value {
   display: inline-flex;
-  text-align: end;
+  text-align: right;
   align-items: center;
   border-left: var(--cell-border-color) 1px solid;
   padding-left: 5px;
+  padding-right: 5px;
 }
 .stacking-context-node-z {
   width: 7ch;
@@ -116,20 +119,18 @@ html, body, #app {
   opacity: 0.7;
 }
 
+.stacking-context-info-label {
+  width: 7ch;
+}
+
 .node-info {
-  position: absolute;
-  bottom: 0;
-  padding: 5px;
+  position:absolute;
+  bottom:0;
+  width:100%;
   border-top: var(--cell-border-color) 1px solid;
-  width: 100%;
 }
 
-.stacking-context-info-table {
-  border-collapse: collapse;
-  text-align: left;
-}
-
-.stacking-context-info-value {
+.highlight-value {
   padding-left: 8px;
   color: var(--theme-highlight-blue);
   font-weight: bold;
@@ -137,6 +138,13 @@ html, body, #app {
 
 .stacking-context-info-header-value {
   padding-left: 8px;
+}
+
+.stacking-context-info-row {
+  background-color: var(--theme-body-background);
+  cursor: default;
+  display: flex;
+  flex: 1;
 }
 
 .header {
