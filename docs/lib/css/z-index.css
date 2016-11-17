@@ -15,9 +15,16 @@ html, body, #app {
   margin: 0;
   order: 1;
   border-left: 1px solid var(--theme-splitter-color);
-  background-color: #fff;
   overflow: hidden;
   background-color: var(--theme-body-background);
+}
+
+.sidebar, .tree {
+  display: flex;
+  flex: 1 0; /* 0 prevents shrinking when there's many elements */
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .main-view {
@@ -28,6 +35,11 @@ html, body, #app {
   flex-direction: column;
 }
 
+.tree-view {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
 .dom-container {
   overflow: scroll;
   flex: 1;
@@ -104,10 +116,12 @@ html, body, #app {
   padding-left: 5px;
 }
 .stacking-context-node-z {
-  width: 7ch;
+  min-width: 7ch;
+  width: 10%;
 }
 .stacking-context-node-context {
-  width: 2ch;
+  min-width: 9ch;
+  width: 10%;
 }
 .stacking-context-node-name {
   flex: 1; /* expand to occupy rest of row */
@@ -117,11 +131,10 @@ html, body, #app {
 }
 
 .node-info {
-  position: absolute;
+  display: flex;
   bottom: 0;
   padding: 5px;
   border-top: var(--cell-border-color) 1px solid;
-  width: 100%;
 }
 
 .stacking-context-info-table {
@@ -144,5 +157,5 @@ html, body, #app {
   color: var(--theme-body-color);
   background-color: var(--theme-tab-toolbar-background);
   border-bottom: 1px solid var(--cell-border-color);
-  flex: 0;
+  flex: 0 0;
 }

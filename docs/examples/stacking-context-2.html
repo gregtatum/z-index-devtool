@@ -1,75 +1,69 @@
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Stacking Context 2</title>
-  </head>
-  <body>
-	<style>
-		div { font: 12px Arial; }
+<style>
+  #div2 {
+    z-index: 2;
+  }
 
-		span.bold { font-weight: bold; }
+  #div3 {
+    z-index: 1;
+  }
 
-		#div2 { z-index: 2; }
-		#div3 { z-index: 1; }
-		#div4 { z-index: 10; }
+  #div4 {
+    z-index: 10;
+  }
 
-		#div1,#div3 {
-		   height: 80px;
-		   position: relative;
-		   border: 1px dashed #669966;
-		   background-color: #ccffcc;
-		   padding-left: 5px;
-		}
+  #div1, #div3 {
+    height: 80px;
+    position: relative;
+    border: 1px dashed #669966;
+    background-color: #ccffcc;
+    padding-left: 5px;
+  }
 
-		#div2 {
-		   opacity: 0.8;
-		   position: absolute;
-		   width: 150px;
-		   height: 200px;
-		   top: 20px;
-		   left: 170px;
-		   border: 1px dashed #990000;
-		   background-color: #ffdddd;
-		   text-align: center;
-		}
+  #div2 {
+    opacity: 0.8;
+    position: absolute;
+    width: 150px;
+    height: 200px;
+    top: 20px;
+    left: 170px;
+    border: 1px dashed #990000;
+    background-color: #ffdddd;
+    text-align: center;
+  }
 
-		#div4 {
-		   opacity: 0.8;
-		   position: absolute;
-		   width: 200px;
-		   height: 70px;
-		   top: 65px;
-		   left: 50px;
-		   border: 1px dashed #000099;
-		   background-color: #ddddff;
-		   text-align: left;
-		   padding-left: 10px;
-		}
-	</style>
-    <br />
+  #div4 {
+    opacity: 0.8;
+    position: absolute;
+    width: 200px;
+    height: 70px;
+    top: 65px;
+    left: 50px;
+    border: 1px dashed #000099;
+    background-color: #ddddff;
+    text-align: left;
+    padding-left: 10px;
+  }
+</style>
 
-    <div id="div1"><br />
-        <span class="bold">DIV #1</span><br />
-        position: relative;
-        <div id="div2"><br />
-            <span class="bold">DIV #2</span><br />
-            position: absolute;<br />
-            z-index: 2;
-        </div>
-    </div>
+<div id="div1"><br/>
+  <span><strong>DIV #1</strong></span><br/>
+  position: relative;
+  <div id="div2"><br/>
+    <span><strong>DIV #2</strong></span><br/>
+    position: absolute;<br/>
+    z-index: 2;
+  </div>
+</div>
 
-    <br />
+<br/>
 
-    <div id="div3"><br />
-        <span class="bold">DIV #3</span><br />
-        position: relative;<br />
-        z-index: 1;
-        <div id="div4"><br />
-            <span class="bold">DIV #4</span><br />
-            position: absolute;<br />
-            z-index: 10;
-        </div>
-    </div>
-
-  </body>
-</html>
+<div id="div3"><br/>
+  <span><strong>DIV #3</strong></span><br/>
+  position: relative;<br/>
+  z-index: 1;
+  <div id="div4"><br/>
+    <span><strong>DIV #4</strong></span><br/>
+    position: absolute;<br/>
+    z-index: 10;
+  </div>
+</div>
