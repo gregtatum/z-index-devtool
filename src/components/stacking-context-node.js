@@ -1,7 +1,10 @@
 const {DOM, createClass} = require("react");
 const {div, button, span} = DOM;
 const React = require("react");
-const {selectStackingContextNode} = require("../actions/stacking-context");
+const {
+  selectStackingContextNode,
+  computeBoundingRect
+} = require("../actions/stacking-context");
 
 const StackingContextNode = createClass({
   render() {
@@ -49,6 +52,7 @@ const StackingContextNode = createClass({
         span({
           onClick: () => {
             store.dispatch(selectStackingContextNode(node));
+            store.dispatch(computeBoundingRect(node.el));
           },
           title: node.properties.isStackingContext? "" : "This element is not part of the stacking context."
         },

@@ -33,7 +33,19 @@ function selectStackingContextNode(node) {
   return function(dispatch, getState) {
     dispatch({
       type: constants.SELECT_NODE,
-      selNode: node
+      selNode: node,
+      selElt: node.el
+    });
+  }
+}
+
+function computeBoundingRect(elt) {
+  return function(dispatch, getState) {
+    dispatch({
+      type: constants.COMPUTE_RECT,
+      //getBoundingClientRect is doing something strange
+      //for the z-index onclick example
+      rect: (elt) ? elt.getBoundingClientRect() : undefined
     });
   }
 }
@@ -70,4 +82,5 @@ module.exports = {
   toggleNode,
   expandNode,
   collapseNode,
+  computeBoundingRect
 }
