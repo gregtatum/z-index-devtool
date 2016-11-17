@@ -41,7 +41,9 @@ const App = createFactory(createClass({
           //props for example dropdown
           fetchNewExampleHtml: (url) => {
             dispatch(fetchNewDomText(url))
-          }
+          },
+          //props for display rectangle
+          elt: stackingContext.selElt
         }),
         div(
           {className: "sidebar"},

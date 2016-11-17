@@ -17,7 +17,8 @@ const MainView = createClass({
       const {
         text,
         newTextReceived,
-        fetchNewExampleHtml
+        fetchNewExampleHtml,
+        elt
       } = this.props;
 
       return div(
@@ -29,7 +30,8 @@ const MainView = createClass({
         DomContainer({
           text: text,
           newTextReceived: newTextReceived
-        })
+        }),
+        DisplayRectangle({elt: elt})
       );
     }
 });
