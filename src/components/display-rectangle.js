@@ -56,7 +56,7 @@ const DisplayRectangle = createClass({
     },
 
     componentWillUnmount() {
-       window.removeEventListener('resize', this.state.handleResize);
+      window.removeEventListener('resize', this.state.handleResize);
       this.updateMutationObserver(undefined);
     },
 

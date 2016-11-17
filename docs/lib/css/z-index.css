@@ -48,6 +48,7 @@ html, body, #app {
   position:relative;
   background-color: #fff;
   color: #000;
+  z-index:0;
 }
 
 .devtools-toolbar {

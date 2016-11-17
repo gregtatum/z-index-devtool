@@ -10,7 +10,6 @@ const {
 
 const MainView = createFactory(require("./main-view"));
 const StackingContextTreeView = createFactory(require("./stacking-context-tree-view"));
-const DisplayRectangle = createFactory(require("./display-rectangle"));
 
 const { todo } = require("../actions/stacking-context");
 
