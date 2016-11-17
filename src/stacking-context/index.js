@@ -109,7 +109,7 @@ function getStackingContextTree(root, treeNodes = [], parent) {
 }
 
 function sortNodesByZIndex(tree) {
-  tree.sort(function(a, b){return a.index < b.index});
+  tree.sort(function(a, b){return a.index <= b.index});
   return tree;
 }
 
