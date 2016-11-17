@@ -11,18 +11,18 @@ const DisplayRectangle = createClass({
       })
     },
 
-    //experiments with using MutationObserver
-    //as yet unsuccessful
-    observeMutations(elt) {
+    //called when receive new element
+    updateMutationObserver(elt) {
       //disconnect any old observer
       if (this.state.observer){
         this.state.observer.disconnect();
       }
       //if there is an element add a new observer
       if (elt){
+        const me = this;
         const observer = new MutationObserver(function(){
-          console.log("mutation observed!");
-          const {store} = this.context;
+          //when mutation observed, recompute rectangle
+          const {store} = me.context;
           store.dispatch(computeBoundingRect(elt));
         });
         observer.observe(elt, {attributes:true, childList: true, subtree: true});
@@ -46,18 +46,18 @@ const DisplayRectangle = createClass({
 
     componentWillReceiveProps(props) {
       this.getBoundingRect(props.elt);
-      //this.observeMutations(props.elt);
+      this.updateMutationObserver(props.elt);
     },
 
     componentWillMount() {
       window.addEventListener('resize', this.state.handleResize);
       this.getBoundingRect(this.props.elt);
-      //this.observeMutations(this.props.elt);
+      this.updateMutationObserver(this.props.elt);
     },
 
     componentWillUnmount() {
        window.removeEventListener('resize', this.state.handleResize);
-      //this.observeMutations(undefined);
+      this.updateMutationObserver(undefined);
     },
 
     render: function() {
