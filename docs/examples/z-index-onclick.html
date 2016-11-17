@@ -1,105 +1,79 @@
-<!DOCTYPE html>
-<html>
+<style type="text/css">
 
-<head>
-    <meta charset="utf-8">
-    <title>Z-Index OnClick Example</title>
-    <style type="text/css">
-        * {
-            margin: 0;
-        }
+  #div1 {
+    position: relative;
+    z-index: 5;
+    background-color: red;
+    height: 200px;
+    padding: 40px 20px 20px;
+    opacity: 0.7;
+  }
 
-        html {
-            padding: 20px;
-            font: 12px/20px Arial, sans-serif;
-        }
+  #div2 {
+    position: relative;
+    z-index: -5;
+    background-color: blue;
+    height: 200px;
+    padding: 40px 20px 20px;
+    opacity: 0.7;
+  }
 
-        div {
-            position: relative;
-        }
+  #div3 {
+    z-index: 4;
+    opacity: 1;
+    position: absolute;
+    top: 80px;
+    left: 180px;
+    width: 330px;
+    height: 230px;
+    background-color: green;
+    padding: 150px 20px 20px;
+  }
 
-        h1 {
-            font: inherit;
-            font-weight: bold;
-        }
+  #divclick {
+    z-index: 1;
+    margin-top: 15px;
+    padding: 5px 10px;
+    background-color: lime;
+  }
 
-        #div1 {
-            z-index: 5;
-            background-color: red;
-            height: 200px;
-            padding: 40px 20px 20px;
-            opacity: 0.7;
-        }
+  #div6 {
+    z-index: 3;
+    position: absolute;
+    top: 80px;
+    left: 180px;
+    width: 150px;
+    height: 125px;
+    padding-top: 125px;
+    background-color: lime;
+    text-align: center;
+  }
+</style>
 
-        #div2 {
-            z-index: -5;
-            background-color: blue;
-            height: 200px;
-            padding: 40px 20px 20px;
-            opacity: 0.7;
-        }
-
-        #div3 {
-            z-index: 4;
-            opacity: 1;
-            position: absolute;
-            top: 80px;
-            left: 180px;
-            width: 330px;
-            height: 230px;
-            background-color: green;
-            padding: 150px 20px 20px;
-        }
-
-        #divclick {
-            z-index: 1;
-            margin-top: 15px;
-            padding: 5px 10px;
-            background-color: lime;
-        }
-
-        #div6 {
-            z-index: 3;
-            position: absolute;
-            top: 80px;
-            left: 180px;
-            width: 150px;
-            height: 125px;
-            padding-top: 125px;
-            background-color: lime;
-            text-align: center;
-        }
-    </style>
-</head>
-
-<body>
-    <!-- divs etc go here -->
-    <div id="div1">
-        <h1>Division Element #1</h1>
-        <code>position: relative;<br/>
-      z-index: 5;</code>
-    </div>
-    <div id="div2">
-        <h1>Division Element #2</h1>
-        <code>position: relative;<br/>
-      z-index: -5;</code>
-    </div>
-    <div id="div3">
-      <div id="divclick" onclick="console.log('click test')">
-          <h1>Clickable Division Element #5</h1>
-          <code>position: relative;<br/>
+<br/>
+<div id="div1">
+  <span><strong>Division Element #1</strong></span>
+  <code>position: relative;<br/>
+    z-index: 5;</code>
+</div>
+<div id="div2">
+  <span><strong>Division Element #2</strong></span>
+  <code>position: relative;<br/>
+    z-index: -5;</code>
+</div>
+<div id="div3">
+  <div id="divclick" onclick="console.log('click test')">
+    <span><strong>Clickable Division Element #5</strong></span>
+    <code>position: relative;<br/>
       z-index: 1;</code>
-      </div>
-        <h1>Division Element #3</h1>
-        <code>position: absolute;<br/>
-      z-index: 4;</code>
-        <div id="div6">
-            <h1>Division Element #6</h1>
-            <code>position: absolute;<br/>
-        z-index: 3;</code>
-        </div>
-    </div>
-    <!-- TODO: divs blocking the selection of items -->
-</body>
-
-</html>
+  </div>
+  <span><strong>Division Element #3</strong></span>
+  <code>position: absolute;<br/>
+    z-index: 4;</code>
+  <div id="div6">
+    <span><strong>Division Element #6</strong></span>
+    <code>position: absolute;<br/>
+      z-index: 3;</code>
+  </div>
+</div>
+<!-- TODO: divs blocking the selection of items -->

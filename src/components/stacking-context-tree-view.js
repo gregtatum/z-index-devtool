@@ -5,7 +5,7 @@ const {connect} = require("react-redux");
 const StackingContextTree = createFactory(require("./stacking-context-tree"));
 const StackingContextNodeInfo = createFactory(require("./stacking-context-node-info"));
 const StackingContextTreeHeader = createFactory(require("./stacking-context-tree-header"));
-const { todo } = require("../actions/stacking-context");
+const {todo} = require("../actions/stacking-context");
 
 const StackingContextTreeView = createFactory(createClass({
   displayName: "StackingContextTreeView",
@@ -22,9 +22,11 @@ const StackingContextTreeView = createFactory(createClass({
     return div(
       {className: "sidebar"},
       div({className: "devtools-toolbar"}, "Stacking Context Tree"),
-      StackingContextTreeHeader(),
-      StackingContextTree({tree, expandedNodes, selNode, toggleNode}),
-      StackingContextNodeInfo()
+      div({className: "tree-view"},
+        StackingContextTreeHeader(),
+        StackingContextTree({tree, expandedNodes, selNode, toggleNode}),
+        StackingContextNodeInfo()
+      )
     );
   }
 }));

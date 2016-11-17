@@ -15,7 +15,7 @@ const StackingContextTreeHeader = createClass({
           className: "stacking-context-node-context",
           title: "Is the node in the stacking context?"
         },
-        ""
+        "In Context"
       ),
 
       span(
