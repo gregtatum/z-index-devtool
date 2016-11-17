@@ -17,6 +17,7 @@ html, body, #app {
   border-left: 1px solid var(--theme-splitter-color);
   overflow: hidden;
   background-color: var(--theme-body-background);
+  z-index: 0;
 }
 
 .sidebar, .tree {
@@ -33,6 +34,7 @@ html, body, #app {
   display:flex;
   align-items: stretch;
   flex-direction: column;
+  z-index: 0;
 }
 
 .tree-view {
@@ -46,6 +48,7 @@ html, body, #app {
   position:relative;
   background-color: #fff;
   color: #000;
+  z-index:0;
 }
 
 .devtools-toolbar {
@@ -86,6 +89,18 @@ html, body, #app {
 
 .tree-node:hover {
   background-color: var(--row-hover-background-color);
+}
+
+.display-rectangle {
+  position:absolute;
+  pointer-events: none;
+  opacity: 0.8;
+  z-index: 1;
+  background-color: orange;
+}
+
+.no-node{
+  display:none;
 }
 
 .selected-node {
@@ -129,6 +144,7 @@ html, body, #app {
 .not-in-context {
   opacity: 0.7;
 }
+
 
 .node-info {
   display: flex;
