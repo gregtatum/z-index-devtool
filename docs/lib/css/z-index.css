@@ -38,10 +38,44 @@ html, body, #app {
   color: #000;
 }
 
+.devtools-toolbar {
+  background-color: var(--theme-toolbar-background);
+}
+
 .selected-node-dom {
   border-style: solid;
   border-width: 3px;
   border-color: #00f;
+}
+/* CSS Variables specific to this panel that aren't defined by the themes */
+.theme-dark {
+  --cell-border-color: rgba(255,255,255,0.15);
+  --cell-border-color-light: rgba(255,255,255,0.1);
+  --focus-cell-border-color: rgba(255,255,255,0.5);
+  --row-alt-background-color: rgba(86, 117, 185, 0.15);
+  --row-hover-background-color: rgba(86, 117, 185, 0.25);
+}
+
+.theme-light {
+  --cell-border-color: rgba(0,0,0,0.15);
+  --cell-border-color-light: rgba(0,0,0,0.1);
+  --focus-cell-border-color: rgba(0,0,0,0.3);
+  --row-alt-background-color: rgba(76,158,217,0.1);
+  --row-hover-background-color: rgba(76,158,217,0.2);
+}
+
+
+.tree-node {
+  background-color: var(--theme-body-background);
+  cursor: default;
+  display: flex;
+}
+.tree-node-odd {
+  background-color: var(--row-alt-background-color);
+}
+
+.tree-node:hover {
+  background-color: var(--row-hover-background-color);
 }
 
 .display-rectangle {
@@ -57,12 +91,43 @@ html, body, #app {
 }
 
 .selected-node {
-  background-color: rgba(0, 0, 0, 0.04);
-  font-weight: bold;
+  background-color: var(--theme-selection-background);
+  color: var(--theme-selection-color);
 }
-/* not sure why this isn't automatically included in tree.js... */
-.arrow {
-  display: inline-block;
+
+.stacking-context-node {
+  display: flex;
+  flex: 1;
+}
+.stacking-context-node.focused {
+  background-color: var(--theme-selection-background);
+  color: var(--theme-selection-color);
+}
+.stacking-context-node.focused ::-moz-selection {
+  background-color: var(--theme-selection-color);
+  color: var(--theme-selection-background);
+}
+/* FLEX */
+.stacking-context-node-name,
+.stacking-context-node-z,
+.stacking-context-node-context {
+  display: inline-flex;
+  text-align: end;
+  align-items: center;
+  border-left: var(--cell-border-color) 1px solid;
+  padding-left: 5px;
+}
+.stacking-context-node-z {
+  width: 7ch;
+}
+.stacking-context-node-context {
+  width: 2ch;
+}
+.stacking-context-node-name {
+  flex: 1; /* expand to occupy rest of row */
+}
+.not-in-context {
+  opacity: 0.7;
 }
 
 
@@ -70,9 +135,7 @@ html, body, #app {
   position: absolute;
   bottom: 0;
   padding: 5px;
-  border-width: thin 0 0 0;
-  border-color: grey;
-  border-style: solid;
+  border-top: var(--cell-border-color) 1px solid;
   width: 100%;
 }
 
@@ -83,10 +146,18 @@ html, body, #app {
 
 .stacking-context-info-value {
   padding-left: 8px;
-  color: #00c1c1;
+  color: var(--theme-highlight-blue);
   font-weight: bold;
 }
 
 .stacking-context-info-header-value {
   padding-left: 8px;
+}
+
+.header {
+  display: flex;
+  color: var(--theme-body-color);
+  background-color: var(--theme-tab-toolbar-background);
+  border-bottom: 1px solid var(--cell-border-color);
+  flex: 0;
 }
