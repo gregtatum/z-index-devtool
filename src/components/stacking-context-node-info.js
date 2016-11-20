@@ -7,17 +7,23 @@ const StackingContextNodeInfo = createClass({
   render() {
     const {store} = this.context;
     const {selNode} = store.getState().stackingContext;
-    let nodeProperties = selNode ? getStackingContextInfo(selNode) : undefined;
+    const nodeInfo = selNode ? getNodeInfo(selNode) : undefined;
 
     return div({
       className: "node-info footer"
     },
-    div({className: "devtools-toolbar"}, "Stacking Context Node Info"),
-    createHeader(),
-    nodeProperties);
+    nodeInfo);
   }
 
 });
+
+function getNodeInfo(node) {
+  let nodeProperties = node ? getStackingContextInfo(node) : undefined;
+
+  return [div({className: "devtools-toolbar"}, "Stacking Context Node Info"),
+  createHeader(),
+  nodeProperties];
+}
 
 function createHeader() {
   return div({className: "header"},
