@@ -127,7 +127,7 @@ html, body, #app {
 .stacking-context-info-label,
 .stacking-context-info-value {
   display: inline-flex;
-  text-align: right;
+  text-align: end;
   align-items: center;
   border-left: var(--cell-border-color) 1px solid;
   padding-left: 5px;

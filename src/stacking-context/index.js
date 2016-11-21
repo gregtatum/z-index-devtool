@@ -76,24 +76,41 @@ function isStackingContext(properties) {
          properties.hasTouchOverflowScrolling;
 }
 
-function getStackingContextTree(root, treeNodes = [], parent) {
+function getStackingContextTree(root, treeNodes = [], parentElement) {
   let counter = 0;
   for (let child of root.children) {
-    let stackingContextProperties = getStackingContextProperties(child);
     let newNode;
-
-    if (stackingContextProperties.isStacked ||
-      stackingContextProperties.isStackingContext ||
-      childrenElementsAreStacked(child)) {
+    if (child.tagName === "DIV" || child.tagName === "SPAN") {
+      let stackingContextProperties = getStackingContextProperties(child);
+      let parentStackingContext;
+      let index;
+      if (parentElement === undefined) {
+        index = stackingContextProperties.zindex;
+        parentStackingContext = undefined;
+      }
+      else if (parentElement.properties.zindex === "auto") {
+        parentStackingContext = parent.parentStackingContext;
+        index = stackingContextProperties.zindex;
+      } else if (parentElement.properties.zindex !== "auto") {
+        parentStackingContext = parent;
+        index = parentElement.index + " > " + stackingContextProperties.zindex;
+      }
+      // let parentStackingContext = (parentElement === undefined) ? undefined :
+      //                             (parentElement.zindex !== "auto")parentElement.parentStackingContext
+      // let index = (parentElement === undefined || parent.properties.zindex === "auto") ? stackingContextProperties.zindex :
+      //       (stackingContextProperties.zindex !== "auto") ? parent.index + " > " + stackingContextProperties.zindex:
+      //         parent.index;
       newNode = {
         el: child,
-        key: (parent === undefined) ? counter++ : parent.key + "-" + counter++,
-        index: (parent != undefined)? parent.index + " > " + stackingContextProperties.zindex : stackingContextProperties.zindex,
+        key: (parentElement === undefined) ? counter++ : parentElement.key + "-" + counter++,
+        index,
         nodes: [],
-        parent,
+        parentElement,
+        parentStackingContext,
         properties: stackingContextProperties
       };
       treeNodes.push(newNode);
+      console.log(newNode.nodes);
     }
 
     // Recurse through children.
@@ -109,7 +126,7 @@ function getStackingContextTree(root, treeNodes = [], parent) {
 }
 
 function sortNodesByZIndex(tree) {
-  tree.sort(function(a, b){return a.index <= b.index});
+  tree.sort(function(a, b){return a.index > b.index});
   return tree;
 }
 

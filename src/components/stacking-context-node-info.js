@@ -7,14 +7,16 @@ const StackingContextNodeInfo = createClass({
   render() {
     const {store} = this.context;
     const {selNode} = store.getState().stackingContext;
-    let nodeProperties = selNode ? getStackingContextInfo(selNode) : undefined;
-
-    return div({
-      className: "node-info footer"
-    },
-    div({className: "devtools-toolbar"}, "Stacking Context Node Info"),
-    createHeader(),
-    nodeProperties);
+    if (selNode) {
+      return div({
+        className: "node-info footer"
+      },
+      div({className: "devtools-toolbar"}, "Stacking Context Node Info"),
+      createHeader(),
+      getStackingContextInfo(selNode));
+    } else {
+      return div({className: "node-info footer"});
+    }
   }
 
 });
