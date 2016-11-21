@@ -32,6 +32,7 @@ const StackingContextNode = createClass({
         key: node.key,
         onClick: () => {
           store.dispatch(selectStackingContextNode(node));
+          store.dispatch(computeBoundingRect(node.el));
         }
       },
 
@@ -50,10 +51,6 @@ const StackingContextNode = createClass({
         },
         arrow,
         span({
-          onClick: () => {
-            store.dispatch(selectStackingContextNode(node));
-            store.dispatch(computeBoundingRect(node.el));
-          },
           title: node.properties.isStackingContext? "" : "This element is not part of the stacking context."
         },
         getNodeContainerName(node.el))
