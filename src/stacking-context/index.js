@@ -82,46 +82,39 @@ function getStackingContextTree(root, treeNodes = [], parentElement) {
     let newNode;
     if (child.tagName === "DIV" || child.tagName === "SPAN") {
       let stackingContextProperties = getStackingContextProperties(child);
-      let parentStackingContext;
-      let index;
-      if (parentElement === undefined) {
-        index = stackingContextProperties.zindex;
-        parentStackingContext = undefined;
-      }
-      else if (parentElement.properties.zindex === "auto") {
-        parentStackingContext = parent.parentStackingContext;
-        index = stackingContextProperties.zindex;
-      } else if (parentElement.properties.zindex !== "auto") {
-        parentStackingContext = parent;
-        index = parentElement.index + " > " + stackingContextProperties.zindex;
-      }
-      // let parentStackingContext = (parentElement === undefined) ? undefined :
-      //                             (parentElement.zindex !== "auto")parentElement.parentStackingContext
-      // let index = (parentElement === undefined || parent.properties.zindex === "auto") ? stackingContextProperties.zindex :
-      //       (stackingContextProperties.zindex !== "auto") ? parent.index + " > " + stackingContextProperties.zindex:
-      //         parent.index;
+      let parentStackingContext = (parentElement === undefined) ? undefined :
+                                  (parentElement.properties.zindex === "auto") ? parentElement.parentStackingContext :
+                                  parentElement;
+      let index = (parentElement === undefined) ? stackingContextProperties.zindex :
+                  (parentElement.properties.zindex === "auto") ? stackingContextProperties.zindex :
+                  parentElement.index + " > " + stackingContextProperties.zindex;
       newNode = {
         el: child,
         key: (parentElement === undefined) ? counter++ : parentElement.key + "-" + counter++,
         index,
         nodes: [],
+        stackingContextChildren: [],
         parentElement,
         parentStackingContext,
         properties: stackingContextProperties
       };
       treeNodes.push(newNode);
-      console.log(newNode.nodes);
     }
 
     // Recurse through children.
+    var childrenNodes;
     if (child.childElementCount) {
-      getStackingContextTree(child,
-                             newNode ? newNode.nodes : treeNodes,
+      childrenNodes = getStackingContextTree(child,
+                             (newNode && (newNode.properties.zindex !== "auto")) ? newNode.nodes : treeNodes,
                              newNode || parent);
+      if (newNode.properties.zindex !== "auto") {
+         newNode.stackingContextChildren = childrenNodes;
+      }
     }
   }
 
   treeNodes = sortNodesByZIndex(treeNodes);
+  console.log(treeNodes);
   return treeNodes;
 }
 
