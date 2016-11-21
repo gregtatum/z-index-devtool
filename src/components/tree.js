@@ -739,12 +739,11 @@ const TreeNode = createFactory(createClass({
                 this.props.depth,
                 this.props.focused,
                 arrow,
-                this.props.expanded)
+                this.props.expanded),
 
             // XXX: OSX won't focus/blur regular elements even if you set tabindex
             // unless there is an input/button child.
-            // JR: commented out this button; it was messing up whole look; no added value?
-            // dom.button(this._buttonAttrs)
+            dom.button(this._buttonAttrs)
         );
     }
 }));
