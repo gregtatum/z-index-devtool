@@ -39,8 +39,7 @@ const DisplayRectangle = createClass({
 
     getInitialState(){
       return {
-        observer: undefined,
-        handleResize: this.handleResize.bind(this)
+        observer: undefined
       };
     },
 
