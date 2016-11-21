@@ -1,10 +1,11 @@
-const {getText} = require("@tatumcreative/get");
+const {getText: getTextModule} = require("@tatumcreative/get");
 const constants = require("../constants");
 const {getStackingContextTree} = require("../stacking-context");
+const {getMockTree} = require('../../test/fixtures/tree-fixture');
 
-function fetchNewDomText (url) {
+function fetchNewDomText (url, getText = getTextModule) {
   return function(dispatch, getState) {
-    getText(url).then(
+    return getText(url).then(
       text => {
         dispatch({
           type: constants.NEW_DOM_TEXT,
@@ -14,13 +15,23 @@ function fetchNewDomText (url) {
       },
       console.error.bind(console)
     );
-  }
+  };
 }
 
 function getStackingContext(containerElement) {
   return function(dispatch, getState) {
     const tree = getStackingContextTree(containerElement);
+    dispatch({
+      type: constants.ADD_STACKING_CONTEXT,
+      containerElement,
+      tree
+    });
+  }
+}
 
+function getMockStackingContext(containerElement) {
+  return function(dispatch, getState) {
+    const tree = getMockTree();
     dispatch({
       type: constants.ADD_STACKING_CONTEXT,
       containerElement,
@@ -78,6 +89,7 @@ function collapseNode(node) {
 module.exports = {
   fetchNewDomText,
   getStackingContext,
+  getMockStackingContext,
   selectStackingContextNode,
   toggleNode,
   expandNode,
