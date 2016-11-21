@@ -88,7 +88,7 @@ function getStackingContextTree(root, treeNodes = [], parent) {
       newNode = {
         el: child,
         key: (parent === undefined) ? counter++ : parent.key + "-" + counter++,
-        index: stackingContextProperties.isStacked ? parseInt(getComputedStyle(child).zIndex, 10) : undefined,
+        index: (parent != undefined)? parent.index + " > " + stackingContextProperties.zindex : stackingContextProperties.zindex,
         nodes: [],
         parent,
         properties: stackingContextProperties
@@ -104,7 +104,13 @@ function getStackingContextTree(root, treeNodes = [], parent) {
     }
   }
 
+  treeNodes = sortNodesByZIndex(treeNodes);
   return treeNodes;
+}
+
+function sortNodesByZIndex(tree) {
+  tree.sort(function(a, b){return a.index <= b.index});
+  return tree;
 }
 
 function childrenElementsAreStacked(node) {
