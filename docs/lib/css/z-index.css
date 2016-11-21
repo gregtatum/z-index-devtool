@@ -103,11 +103,6 @@ html, body, #app {
   display:none;
 }
 
-.selected-node {
-  background-color: var(--theme-selection-background);
-  color: var(--theme-selection-color);
-}
-
 .stacking-context-node {
   display: flex;
   flex: 1;

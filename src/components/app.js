@@ -5,6 +5,8 @@ const {connect} = require("react-redux");
 const {
   fetchNewDomText,
   getStackingContext,
+  selectStackingContextNode,
+  computeBoundingRect,
   toggleNode,
 } = require("../actions/stacking-context");
 
@@ -47,7 +49,9 @@ const App = createFactory(createClass({
         StackingContextTreeView({
           tree: stackingContext.tree,
           expandedNodes: stackingContext.expandedNodes,
-          selNode: stackingContext.selNode,
+          selectedNode: stackingContext.selNode,
+          selectNode: node => dispatch(selectStackingContextNode(node)),
+          computeBoundingRect: node => dispatch(computeBoundingRect(node)),
           toggleNode: node => dispatch(toggleNode(node))
         })
     );
