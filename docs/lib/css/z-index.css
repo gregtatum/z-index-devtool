@@ -153,11 +153,11 @@ html, body, #app {
 }
 
 .node-info {
-  position:absolute;
-  width:100%;
+  display: flex;
+  flex-direction: column;
   bottom: 0;
-  padding: 5px;
   border-top: var(--cell-border-color) 1px solid;
+  padding-bottom: 10px;
 }
 
 .highlight-value {
