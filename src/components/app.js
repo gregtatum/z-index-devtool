@@ -10,6 +10,7 @@ const {
 
 const MainView = createFactory(require("./main-view"));
 const StackingContextTreeView = createFactory(require("./stacking-context-tree-view"));
+const StackingContextNodeInfo = createFactory(require("./stacking-context-node-info"))
 
 const { todo } = require("../actions/stacking-context");
 
@@ -44,12 +45,16 @@ const App = createFactory(createClass({
           //props for display rectangle
           elt: stackingContext.selElt
         }),
-        StackingContextTreeView({
-          tree: stackingContext.tree,
-          expandedNodes: stackingContext.expandedNodes,
-          selNode: stackingContext.selNode,
-          toggleNode: node => dispatch(toggleNode(node))
-        })
+        div(
+          {className: "sidebar"},
+          StackingContextTreeView({
+            tree: stackingContext.tree,
+            expandedNodes: stackingContext.expandedNodes,
+            selNode: stackingContext.selNode,
+            toggleNode: node => dispatch(toggleNode(node))
+          }),
+          StackingContextNodeInfo()
+        )
     );
   }
 }));
