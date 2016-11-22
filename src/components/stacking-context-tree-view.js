@@ -22,7 +22,8 @@ const StackingContextTreeView = createFactory(createClass({
       {className: "tree-view"},
       div({className: "devtools-toolbar"}, "Stacking Context Tree"),
         StackingContextTreeHeader(),
-        StackingContextTree({tree, expandedNodes, selectedNode, selectNode, computeBoundingRect, toggleNode})
+        StackingContextTree({tree, expandedNodes, selectedNode, selectNode, computeBoundingRect, toggleNode})/*,
+        StackingContextNodeInfo()*/
     );
   }
 }));
