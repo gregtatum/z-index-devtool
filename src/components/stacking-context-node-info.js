@@ -47,14 +47,13 @@ function getStackingContextInfo(node) {
            p === "transform" || p === "filter" ||
            p === "perspective" || p === "isolation";
   });
+  // As a default, display the position and z-index info for all nodes
   tableRows.push(createTableRow("Z-Index", properties.zindex));
   tableRows.push(createTableRow("Position", properties.position));
-  //if (properties.isStacked) tableRows.push(createTableRow("Z-Index", properties.zindex));
   if (properties.filter !== "none") tableRows.push(createTableRow("Filter", properties.filter));
   if (properties.mixBlendMode !== "normal") tableRows.push(createTableRow("Mix-Blend-Mode", properties.mixBlendMode));
   if (properties.opacity !== "1") tableRows.push(createTableRow("Opacity", properties.opacity));
   if (properties.perspective !== "none") tableRows.push(createTableRow("Perspective", properties.perspective));
-  //if (properties.position !== "static") tableRows.push(createTableRow("Position", properties.position));
   if (properties.transform !== "none") tableRows.push(createTableRow("Transform", properties.transform));
   if (willChange) tableRows.push(createTableRow("Will-Change", properties.willChange));
   if (properties.hasTouchOverflowScrolling) tableRows.push(createTableRow("Has Touch Overflow-Scrolling", properties.hasTouchOverflowScrolling));
