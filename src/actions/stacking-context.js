@@ -44,13 +44,14 @@ function selectStackingContextNode(node) {
   return function(dispatch, getState) {
     dispatch({
       type: constants.SELECT_NODE,
-      selNode: node,
+      selectedNode: node,
       selElt: node.el
     });
   }
 }
 
-function computeBoundingRect(elt) {
+function computeBoundingRect(node) {
+  let elt = node.el;
   return function(dispatch, getState) {
     dispatch({
       type: constants.COMPUTE_RECT,

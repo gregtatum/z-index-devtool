@@ -19,7 +19,7 @@ const StackingContextNode = createClass({
 
     let className = "stacking-context-node";
     if (isFocused) {
-      className += " selected-node";
+      className += " focused";
     }
 
     if (!node.properties.isStackingContext) {
@@ -37,7 +37,7 @@ const StackingContextNode = createClass({
         key: node.key,
         onClick: () => {
           store.dispatch(selectStackingContextNode(node));
-          store.dispatch(computeBoundingRect(node.el));
+          store.dispatch(computeBoundingRect(node));
         }
       },
 

@@ -3,17 +3,17 @@ const {div, span} = DOM;
 const React = require("react");
 
 const StackingContextNodeInfo = createClass({
-  // USING selNode TO DISPLAY THE STACKING CONTEXT INFO BASED ON SELECTED NODE
+  // USING selectedNode TO DISPLAY THE STACKING CONTEXT INFO BASED ON SELECTED NODE
   render() {
     const {store} = this.context;
-    const {selNode} = store.getState().stackingContext;
-    if (selNode) {
+    const {selectedNode} = store.getState().stackingContext;
+    if (selectedNode) {
       return div({
         className: "node-info footer"
       },
       div({className: "devtools-toolbar"}, "Stacking Context Node Info"),
       createHeader(),
-      getStackingContextInfo(selNode));
+      getStackingContextInfo(selectedNode));
     } else {
       return div({className: "node-info footer"});
     }
