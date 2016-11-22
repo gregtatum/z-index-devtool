@@ -76,144 +76,67 @@ function isStackingContext(properties) {
          properties.hasTouchOverflowScrolling;
 }
 
-function getStackingContextTree(root, treeNodes = [], parent) {
+function getStackingContextTree(root, treeNodes = [], parentElement) {
   let counter = 0;
   for (let child of root.children) {
-    let stackingContextProperties = getStackingContextProperties(child);
     let newNode;
-
-    if (stackingContextProperties.isStacked ||
-      stackingContextProperties.isStackingContext ||
-      childrenElementsAreStacked(child)) {
+    // Filter for divs and spans only.
+    // Easily change to include others. (Maybe make it a configurable setting in the future)
+    if (child.tagName === "DIV" || child.tagName === "SPAN") {
+      let stackingContextProperties = getStackingContextProperties(child);
+      // Terminology: parentElement = parent element of the current element
+      //              parentStackingContext = the parent stacking order element
+      // Logic: If parent element is undefined, then the parent stacking element is undefined.
+      //        If the parent element is part of the stacking context, then the parent stacking
+      //        element is the parent element; otherwise, the parent stacking element of the
+      //        parent element is the stacking element for this element
+      let parentStackingContext = (parentElement === undefined) ? undefined :
+                                  (parentElement.properties.isStackingContext) ? parentElement :
+                                  parentElement.parentStackingContext;
       newNode = {
         el: child,
-        key: (parent === undefined) ? counter++ : parent.key + "-" + counter++,
-        index: stackingContextProperties.isStacked ? parseInt(getComputedStyle(child).zIndex, 10) : undefined,
+        key: (parentElement === undefined) ? counter++ : parentElement.key + "-" + counter++,
         nodes: [],
-        parent,
+        stackingContextChildren: [],
+        parentElement,
+        parentStackingContext,
         properties: stackingContextProperties
       };
       treeNodes.push(newNode);
     }
 
     // Recurse through children.
+    var childrenNodes;
     if (child.childElementCount) {
-      getStackingContextTree(child,
-                             newNode ? newNode.nodes : treeNodes,
-                             newNode || parent);
+      childrenNodes = getStackingContextTree(child,
+                             (newNode && newNode.properties.isStackingContext) ? newNode.nodes : treeNodes,
+                             newNode || parentElement);
+      // Add the children nodes to newNode.stackingContextChildren.
+      // This is different from newNode.nodes which is the DOM children.
+      if (newNode && newNode.properties.isStackingContext) {
+         newNode.stackingContextChildren = childrenNodes;
+      }
     }
   }
 
+  treeNodes = sortNodesByZIndex(treeNodes);
   return treeNodes;
 }
 
-function childrenElementsAreStacked(node) {
-  for (let child of node.children) {
-    let stackingContextProperties = getStackingContextProperties(child);
-    if (stackingContextProperties.isStacked || stackingContextProperties.isStackingContext) {
-      return true;
-    } else if (child.childElementCount) {
-      childrenElementsAreStacked(child);
+// Sort nodes based on their zindex. "auto" is equivalent to 0
+function sortNodesByZIndex(tree) {
+  tree.sort(function(a, b){
+    if (a.properties.isStackingContext && b.properties.isStackingContext) {
+      var aZindex = (a.properties.zindex === "auto") ? 0 : a.properties.zindex;
+      var bZindex = (b.properties.zindex === "auto") ? 0 : b.properties.zindex;
+      return aZindex > bZindex;
+    } else {
+      return (a.properties.isStackingContext) ? 1 : 0;
     }
-  }
-  return false;
-}
-
-function outputNode({el, isStackingContext, isStacked, index}) {
-  return el.tagName.toLowerCase() +
-         (el.id.trim() !== "" ? "#" + el.id.trim() : "") +
-         (el.className && el.className.trim && el.className.trim() !== "" ? "." + el.className.trim().split(" ").join(".") : "") +
-         (isStackingContext ? " [CONTEXT]" : "") +
-         (isStacked ? ` [${index}]` : "");
-}
-
-function outputTree(tree, indent = "", output = []) {
-  for (let node of tree) {
-    let out = outputNode(node);
-    output.push(indent + outputNode(node));
-    if (node.nodes) {
-      outputTree(node.nodes, indent + "  ", output);
-    }
-  }
-  return output;
-}
-
-function findNode(tree, node) {
-  for (let item of tree) {
-    if (item.el === node) {
-      return item;
-    }
-    if (item.nodes) {
-      let candidate = findNode(item.nodes, node);
-      if (candidate) {
-        return candidate;
-      }
-    }
-  }
-}
-
-function compareNodes(tree, node1, node2) {
-  // Get the item in the stack tree corresponding to node1.
-  let item1 = findNode(tree, node1);
-  // And get the list of its parent leading up to the root.
-  let parents1 = [];
-  let item = item1;
-  while (item.parent) {
-    parents1.push(item.parent);
-    item = item.parent;
-  }
-
-  // Do the same for node2.
-  let item2 = findNode(tree, node2);
-  let parents2 = [];
-  item = item2;
-  while (item.parent) {
-    parents2.push(item.parent);
-    item = item.parent;
-  }
-
-  // Now find the common root in these 2 lists of parents and the sub branches from it.
-  let commonRoot;
-  let subParents1 = [];
-  let subParents2 = [];
-  for (let parent1 of parents1) {
-    subParents1.push(parent1);
-    subParents2 = [];
-    for (let parent2 of parents2) {
-      subParents2.push(parent2);
-      if (parent1 === parent2) {
-        commonRoot = parent1;
-        break;
-      }
-    }
-    if (commonRoot) {
-      break;
-    }
-  }
-  subParents1.reverse().push(item1);
-  subParents2.reverse().push(item2);
-
-  // And now display only these 2 sub branches, from the common
-  // root to node1 and node2.
-  console.log(subParents1.map(outputNode).join(" --> "));
-  console.log(subParents2.map(outputNode).join(" --> "));
-}
-
-function flattenTreeWithDepth(tree = [], depth = 0) {
-  return tree.reduce((previousValue, node) => {
-    return [
-      ...previousValue,
-      Object.assign({depth}, node),
-      ...flattenTreeWithDepth(node.nodes, depth + 1)
-    ];
-  }, [])
+  });
+  return tree;
 }
 
 module.exports = {
-  getStackingContextTree,
-  outputNode,
-  outputTree,
-  findNode,
-  compareNodes,
-  flattenTreeWithDepth
+  getStackingContextTree
 };
