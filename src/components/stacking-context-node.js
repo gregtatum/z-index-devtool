@@ -27,7 +27,7 @@ const StackingContextNode = createClass({
     }
 
     let nodeZ = {className: "stacking-context-node-z"};
-    if (node.index.includes("auto")) {
+    if (node.properties.zindex === "auto") {
       nodeZ.title = "'auto' is equivalent to having a Z-Index of 0";
     }
 
@@ -45,7 +45,7 @@ const StackingContextNode = createClass({
       ),
 
       span(nodeZ,
-        node.index
+        node.properties.zindex
       ),
 
       span(
