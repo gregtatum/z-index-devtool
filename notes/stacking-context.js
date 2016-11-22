@@ -129,9 +129,13 @@ function getStackingContextTree(root, treeNodes = [], parentElement) {
 // Sort nodes based on their zindex. "auto" is equivalent to 0
 function sortNodesByZIndex(tree) {
   tree.sort(function(a, b){
-    var aZindex = (a.properties.zindex === "auto") ? 0 : a.properties.zindex;
-    var bZindex = (b.properties.zindex === "auto") ? 0 : b.properties.zindex;
-    return aZindex > bZindex;
+    if (a.properties.isStackingContext && b.properties.isStackingContext) {
+      var aZindex = (a.properties.zindex === "auto") ? 0 : a.properties.zindex;
+      var bZindex = (b.properties.zindex === "auto") ? 0 : b.properties.zindex;
+      return aZindex > bZindex;
+    } else {
+      return (a.properties.isStackingContext) ? 1 : 0;
+    }
   });
   return tree;
 }
