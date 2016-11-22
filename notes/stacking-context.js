@@ -1,3 +1,5 @@
+/** THIS IS THE NEW WAY OF GENERATING THE STACKING CONTEXT.
+  */
 (function() {
 /**
  * https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context
@@ -21,17 +23,13 @@ function getWin(el) {
   return el.ownerDocument.defaultView;
 }
 
-function isStacked(el) {
-  return getWin(el).getComputedStyle(el).zIndex !== "auto";
-}
-
 function isElement(el) {
   return el.nodeType && el.nodeType === Node.ELEMENT_NODE;
 }
 
-function isStackingContext(el) {
+function getStackingContextProperties(el) {
   if (!isElement(el)) {
-    return false;
+    return undefined;
   }
 
   let win = getWin(el);
@@ -40,161 +38,109 @@ function isStackingContext(el) {
   let parentStyle = parentEl && isElement(parentEl)
                     ? win.getComputedStyle(parentEl)
                     : {};
+  let nodeProperties = {
+    isStacked: style.zIndex !== "auto",
+    zindex: style.zIndex,
+    isRoot: el === el.ownerDocument.documentElement,
+    position: style.position,
+    isFlexItem: parentStyle.display === "flex" || parentStyle.display === "inline-flex",
+    opacity: style.opacity,
+    transform: style.transform,
+    mixBlendMode: style.mixBlendMode,
+    filter: style.filter,
+    perspective: style.perspective,
+    isIsolated: style.isolation === "isolate",
+    willChange: style.willChange,
+    hasTouchOverflowScrolling: style.WebkitOverflowScrolling === "touch"
+  }
 
-  let isRoot = el === el.ownerDocument.documentElement;
-  let isPositioned = style.position === "relative" || style.position === "absolute";
-  let hasNonAutoZIndex = isStacked(el);
-  let isFlexItem = parentStyle.display === "flex" || parentStyle.display === "inline-flex";
-  let isNotOpaque = style.opacity !== "1";
-  let isTransformed = style.transform !== "none";
-  let hasMixBlendMode = style.mixBlendMode !== "normal";
-  let isFiltered = style.filter !== "none";
-  let hasPerspective = style.perspective !== "none";
-  let isIsolated = style.isolation === "isolate";
-  let isFixed = style.position === "fixed";
-  let willChange = style.willChange.split(", ").some(p => {
+  nodeProperties.isStackingContext = isStackingContext(nodeProperties);
+
+  return nodeProperties;
+}
+
+function isStackingContext(properties) {
+  let willChange = properties.willChange.split(", ").some(p => {
     return p === "position" || p === "opacity" ||
            p === "transform" || p === "filter" ||
            p === "perspective" || p === "isolation";
   });
-  let hasTouchOverflowScrolling = style.WebkitOverflowScrolling === "touch";
-
-  return isRoot ||
-         (hasNonAutoZIndex && isPositioned) ||
-         (hasNonAutoZIndex && isFlexItem) ||
-         isNotOpaque ||
-         isTransformed ||
-         hasMixBlendMode ||
-         isFiltered ||
-         hasPerspective ||
-         isIsolated ||
-         isFixed ||
+  return properties.isRoot ||
+         (properties.isStacked && (properties.position === "relative" || properties.position === "absolute")) ||
+         (properties.isStacked && properties.isFlexItem) ||
+         properties.opacity !== "1"||
+         properties.transform !== "none"||
+         properties.mixBlendMode !== "normal"||
+         properties.filter !== "none"||
+         properties.perspective !== "none"||
+         properties.isIsolated ||
+         properties.position === "fixed" ||
          willChange ||
-         hasTouchOverflowScrolling;
+         properties.hasTouchOverflowScrolling;
 }
 
-function getStackingContextTree(root, treeNodes = [], parent) {
+function getStackingContextTree(root, treeNodes = [], parentElement) {
+  let counter = 0;
   for (let child of root.children) {
-    let isChildStacked = isStacked(child);
-    let isChildStackingContext = isStackingContext(child);
     let newNode;
-
-    if (isChildStacked || isChildStackingContext) {
+    // Filter for divs and spans only.
+    // Easily change to include others. (Maybe make it a configurable setting in the future)
+    if (child.tagName === "DIV" || child.tagName === "SPAN") {
+      let stackingContextProperties = getStackingContextProperties(child);
+      // Terminology: parentElement = parent element of the current element
+      //              parentStackingContext = the parent stacking order element
+      // Logic: If parent element is undefined, then the parent stacking element is undefined.
+      //        If the parent element is part of the stacking context, then the parent stacking
+      //        element is the parent element; otherwise, the parent stacking element of the
+      //        parent element is the stacking element for this element
+      let parentStackingContext = (parentElement === undefined) ? undefined :
+                                  (parentElement.properties.isStackingContext) ? parentElement :
+                                  parentElement.parentStackingContext;
       newNode = {
         el: child,
-        isStacked: isChildStacked,
-        index: isChildStacked ? parseInt(getComputedStyle(child).zIndex, 10) : undefined,
-        isStackingContext: isChildStackingContext,
+        key: (parentElement === undefined) ? counter++ : parentElement.key + "-" + counter++,
         nodes: [],
-        parent
+        stackingContextChildren: [],
+        parentElement,
+        parentStackingContext,
+        properties: stackingContextProperties
       };
       treeNodes.push(newNode);
     }
 
     // Recurse through children.
+    var childrenNodes;
     if (child.childElementCount) {
-      getStackingContextTree(child,
-                             newNode && isChildStackingContext ? newNode.nodes : treeNodes,
-                             newNode || parent);
+      childrenNodes = getStackingContextTree(child,
+                             (newNode && newNode.properties.isStackingContext) ? newNode.nodes : treeNodes,
+                             newNode || parentElement);
+      // Add the children nodes to newNode.stackingContextChildren.
+      // This is different from newNode.nodes which is the DOM children.
+      if (newNode && newNode.properties.isStackingContext) {
+         newNode.stackingContextChildren = childrenNodes;
+      }
     }
   }
 
+  treeNodes = sortNodesByZIndex(treeNodes);
   return treeNodes;
 }
 
-let tree = getStackingContextTree(document);
-
-function outputNode({el, isStackingContext, isStacked, index}) {
-  return el.tagName.toLowerCase() +
-         (el.id.trim() !== "" ? "#" + el.id.trim() : "") +
-         (el.className && el.className.trim && el.className.trim() !== "" ? "." + el.className.trim().split(" ").join(".") : "") +
-         (isStackingContext ? " [CONTEXT]" : "") +
-         (isStacked ? ` [${index}]` : "");
-}
-
-function outputTree(tree, indent = "", output = []) {
-  for (let node of tree) {
-    let out = outputNode(node);
-    output.push(indent + outputNode(node));
-    if (node.nodes) {
-      outputTree(node.nodes, indent + "  ", output);
-    }
-  }
-  return output;
-}
-
-// console.log(outputTree(tree).join("\n"))
-
-function findNode(tree, node) {
-  for (let item of tree) {
-    if (item.el === node) {
-      return item;
-    }
-    if (item.nodes) {
-      let candidate = findNode(item.nodes, node);
-      if (candidate) {
-        return candidate;
-      }
-    }
-  }
-}
-
-function compareNodes(tree, node1, node2) {
-  // Get the item in the stack tree corresponding to node1.
-  let item1 = findNode(tree, node1);
-  // And get the list of its parent leading up to the root.
-  let parents1 = [];
-  let item = item1;
-  while (item.parent) {
-    parents1.push(item.parent);
-    item = item.parent;
-  }
-
-  // Do the same for node2.
-  let item2 = findNode(tree, node2);
-  let parents2 = [];
-  item = item2;
-  while (item.parent) {
-    parents2.push(item.parent);
-    item = item.parent;
-  }
-
-  // Now find the common root in these 2 lists of parents and the sub branches from it.
-  let commonRoot;
-  let subParents1 = [];
-  let subParents2 = [];
-  for (let parent1 of parents1) {
-    subParents1.push(parent1);
-    subParents2 = [];
-    for (let parent2 of parents2) {
-      subParents2.push(parent2);
-      if (parent1 === parent2) {
-        commonRoot = parent1;
-        break;
-      }
-    }
-    if (commonRoot) {
-      break;
-    }
-  }
-  subParents1.reverse().push(item1);
-  subParents2.reverse().push(item2);
-
-  // And now display only these 2 sub branches, from the common
-  // root to node1 and node2.
-  console.log(subParents1.map(outputNode).join(" --> "));
-  console.log(subParents2.map(outputNode).join(" --> "));
+// Sort nodes based on their zindex. "auto" is equivalent to 0
+function sortNodesByZIndex(tree) {
+  tree.sort(function(a, b){
+    var aZindex = (a.properties.zindex === "auto") ? 0 : a.properties.zindex;
+    var bZindex = (b.properties.zindex === "auto") ? 0 : b.properties.zindex;
+    return aZindex > bZindex;
+  });
+  return tree;
 }
 
 // STR:
-// - Open any page with z-index elements you want to find out about
-// - Open this file in scratchpad
-// - Find 2 nodes that you want to compare:
-let node1 = document.querySelector("#chattext");
-let node2 = document.querySelector("#mycolorpicker");
-// - Call compareNodes with these 2 nodes and the stacking context tree:
-compareNodes(tree, node1, node2);
+// - Open a HTML page with elements that you want to know the stacking-context of in scratchpad
+// - Call getStackingContextTree on the entire document:
+console.log(getStackingContextTree(document));
 // - Open the web console to see the result
-// - You should see 2 branches of DOM nodes, leading up to the same root context node.
+// - You should see the stacking context array.
 
 })();

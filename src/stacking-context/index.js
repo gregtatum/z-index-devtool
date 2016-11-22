@@ -110,7 +110,9 @@ function getStackingContextTree(root, treeNodes = [], parentElement) {
     if (child.childElementCount) {
       childrenNodes = getStackingContextTree(child,
                              (newNode && newNode.properties.isStackingContext) ? newNode.nodes : treeNodes,
-                             newNode || parent);
+                             newNode || parentElement);
+      // Add the children nodes to newNode.stackingContextChildren.
+      // This is different from newNode.nodes which is the DOM children.
       if (newNode && newNode.properties.isStackingContext) {
          newNode.stackingContextChildren = childrenNodes;
       }
@@ -131,113 +133,6 @@ function sortNodesByZIndex(tree) {
   return tree;
 }
 
-function childrenElementsAreStacked(node) {
-  for (let child of node.children) {
-    let stackingContextProperties = getStackingContextProperties(child);
-    if (stackingContextProperties.isStacked || stackingContextProperties.isStackingContext) {
-      return true;
-    } else if (child.childElementCount) {
-      childrenElementsAreStacked(child);
-    }
-  }
-  return false;
-}
-
-function outputNode({el, isStackingContext, isStacked, index}) {
-  return el.tagName.toLowerCase() +
-         (el.id.trim() !== "" ? "#" + el.id.trim() : "") +
-         (el.className && el.className.trim && el.className.trim() !== "" ? "." + el.className.trim().split(" ").join(".") : "") +
-         (isStackingContext ? " [CONTEXT]" : "") +
-         (isStacked ? ` [${index}]` : "");
-}
-
-function outputTree(tree, indent = "", output = []) {
-  for (let node of tree) {
-    let out = outputNode(node);
-    output.push(indent + outputNode(node));
-    if (node.nodes) {
-      outputTree(node.nodes, indent + "  ", output);
-    }
-  }
-  return output;
-}
-
-function findNode(tree, node) {
-  for (let item of tree) {
-    if (item.el === node) {
-      return item;
-    }
-    if (item.nodes) {
-      let candidate = findNode(item.nodes, node);
-      if (candidate) {
-        return candidate;
-      }
-    }
-  }
-}
-
-function compareNodes(tree, node1, node2) {
-  // Get the item in the stack tree corresponding to node1.
-  let item1 = findNode(tree, node1);
-  // And get the list of its parent leading up to the root.
-  let parents1 = [];
-  let item = item1;
-  while (item.parent) {
-    parents1.push(item.parent);
-    item = item.parent;
-  }
-
-  // Do the same for node2.
-  let item2 = findNode(tree, node2);
-  let parents2 = [];
-  item = item2;
-  while (item.parent) {
-    parents2.push(item.parent);
-    item = item.parent;
-  }
-
-  // Now find the common root in these 2 lists of parents and the sub branches from it.
-  let commonRoot;
-  let subParents1 = [];
-  let subParents2 = [];
-  for (let parent1 of parents1) {
-    subParents1.push(parent1);
-    subParents2 = [];
-    for (let parent2 of parents2) {
-      subParents2.push(parent2);
-      if (parent1 === parent2) {
-        commonRoot = parent1;
-        break;
-      }
-    }
-    if (commonRoot) {
-      break;
-    }
-  }
-  subParents1.reverse().push(item1);
-  subParents2.reverse().push(item2);
-
-  // And now display only these 2 sub branches, from the common
-  // root to node1 and node2.
-  console.log(subParents1.map(outputNode).join(" --> "));
-  console.log(subParents2.map(outputNode).join(" --> "));
-}
-
-function flattenTreeWithDepth(tree = [], depth = 0) {
-  return tree.reduce((previousValue, node) => {
-    return [
-      ...previousValue,
-      Object.assign({depth}, node),
-      ...flattenTreeWithDepth(node.nodes, depth + 1)
-    ];
-  }, [])
-}
-
 module.exports = {
-  getStackingContextTree,
-  outputNode,
-  outputTree,
-  findNode,
-  compareNodes,
-  flattenTreeWithDepth
+  getStackingContextTree
 };
