@@ -26,6 +26,11 @@ const StackingContextNode = createClass({
       className += " not-in-context";
     }
 
+    let nodeZ = {className: "stacking-context-node-z"};
+    if (node.properties.zindex === "auto") {
+      nodeZ.title = "'auto' is equivalent to having a Z-Index of 0";
+    }
+
     return div(
       {
         className,
@@ -40,8 +45,8 @@ const StackingContextNode = createClass({
           node.properties.isStackingContext ? "✔" : "✘"
       ),
 
-      span({className: "stacking-context-node-z"},
-        node.index
+      span(nodeZ,
+        node.properties.zindex
       ),
 
       span(

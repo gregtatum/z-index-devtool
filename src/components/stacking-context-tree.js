@@ -15,8 +15,8 @@ const StackingContextTree = createClass({
       if (tree != undefined) {
         return Tree({
           getRoots: () => tree, // all top-level nodes
-          getChildren: node => node.nodes,
-          getParent: node => node.parent,
+          getChildren: node => node.stackingContextChildren,
+          getParent: node => node.parentStackingContext,
           getKey: node => node.key,
           isExpanded: node => expandedNodes.has(node),
           renderItem: (node, depth, isFocused, arrow, isExpanded) => {
