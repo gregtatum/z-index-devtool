@@ -39,6 +39,13 @@ handlers[constants.SELECT_NODE] = function(state, action) {
   });
 };
 
+handlers[constants.HIGHLIGHT_ELEMENT] = function(state, action) {
+  return Object.assign({}, state, {
+    selElt: action.selElt
+  });
+};
+
+
 handlers[constants.COMPUTE_RECT] = function(state, action) {
   return Object.assign({}, state, {
     displayRect: action.rect

@@ -3,7 +3,8 @@ const {div, button, span} = DOM;
 const React = require("react");
 const {
   selectStackingContextNode,
-  computeBoundingRect
+  computeBoundingRect,
+  highlightElement
 } = require("../actions/stacking-context");
 
 const StackingContextNode = createClass({
@@ -35,6 +36,14 @@ const StackingContextNode = createClass({
       {
         className,
         key: node.key,
+        onMouseOver: () => {
+          store.dispatch(highlightElement(node.el));
+          store.dispatch(computeBoundingRect(node.el));
+        },
+        onMouseLeave: () => {
+          store.dispatch(highlightElement(undefined));
+          store.dispatch(computeBoundingRect(undefined));
+        },
         onClick: () => {
           store.dispatch(selectStackingContextNode(node));
           store.dispatch(computeBoundingRect(node.el));

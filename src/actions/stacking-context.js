@@ -50,6 +50,15 @@ function selectStackingContextNode(node) {
   }
 }
 
+function highlightElement(elt){
+  return function(dispatch, getState) {
+    dispatch({
+      type: constants.HIGHLIGHT_ELEMENT,
+      selElt: elt
+    });
+  }
+}
+
 function computeBoundingRect(elt) {
   return function(dispatch, getState) {
     dispatch({
@@ -91,6 +100,7 @@ module.exports = {
   getStackingContext,
   getMockStackingContext,
   selectStackingContextNode,
+  highlightElement,
   toggleNode,
   expandNode,
   collapseNode,
