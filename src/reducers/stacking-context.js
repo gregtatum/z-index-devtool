@@ -4,7 +4,7 @@ const DEFAULT_STATE = {
   tree: undefined,
   containerElement: undefined,
   text: undefined,
-  selNode: undefined,
+  selectedNode: undefined,
   selElt: undefined,
   displayRect: undefined,
   expandedNodes: new Set(),
@@ -19,7 +19,7 @@ handlers[constants.NEW_DOM_TEXT] = function(state, action) {
     text: action.text,
     url: action.url,
     //clear selected node
-    selNode: undefined,
+    selectedNode: undefined,
     selElt: undefined,
     displayRect: undefined
   });
@@ -34,7 +34,7 @@ handlers[constants.ADD_STACKING_CONTEXT] = function(state, action) {
 
 handlers[constants.SELECT_NODE] = function(state, action) {
   return Object.assign({}, state, {
-    selNode: action.selNode,
+    selectedNode: action.selectedNode,
     selElt: action.selElt
   });
 };

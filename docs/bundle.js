@@ -22563,28 +22563,29 @@ function symbolObservablePonyfill(root) {
 	return result;
 };
 },{}],198:[function(require,module,exports){
-const {getText} = require("@tatumcreative/get");
+const {getText: getTextModule} = require("@tatumcreative/get");
 const constants = require("../constants");
-const {getStackingContextTree} = require("../stacking-context")
+const {getStackingContextTree} = require("../stacking-context");
+const {getMockTree} = require('../../test/fixtures/tree-fixture');
 
-function fetchNewDomText (url) {
+function fetchNewDomText (url, getText = getTextModule) {
   return function(dispatch, getState) {
-    getText(url).then(
+    return getText(url).then(
       text => {
         dispatch({
           type: constants.NEW_DOM_TEXT,
-          text: text
+          text: text,
+          url: url
         });
       },
       console.error.bind(console)
     );
-  }
+  };
 }
 
 function getStackingContext(containerElement) {
   return function(dispatch, getState) {
     const tree = getStackingContextTree(containerElement);
-
     dispatch({
       type: constants.ADD_STACKING_CONTEXT,
       containerElement,
@@ -22593,23 +22594,91 @@ function getStackingContext(containerElement) {
   }
 }
 
-module.exports = {
-  fetchNewDomText,
-  getStackingContext
+function getMockStackingContext(containerElement) {
+  return function(dispatch, getState) {
+    const tree = getMockTree();
+    dispatch({
+      type: constants.ADD_STACKING_CONTEXT,
+      containerElement,
+      tree
+    });
+  }
 }
 
-},{"../constants":206,"../stacking-context":209,"@tatumcreative/get":1}],199:[function(require,module,exports){
+function selectStackingContextNode(node) {
+  return function(dispatch, getState) {
+    dispatch({
+      type: constants.SELECT_NODE,
+      selectedNode: node,
+      selElt: node.el
+    });
+  }
+}
+
+function computeBoundingRect(node) {
+  let elt = node.el;
+  return function(dispatch, getState) {
+    dispatch({
+      type: constants.COMPUTE_RECT,
+      //getBoundingClientRect is doing something strange
+      //for the z-index onclick example
+      rect: (elt) ? elt.getBoundingClientRect() : undefined
+    });
+  }
+}
+
+function toggleNode(node) {
+  return function(dispatch, getState) {
+    const {expandedNodes} = getState().stackingContext;
+    return dispatch(
+      expandedNodes.has(node)
+        ? collapseNode(node)
+        : expandNode(node)
+    );
+  }
+}
+
+function expandNode(node) {
+  return {
+    type: constants.EXPAND_NODE,
+    node: node
+  }
+}
+
+function collapseNode(node) {
+  return {
+    type: constants.COLLAPSE_NODE,
+    node: node
+  }
+}
+
+module.exports = {
+  fetchNewDomText,
+  getStackingContext,
+  getMockStackingContext,
+  selectStackingContextNode,
+  toggleNode,
+  expandNode,
+  collapseNode,
+  computeBoundingRect
+}
+
+},{"../../test/fixtures/tree-fixture":216,"../constants":210,"../stacking-context":213,"@tatumcreative/get":1}],199:[function(require,module,exports){
 const {DOM, createClass, createFactory} = require("react");
 const {div} = DOM;
 const {connect} = require("react-redux");
 
 const {
   fetchNewDomText,
-  getStackingContext
+  getStackingContext,
+  selectStackingContextNode,
+  computeBoundingRect,
+  toggleNode,
 } = require("../actions/stacking-context");
 
 const MainView = createFactory(require("./main-view"));
 const StackingContextTreeView = createFactory(require("./stacking-context-tree-view"));
+const StackingContextNodeInfo = createFactory(require("./stacking-context-node-info"));
 
 const { todo } = require("../actions/stacking-context");
 
@@ -22640,9 +22709,22 @@ const App = createFactory(createClass({
           //props for example dropdown
           fetchNewExampleHtml: (url) => {
             dispatch(fetchNewDomText(url))
-          }
+          },
+          //props for display rectangle
+          elt: stackingContext.selElt
         }),
-        StackingContextTreeView({tree: stackingContext.tree})
+        div(
+          {className: "sidebar"},
+          StackingContextTreeView({
+            tree: stackingContext.tree,
+            expandedNodes: stackingContext.expandedNodes,
+            selectedNode: stackingContext.selectedNode,
+            selectNode: node => dispatch(selectStackingContextNode(node)),
+            computeBoundingRect: node => dispatch(computeBoundingRect(node)),
+            toggleNode: node => dispatch(toggleNode(node))
+          }),
+          StackingContextNodeInfo()
+        )
     );
   }
 }));
@@ -22653,59 +22735,151 @@ function mapStateToProps(state) {
 
 module.exports = connect(mapStateToProps)(App);
 
-},{"../actions/stacking-context":198,"./main-view":202,"./stacking-context-tree-view":204,"react":185,"react-redux":38}],200:[function(require,module,exports){
+},{"../actions/stacking-context":198,"./main-view":203,"./stacking-context-node-info":204,"./stacking-context-tree-view":207,"react":185,"react-redux":38}],200:[function(require,module,exports){
+const {DOM, createClass} = require("react");
+const {div, canvas} = DOM;
+const React = require("react");
+const {computeBoundingRect} = require("../actions/stacking-context");
+
+const DisplayRectangle = createClass({
+    getBoundingRect(elt) {
+      const {store} = this.context;
+      this.setState({
+        boundingRect: store.getState().stackingContext.displayRect
+      })
+    },
+
+    //called when receive new element
+    updateMutationObserver(elt) {
+      //disconnect any old observer
+      if (this.state.observer){
+        this.state.observer.disconnect();
+      }
+      //if there is an element add a new observer
+      if (elt){
+        const me = this;
+        const observer = new MutationObserver(function(){
+          //when mutation observed, recompute rectangle
+          const {store} = me.context;
+          store.dispatch(computeBoundingRect(elt));
+        });
+        observer.observe(elt, {attributes:true, childList: true, subtree: true});
+        this.setState({
+          observer: observer
+        });
+      }
+    },
+
+    handleResize() {
+      const {store} = this.context;
+      store.dispatch(computeBoundingRect(this.props.elt));
+    },
+
+    getInitialState(){
+      return {
+        observer: undefined
+      };
+    },
+
+    componentWillReceiveProps(props) {
+      this.getBoundingRect(props.elt);
+      this.updateMutationObserver(props.elt);
+    },
+
+    componentWillMount() {
+      window.addEventListener('resize', this.state.handleResize);
+      this.getBoundingRect(this.props.elt);
+      this.updateMutationObserver(this.props.elt);
+    },
+
+    componentWillUnmount() {
+      window.removeEventListener('resize', this.state.handleResize);
+      this.updateMutationObserver(undefined);
+    },
+
+    render: function() {
+      const boundingRect = this.state.boundingRect;
+      //not really used right now, but if introduce toggling behaviour could
+      //be useful...
+      const hasNodeClass = (boundingRect) ? 'has-node' : 'no-node';
+      return div(
+        {
+            className: "display-rectangle "+hasNodeClass,
+            style:{
+              width:(boundingRect)? boundingRect.width +'px' : 0,
+              height:(boundingRect)? boundingRect.height +'px' : 0,
+              top: (boundingRect)? boundingRect.top +'px' : 0,
+              left: (boundingRect)? boundingRect.left +'px' : 0
+            }
+        }
+      );
+  }
+});
+
+DisplayRectangle.contextTypes = {
+  store: React.PropTypes.object
+};
+
+module.exports = DisplayRectangle;
+
+},{"../actions/stacking-context":198,"react":185}],201:[function(require,module,exports){
 const {DOM, createClass} = require("react");
 const {div} = DOM;
+const React = require("react");
+const {computeBoundingRect} = require("../actions/stacking-context");
 
 /**
  * Container for the DOM. Takes in a single <div> element and displays it.
  */
 const DomContainer = createClass({
 
-    componentDidUpdate(prevProps, prevState) {
-      if (this.props.text !== prevProps.text) {
-        this.props.newTextReceived(this._div);
-      }
-    },
-
-    render() {
-      const {text} = this.props;
-      return div({
-        className: "dom-container",
-        ref: (div) => this._div = div,
-        dangerouslySetInnerHTML: {__html: text}
-      });
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.text !== prevProps.text) {
+      this.props.newTextReceived(this._div);
     }
+  },
+
+  render() {
+    const {text} = this.props;
+    const {store} = this.context;
+    return div({
+      className: "dom-container",
+      ref: (div) => this._div = div,
+      dangerouslySetInnerHTML: {__html: text},
+      onScroll: () => {
+        store.dispatch(computeBoundingRect(store.getState().stackingContext.selElt))
+      }
+    });
+  }
 });
+
+DomContainer.contextTypes = {
+  store: React.PropTypes.object
+};
 
 module.exports = DomContainer;
 
-},{"react":185}],201:[function(require,module,exports){
+},{"../actions/stacking-context":198,"react":185}],202:[function(require,module,exports){
 const {DOM, createClass} = require("react");
 const {div, select, option, label, span} = DOM;
+const React = require("react");
 const {getText} = require("@tatumcreative/get");
 
 const ExamplesDropdown = createClass({
   displayName: "ExamplesDropdown",
 
-  getInitialState() {
-    return { selectValue: "stacking-context-1.html" };
-  },
-
-  handleChange(e) {
-    // TODO, remove any state from component, do this from Redux
-    this.setState({selectValue: e.target.value});
-    this.props.fetchNewExampleHtml(e.target.value);
-  },
-
   render() {
+    const {store} = this.context;
+    const {url} = store.getState().stackingContext;
     return div({className: "examples-dropdown devtools-toolbar"},
       label({title: "Change the markup example"},
         span({}, "Example: "),
         select(
           {
-            value: this.state.selectValue,
-            onChange: this.handleChange
+            value: url,
+            onChange: (event) => {
+              this.props.fetchNewExampleHtml(event.target.value);
+            }
           },
           files.map(file => option(
             {key:file.name, value: file.path},
@@ -22750,9 +22924,13 @@ const files = [{
     path: "examples/z-index-onclick.html"
 }];
 
+ExamplesDropdown.contextTypes = {
+  store: React.PropTypes.object
+};
+
 module.exports = ExamplesDropdown;
 
-},{"@tatumcreative/get":1,"react":185}],202:[function(require,module,exports){
+},{"@tatumcreative/get":1,"react":185}],203:[function(require,module,exports){
 const {DOM, createClass, createFactory} = require("react");
 const {div} = DOM;
 const {connect} = require("react-redux");
@@ -22763,6 +22941,7 @@ const {
 } = require("../actions/stacking-context");
 const DomContainer = createFactory(require("./dom-container"));
 const ExamplesDropdown = createFactory(require("./examples-dropdown"));
+const DisplayRectangle = createFactory(require("./display-rectangle"));
 
 const MainView = createClass({
   displayName: "MainView",
@@ -22771,7 +22950,8 @@ const MainView = createClass({
       const {
         text,
         newTextReceived,
-        fetchNewExampleHtml
+        fetchNewExampleHtml,
+        elt
       } = this.props;
 
       return div(
@@ -22783,54 +22963,219 @@ const MainView = createClass({
         DomContainer({
           text: text,
           newTextReceived: newTextReceived
-        })
+        }),
+        DisplayRectangle({elt: elt})
       );
     }
 });
 
 module.exports = MainView;
 
-},{"../actions/stacking-context":198,"./dom-container":200,"./examples-dropdown":201,"react":185,"react-redux":38}],203:[function(require,module,exports){
+},{"../actions/stacking-context":198,"./display-rectangle":200,"./dom-container":201,"./examples-dropdown":202,"react":185,"react-redux":38}],204:[function(require,module,exports){
+const {DOM, createClass, createFactory} = require("react");
+const {div, span} = DOM;
+const React = require("react");
+
+const StackingContextNodeInfo = createClass({
+  // USING selectedNode TO DISPLAY THE STACKING CONTEXT INFO BASED ON SELECTED NODE
+  render() {
+    const {store} = this.context;
+    const {selectedNode} = store.getState().stackingContext;
+    if (selectedNode) {
+      return div({
+        className: "node-info footer"
+      },
+      div({className: "devtools-toolbar"}, "Stacking Context Node Info"),
+      createHeader(),
+      getStackingContextInfo(selectedNode));
+    } else {
+      return div({className: "node-info footer"});
+    }
+  }
+
+});
+
+function createHeader() {
+  return div({className: "header"},
+    span({className: "stacking-context-info-label"},
+      "Property"
+    ),
+    span({className: "stacking-context-info-value",},
+      "Value"
+    )
+  );
+}
+
+function createTableRow(property, value) {
+  return div({key: property,
+    className: "stacking-context-info-row"},
+    span({className: "stacking-context-info-label"}, property),
+    span({className: "stacking-context-info-value highlight-value"}, value));
+}
+
+function getStackingContextInfo(node) {
+  let properties = node.properties;
+  let tableRows = [];
+  let willChange = properties.willChange.split(", ").some(p => {
+    return p === "position" || p === "opacity" ||
+           p === "transform" || p === "filter" ||
+           p === "perspective" || p === "isolation";
+  });
+  // As a default, display the position and z-index info for all nodes
+  tableRows.push(createTableRow("Z-Index", properties.zindex));
+  tableRows.push(createTableRow("Position", properties.position));
+  if (properties.filter !== "none") tableRows.push(createTableRow("Filter", properties.filter));
+  if (properties.mixBlendMode !== "normal") tableRows.push(createTableRow("Mix-Blend-Mode", properties.mixBlendMode));
+  if (properties.opacity !== "1") tableRows.push(createTableRow("Opacity", properties.opacity));
+  if (properties.perspective !== "none") tableRows.push(createTableRow("Perspective", properties.perspective));
+  if (properties.transform !== "none") tableRows.push(createTableRow("Transform", properties.transform));
+  if (willChange) tableRows.push(createTableRow("Will-Change", properties.willChange));
+  if (properties.hasTouchOverflowScrolling) tableRows.push(createTableRow("Has Touch Overflow-Scrolling", properties.hasTouchOverflowScrolling));
+  if (properties.isStacked && properties.isFlexItem) tableRows.push(createTableRow("Is a Flex Item:", properties.isFlexItem));
+  if (properties.isIsolated) tableRows.push(createTableRow("Is Isolated", properties.isIsolated));
+
+  return div({className: "stacking-context-info-table"},
+    tableRows
+  );
+};
+
+StackingContextNodeInfo.contextTypes = {
+    store: React.PropTypes.object
+  };
+
+module.exports = StackingContextNodeInfo;
+
+},{"react":185}],205:[function(require,module,exports){
 const {DOM, createClass} = require("react");
-const {div} = DOM;
+const {div, button, span} = DOM;
+const React = require("react");
+const {
+  selectStackingContextNode,
+  computeBoundingRect
+} = require("../actions/stacking-context");
 
 const StackingContextNode = createClass({
-  render: function() {
-    const {node} = this.props;
+  render() {
+    const {
+      node,
+      depth,
+      isFocused,
+      arrow,
+      isExpanded // used automagically in 'arrow'
+    } = this.props;
+    const {store} = this.context;
 
-    console.log(node);
+    let className = "stacking-context-node";
+    if (isFocused) {
+      className += " focused";
+    }
+
+    if (!node.properties.isStackingContext) {
+      className += " not-in-context";
+    }
+
+    let nodeZ = {className: "stacking-context-node-z"};
+    if (node.properties.zindex === "auto") {
+      nodeZ.title = "'auto' is equivalent to having a Z-Index of 0";
+    }
+
     return div(
-        {className: "stacking-context-node",
-        style: {paddingLeft: node.depth * 10 + "px"}
+      {
+        className,
+        key: node.key,
+        onClick: () => {
+          store.dispatch(selectStackingContextNode(node));
+          store.dispatch(computeBoundingRect(node));
+        }
+      },
+
+      span({className: "stacking-context-node-context"},
+          node.properties.isStackingContext ? "✔" : "✘"
+      ),
+
+      span(nodeZ,
+        node.properties.zindex
+      ),
+
+      span(
+        {
+          className: "stacking-context-node-name",
+          style: {paddingLeft: depth * 10 + "px"},
         },
-        nodeToString(node.el),
-        getStackingContextInfo(node)
+        arrow,
+        span({
+          title: node.properties.isStackingContext? "" : "This element is not part of the stacking context."
+        },
+        getNodeContainerName(node.el))
+      )
     );
   }
 });
 
-function nodeToString(el) {
+function getNodeContainerName(el) {
   return el.tagName.toLowerCase() +
-  (el.id.trim() !== "" ? "#" + el.id.trim() : "") +
-  (el.className && el.className.trim && el.className.trim() !== "" ? "." + el.className.trim().split(" ").join(".") : "");
+    (el.id.trim() !== "" ? "#" + el.id.trim() : "") +
+    (el.className && el.className.trim && el.className.trim() !== "" ? "." + el.className.trim().split(" ").join(".") : "");
 };
 
-function getStackingContextInfo(node) {
-  return (node.isStackingContext ? " [CONTEXT] " : "") +
-      (node.isStacked ? "[z-index: " + node.index + "]": "");
+StackingContextNode.contextTypes = {
+  store: React.PropTypes.object
 };
 
 module.exports = StackingContextNode;
 
-},{"react":185}],204:[function(require,module,exports){
+},{"../actions/stacking-context":198,"react":185}],206:[function(require,module,exports){
+const {DOM, createClass} = require("react");
+const {div, span} = DOM;
+
+const StackingContextTreeHeader = createClass({
+  displayName: "StackingContextTreeHeader",
+
+  render() {
+    return div(
+      {
+        className: "header"
+      },
+
+      span(
+        {
+          className: "stacking-context-node-context",
+          title: "Is the node in the stacking context?"
+        },
+        "In Context"
+      ),
+
+      span(
+        {
+          className: "stacking-context-node-z",
+          title: "Z-Index value assigned to this node"
+        },
+        "Z-Index"
+      ),
+
+      span(
+        {
+          className: "stacking-context-node-name",
+          title: "Tree view of the nodes"
+        },
+        "Stacking Context Node"
+      )
+
+    );
+  }
+});
+
+module.exports = StackingContextTreeHeader;
+},{"react":185}],207:[function(require,module,exports){
 const {DOM, createClass, createFactory} = require("react");
 const {div} = DOM;
 const {connect} = require("react-redux");
 
 const StackingContextTree = createFactory(require("./stacking-context-tree"));
-const { todo } = require("../actions/stacking-context");
+const StackingContextNodeInfo = createFactory(require("./stacking-context-node-info"));
+const StackingContextTreeHeader = createFactory(require("./stacking-context-tree-header"));
 
-const StackingContextTreeView= createFactory(createClass({
+const StackingContextTreeView = createFactory(createClass({
   displayName: "StackingContextTreeView",
 
   componentWillMount() {
@@ -22839,68 +23184,888 @@ const StackingContextTreeView= createFactory(createClass({
 
   render() {
     const {
-      tree
+      tree, expandedNodes, selectedNode, selectNode, computeBoundingRect, toggleNode
     } = this.props;
 
     return div(
-      {className: "sidebar"},
+      {className: "tree-view"},
       div({className: "devtools-toolbar"}, "Stacking Context Tree"),
-      StackingContextTree({tree: tree})
+        StackingContextTreeHeader(),
+        StackingContextTree({tree, expandedNodes, selectedNode, selectNode, computeBoundingRect, toggleNode})/*,
+        StackingContextNodeInfo()*/
     );
   }
 }));
 
-module.exports = StackingContextTreeView
+module.exports = StackingContextTreeView;
 
-},{"../actions/stacking-context":198,"./stacking-context-tree":205,"react":185,"react-redux":38}],205:[function(require,module,exports){
+},{"./stacking-context-node-info":204,"./stacking-context-tree":208,"./stacking-context-tree-header":206,"react":185,"react-redux":38}],208:[function(require,module,exports){
 const {DOM, createClass, createFactory} = require("react");
 const {div} = DOM;
 const StackingContextNode = createFactory(require("./stacking-context-node"));
-const {flattenTreeWithDepth} = require("./../stacking-context/")
+const Tree = createFactory(require("./tree"));
 
 const StackingContextTree = createClass({
-  render: function() {
-    const {tree} = this.props;
-    const nodes = flattenTreeWithDepth(tree);
+    render() {
+      const {
+        tree,
+        expandedNodes,
+        selectedNode,
+        selectNode,
+        computeBoundingRect,
+        toggleNode
+      } = this.props;
 
-    return div(
-        {id: "tree"},
-        ...nodes.map((node) => StackingContextNode({node}))
-        );
-  }
-});
+      if (tree != undefined) {
+        return Tree({
+          getRoots: () => tree, // all top-level nodes
+          getChildren: node => node.stackingContextChildren,
+          getParent: node => node.parentStackingContext,
+          getKey: node => node.key,
+          isExpanded: node => expandedNodes.has(node),
+          renderItem: (node, depth, isFocused, arrow, isExpanded) => {
+            return StackingContextNode(
+              {
+                node,
+                depth,
+                isFocused: selectedNode === node,
+                arrow,
+                isExpanded,
+              }
+            );
+          },
+          focused: selectedNode,
+          onFocus: node => {selectNode(node); computeBoundingRect(node);},
+          onExpand: toggleNode,
+          onCollapse: toggleNode,
+          itemHeight: 10
+        });
+      } else {
+        return div({id: "tree"});
+      }
+    }
+  });
 
 module.exports = StackingContextTree;
 
-},{"./../stacking-context/":209,"./stacking-context-node":203,"react":185}],206:[function(require,module,exports){
+},{"./stacking-context-node":205,"./tree":209,"react":185}],209:[function(require,module,exports){
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+/* eslint-env browser */
+"use strict";
+
+const { DOM: dom, createClass, createFactory, PropTypes } = require("react");
+
+const AUTO_EXPAND_DEPTH = 0;
+const NUMBER_OF_OFFSCREEN_ITEMS = 1;
+
+/**
+ * A fast, generic, expandable and collapsible tree component.
+ *
+ * This tree component is fast: it can handle trees with *many* items. It only
+ * renders the subset of those items which are visible in the viewport. It's
+ * been battle tested on huge trees in the memory panel. We've optimized tree
+ * traversal and rendering, even in the presence of cross-compartment wrappers.
+ *
+ * This tree component doesn't make any assumptions about the structure of your
+ * tree data. Whether children are computed on demand, or stored in an array in
+ * the parent's `_children` property, it doesn't matter. We only require the
+ * implementation of `getChildren`, `getRoots`, `getParent`, and `isExpanded`
+ * functions.
+ *
+ * This tree component is well tested and reliable. See
+ * devtools/client/shared/components/test/mochitest/test_tree_* and its usage in
+ * the performance and memory panels.
+ *
+ * This tree component doesn't make any assumptions about how to render items in
+ * the tree. You provide a `renderItem` function, and this component will ensure
+ * that only those items whose parents are expanded and which are visible in the
+ * viewport are rendered. The `renderItem` function could render the items as a
+ * "traditional" tree or as rows in a table or anything else. It doesn't
+ * restrict you to only one certain kind of tree.
+ *
+ * The only requirement is that every item in the tree render as the same
+ * height. This is required in order to compute which items are visible in the
+ * viewport in constant time.
+ *
+ * ### Example Usage
+ *
+ * Suppose we have some tree data where each item has this form:
+ *
+ *     {
+ *       id: Number,
+ *       label: String,
+ *       parent: Item or null,
+ *       children: Array of child items,
+ *       expanded: bool,
+ *     }
+ *
+ * Here is how we could render that data with this component:
+ *
+ *     const MyTree = createClass({
+ *       displayName: "MyTree",
+ *
+ *       propTypes: {
+ *         // The root item of the tree, with the form described above.
+ *         root: PropTypes.object.isRequired
+ *       },
+ *
+ *       render() {
+ *         return Tree({
+ *           itemHeight: 20, // px
+ *
+ *           getRoots: () => [this.props.root],
+ *
+ *           getParent: item => item.parent,
+ *           getChildren: item => item.children,
+ *           getKey: item => item.id,
+ *           isExpanded: item => item.expanded,
+ *
+ *           renderItem: (item, depth, isFocused, arrow, isExpanded) => {
+ *             let className = "my-tree-item";
+ *             if (isFocused) {
+ *               className += " focused";
+ *             }
+ *             return dom.div(
+ *               {
+ *                 className,
+ *                 // Apply 10px nesting per expansion depth.
+ *                 style: { marginLeft: depth * 10 + "px" }
+ *               },
+ *               // Here is the expando arrow so users can toggle expansion and
+ *               // collapse state.
+ *               arrow,
+ *               // And here is the label for this item.
+ *               dom.span({ className: "my-tree-item-label" }, item.label)
+ *             );
+ *           },
+ *
+ *           onExpand: item => dispatchExpandActionToRedux(item),
+ *           onCollapse: item => dispatchCollapseActionToRedux(item),
+ *         });
+ *       }
+ *     });
+ */
+module.exports = createClass({
+    displayName: "Tree",
+
+    propTypes: {
+        // Required props
+
+        // A function to get an item's parent, or null if it is a root.
+        //
+        // Type: getParent(item: Item) -> Maybe<Item>
+        //
+        // Example:
+        //
+        //     // The parent of this item is stored in its `parent` property.
+        //     getParent: item => item.parent
+        getParent: PropTypes.func.isRequired,
+
+        // A function to get an item's children.
+        //
+        // Type: getChildren(item: Item) -> [Item]
+        //
+        // Example:
+        //
+        //     // This item's children are stored in its `children` property.
+        //     getChildren: item => item.children
+        getChildren: PropTypes.func.isRequired,
+
+        // A function which takes an item and ArrowExpander component instance and
+        // returns a component, or text, or anything else that React considers
+        // renderable.
+        //
+        // Type: renderItem(item: Item,
+        //                  depth: Number,
+        //                  isFocused: Boolean,
+        //                  arrow: ReactComponent,
+        //                  isExpanded: Boolean) -> ReactRenderable
+        //
+        // Example:
+        //
+        //     renderItem: (item, depth, isFocused, arrow, isExpanded) => {
+        //       let className = "my-tree-item";
+        //       if (isFocused) {
+        //         className += " focused";
+        //       }
+        //       return dom.div(
+        //         {
+        //           className,
+        //           style: { marginLeft: depth * 10 + "px" }
+        //         },
+        //         arrow,
+        //         dom.span({ className: "my-tree-item-label" }, item.label)
+        //       );
+        //     },
+        renderItem: PropTypes.func.isRequired,
+
+        // A function which returns the roots of the tree (forest).
+        //
+        // Type: getRoots() -> [Item]
+        //
+        // Example:
+        //
+        //     // In this case, we only have one top level, root item. You could
+        //     // return multiple items if you have many top level items in your
+        //     // tree.
+        //     getRoots: () => [this.props.rootOfMyTree]
+        getRoots: PropTypes.func.isRequired,
+
+        // A function to get a unique key for the given item. This helps speed up
+        // React's rendering a *TON*.
+        //
+        // Type: getKey(item: Item) -> String
+        //
+        // Example:
+        //
+        //     getKey: item => `my-tree-item-${item.uniqueId}`
+        getKey: PropTypes.func.isRequired,
+
+        // A function to get whether an item is expanded or not. If an item is not
+        // expanded, then it must be collapsed.
+        //
+        // Type: isExpanded(item: Item) -> Boolean
+        //
+        // Example:
+        //
+        //     isExpanded: item => item.expanded,
+        isExpanded: PropTypes.func.isRequired,
+
+        // The height of an item in the tree including margin and padding, in
+        // pixels.
+        itemHeight: PropTypes.number.isRequired,
+
+        // Optional props
+
+        // The currently focused item, if any such item exists.
+        focused: PropTypes.any,
+
+        // Handle when a new item is focused.
+        onFocus: PropTypes.func,
+
+        // The depth to which we should automatically expand new items.
+        autoExpandDepth: PropTypes.number,
+
+        // Optional event handlers for when items are expanded or collapsed. Useful
+        // for dispatching redux events and updating application state, maybe lazily
+        // loading subtrees from a worker, etc.
+        //
+        // Type:
+        //     onExpand(item: Item)
+        //     onCollapse(item: Item)
+        //
+        // Example:
+        //
+        //     onExpand: item => dispatchExpandActionToRedux(item)
+        onExpand: PropTypes.func,
+        onCollapse: PropTypes.func,
+    },
+
+    getDefaultProps() {
+        return {
+            autoExpandDepth: AUTO_EXPAND_DEPTH,
+        };
+    },
+
+    getInitialState() {
+        return {
+            scroll: 0,
+            height: window.innerHeight,
+            seen: new Set(),
+        };
+    },
+
+    componentDidMount() {
+        window.addEventListener("resize", this._updateHeight);
+        this._autoExpand();
+        this._updateHeight();
+    },
+
+    componentWillReceiveProps(nextProps) {
+        this._autoExpand();
+        this._updateHeight();
+    },
+
+    componentWillUnmount() {
+        window.removeEventListener("resize", this._updateHeight);
+    },
+
+    _autoExpand() {
+        if (!this.props.autoExpandDepth) {
+            return;
+        }
+
+        // Automatically expand the first autoExpandDepth levels for new items. Do
+        // not use the usual DFS infrastructure because we don't want to ignore
+        // collapsed nodes.
+        const autoExpand = (item, currentDepth) => {
+            if (currentDepth >= this.props.autoExpandDepth ||
+                this.state.seen.has(item)) {
+                return;
+            }
+
+            this.props.onExpand(item);
+            this.state.seen.add(item);
+
+            const children = this.props.getChildren(item);
+            const length = children.length;
+            for (let i = 0; i < length; i++) {
+                autoExpand(children[i], currentDepth + 1);
+            }
+        };
+
+        const roots = this.props.getRoots();
+        const length = roots.length;
+        for (let i = 0; i < length; i++) {
+            autoExpand(roots[i], 0);
+        }
+    },
+
+    _preventArrowKeyScrolling(e) {
+        switch (e.key) {
+            case "ArrowUp":
+            case "ArrowDown":
+            case "ArrowLeft":
+            case "ArrowRight":
+                e.preventDefault();
+                e.stopPropagation();
+                if (e.nativeEvent) {
+                    if (e.nativeEvent.preventDefault) {
+                        e.nativeEvent.preventDefault();
+                    }
+                    if (e.nativeEvent.stopPropagation) {
+                        e.nativeEvent.stopPropagation();
+                    }
+                }
+        }
+    },
+
+    /**
+     * Updates the state's height based on clientHeight.
+     */
+    _updateHeight() {
+        this.setState({
+            height: this.refs.tree.clientHeight
+        });
+    },
+
+    /**
+     * Perform a pre-order depth-first search from item.
+     */
+    _dfs(item, maxDepth = Infinity, traversal = [], _depth = 0) {
+        traversal.push({ item, depth: _depth });
+
+        if (!this.props.isExpanded(item)) {
+            return traversal;
+        }
+
+        const nextDepth = _depth + 1;
+
+        if (nextDepth > maxDepth) {
+            return traversal;
+        }
+
+        const children = this.props.getChildren(item);
+        const length = children.length;
+        for (let i = 0; i < length; i++) {
+            this._dfs(children[i], maxDepth, traversal, nextDepth);
+        }
+
+        return traversal;
+    },
+
+    /**
+     * Perform a pre-order depth-first search over the whole forest.
+     */
+    _dfsFromRoots(maxDepth = Infinity) {
+        const traversal = [];
+
+        const roots = this.props.getRoots();
+        const length = roots.length;
+        for (let i = 0; i < length; i++) {
+            this._dfs(roots[i], maxDepth, traversal);
+        }
+
+        return traversal;
+    },
+
+    /**
+     * Expands current row.
+     *
+     * @param {Object} item
+     * @param {Boolean} expandAllChildren
+     */
+    _onExpand: oncePerAnimationFrame(function (item, expandAllChildren) {
+        if (this.props.onExpand) {
+            this.props.onExpand(item);
+
+            if (expandAllChildren) {
+                const children = this._dfs(item);
+                const length = children.length;
+                for (let i = 0; i < length; i++) {
+                    this.props.onExpand(children[i].item);
+                }
+            }
+        }
+    }),
+
+    /**
+     * Collapses current row.
+     *
+     * @param {Object} item
+     */
+    _onCollapse: oncePerAnimationFrame(function (item) {
+        if (this.props.onCollapse) {
+            this.props.onCollapse(item);
+        }
+    }),
+
+    /**
+     * Sets the passed in item to be the focused item.
+     *
+     * @param {Number} index
+     *        The index of the item in a full DFS traversal (ignoring collapsed
+     *        nodes). Ignored if `item` is undefined.
+     *
+     * @param {Object|undefined} item
+     *        The item to be focused, or undefined to focus no item.
+     */
+    _focus(index, item) {
+        if (item !== undefined) {
+            const itemStartPosition = index * this.props.itemHeight;
+            const itemEndPosition = (index + 1) * this.props.itemHeight;
+
+            // Note that if the height of the viewport (this.state.height) is less
+            // than `this.props.itemHeight`, we could accidentally try and scroll both
+            // up and down in a futile attempt to make both the item's start and end
+            // positions visible. Instead, give priority to the start of the item by
+            // checking its position first, and then using an "else if", rather than
+            // a separate "if", for the end position.
+            if (this.state.scroll > itemStartPosition) {
+                this.refs.tree.scrollTo(0, itemStartPosition);
+            } else if ((this.state.scroll + this.state.height) < itemEndPosition) {
+                this.refs.tree.scrollTo(0, itemEndPosition - this.state.height);
+            }
+        }
+
+        if (this.props.onFocus) {
+            this.props.onFocus(item);
+        }
+    },
+
+    /**
+     * Sets the state to have no focused item.
+     */
+    _onBlur() {
+        this._focus(0, undefined);
+    },
+
+    /**
+     * Fired on a scroll within the tree's container, updates
+     * the stored position of the view port to handle virtual view rendering.
+     *
+     * @param {Event} e
+     */
+    _onScroll: oncePerAnimationFrame(function (e) {
+        this.setState({
+            scroll: Math.max(this.refs.tree.scrollTop, 0),
+            height: this.refs.tree.clientHeight
+        });
+    }),
+
+    /**
+     * Handles key down events in the tree's container.
+     *
+     * @param {Event} e
+     */
+    _onKeyDown(e) {
+        if (this.props.focused == null) {
+            return;
+        }
+
+        // Allow parent nodes to use navigation arrows with modifiers.
+        if (e.altKey || e.ctrlKey || e.shiftKey || e.metaKey) {
+            return;
+        }
+
+        this._preventArrowKeyScrolling(e);
+
+        switch (e.key) {
+            case "ArrowUp":
+                this._focusPrevNode();
+                return;
+
+            case "ArrowDown":
+                this._focusNextNode();
+                return;
+
+            case "ArrowLeft":
+                if (this.props.isExpanded(this.props.focused)
+                    && this.props.getChildren(this.props.focused).length) {
+                    this._onCollapse(this.props.focused);
+                } else {
+                    this._focusParentNode();
+                }
+                return;
+
+            case "ArrowRight":
+                if (!this.props.isExpanded(this.props.focused)) {
+                    this._onExpand(this.props.focused);
+                } else {
+                    this._focusNextNode();
+                }
+                return;
+        }
+    },
+
+    /**
+     * Sets the previous node relative to the currently focused item, to focused.
+     */
+    _focusPrevNode: oncePerAnimationFrame(function () {
+        // Start a depth first search and keep going until we reach the currently
+        // focused node. Focus the previous node in the DFS, if it exists. If it
+        // doesn't exist, we're at the first node already.
+
+        let prev;
+        let prevIndex;
+
+        const traversal = this._dfsFromRoots();
+        const length = traversal.length;
+        for (let i = 0; i < length; i++) {
+            const item = traversal[i].item;
+            if (item === this.props.focused) {
+                break;
+            }
+            prev = item;
+            prevIndex = i;
+        }
+
+        if (prev === undefined) {
+            return;
+        }
+
+        this._focus(prevIndex, prev);
+    }),
+
+    /**
+     * Handles the down arrow key which will focus either the next child
+     * or sibling row.
+     */
+    _focusNextNode: oncePerAnimationFrame(function () {
+        // Start a depth first search and keep going until we reach the currently
+        // focused node. Focus the next node in the DFS, if it exists. If it
+        // doesn't exist, we're at the last node already.
+
+        const traversal = this._dfsFromRoots();
+        const length = traversal.length;
+        let i = 0;
+
+        while (i < length) {
+            if (traversal[i].item === this.props.focused) {
+                break;
+            }
+            i++;
+        }
+
+        if (i + 1 < traversal.length) {
+            this._focus(i + 1, traversal[i + 1].item);
+        }
+    }),
+
+    /**
+     * Handles the left arrow key, going back up to the current rows'
+     * parent row.
+     */
+    _focusParentNode: oncePerAnimationFrame(function () {
+        const parent = this.props.getParent(this.props.focused);
+        if (!parent) {
+            return;
+        }
+
+        const traversal = this._dfsFromRoots();
+        const length = traversal.length;
+        let parentIndex = 0;
+        for (; parentIndex < length; parentIndex++) {
+            if (traversal[parentIndex].item === parent) {
+                break;
+            }
+        }
+
+        this._focus(parentIndex, parent);
+    }),
+
+    render() {
+        const traversal = this._dfsFromRoots();
+
+        // 'begin' and 'end' are the index of the first (at least partially) visible item
+        // and the index after the last (at least partially) visible item, respectively.
+        // `NUMBER_OF_OFFSCREEN_ITEMS` is removed from `begin` and added to `end` so that
+        // the top and bottom of the page are filled with the `NUMBER_OF_OFFSCREEN_ITEMS`
+        // previous and next items respectively, which helps the user to see fewer empty
+        // gaps when scrolling quickly.
+        const { itemHeight } = this.props;
+        const { scroll, height } = this.state;
+        const begin = Math.max(((scroll / itemHeight) | 0) - NUMBER_OF_OFFSCREEN_ITEMS, 0);
+        const end = Math.ceil((scroll + height) / itemHeight) + NUMBER_OF_OFFSCREEN_ITEMS;
+        const toRender = traversal.slice(begin, end);
+        const topSpacerHeight = begin * itemHeight;
+        const bottomSpacerHeight = Math.max(traversal.length - end, 0) * itemHeight;
+
+        const nodes = [
+            dom.div({
+                key: "top-spacer",
+                style: {
+                    padding: 0,
+                    margin: 0,
+                    height: topSpacerHeight + "px"
+                }
+            })
+        ];
+
+        for (let i = 0; i < toRender.length; i++) {
+            const index = begin + i;
+            const first = index == 0;
+            const last = index == traversal.length - 1;
+            const { item, depth } = toRender[i];
+            nodes.push(TreeNode({
+                    key: this.props.getKey(item),
+                    index,
+                    first,
+                    last,
+                    item,
+                    depth,
+                    renderItem: this.props.renderItem,
+                    focused: this.props.focused === item,
+                    expanded: this.props.isExpanded(item),
+                    hasChildren: !!this.props.getChildren(item).length,
+                    onExpand: this._onExpand,
+                    onCollapse: this._onCollapse,
+                    onFocus: () => this._focus(begin + i, item),
+                onFocusedNodeUnmount: () => this.refs.tree && this.refs.tree.focus(),
+        }));
+        }
+
+        nodes.push(dom.div({
+            key: "bottom-spacer",
+            style: {
+                padding: 0,
+                margin: 0,
+                height: bottomSpacerHeight + "px"
+            }
+        }));
+
+        return dom.div(
+            {
+                className: "tree",
+                ref: "tree",
+                onKeyDown: this._onKeyDown,
+                onKeyPress: this._preventArrowKeyScrolling,
+                onKeyUp: this._preventArrowKeyScrolling,
+                onScroll: this._onScroll,
+                style: {
+                    padding: 0,
+                    margin: 0
+                }
+            },
+            nodes
+        );
+    }
+});
+
+/**
+ * An arrow that displays whether its node is expanded (â–¼) or collapsed
+ * (â–¶). When its node has no children, it is hidden.
+ */
+const ArrowExpander = createFactory(createClass({
+    displayName: "ArrowExpander",
+
+    shouldComponentUpdate(nextProps, nextState) {
+        return this.props.item !== nextProps.item
+            || this.props.visible !== nextProps.visible
+            || this.props.expanded !== nextProps.expanded;
+    },
+
+    render() {
+        const attrs = {
+                className: "arrow theme-twisty",
+                onClick: this.props.expanded
+                    ? () => this.props.onCollapse(this.props.item)
+    : e => this.props.onExpand(this.props.item, e.altKey)
+    };
+
+        if (this.props.expanded) {
+            attrs.className += " open";
+        }
+
+        if (!this.props.visible) {
+            attrs.style = {
+                visibility: "hidden"
+            };
+        }
+
+        return dom.div(attrs);
+    }
+}));
+
+const TreeNode = createFactory(createClass({
+    componentDidMount() {
+        if (this.props.focused) {
+            this.refs.button.focus();
+        }
+    },
+
+    componentDidUpdate() {
+        if (this.props.focused) {
+            this.refs.button.focus();
+        }
+    },
+
+    componentWillUnmount() {
+        // If this node is being destroyed and has focus, transfer the focus manually
+        // to the parent tree component. Otherwise, the focus will get lost and keyboard
+        // navigation in the tree will stop working. This is a workaround for a XUL bug.
+        // See bugs 1259228 and 1152441 for details.
+        // DE-XUL: Remove this hack once all usages are only in HTML documents.
+        if (this.props.focused) {
+            this.refs.button.blur();
+            if (this.props.onFocusedNodeUnmount) {
+                this.props.onFocusedNodeUnmount();
+            }
+        }
+    },
+
+    _buttonAttrs: {
+        ref: "button",
+        style: {
+            opacity: 0,
+            width: "0 !important",
+            height: "0 !important",
+            padding: "0 !important",
+            outline: "none",
+            MozAppearance: "none",
+            // XXX: Despite resetting all of the above properties (and margin), the
+            // button still ends up with ~79px width, so we set a large negative
+            // margin to completely hide it.
+            MozMarginStart: "-1000px !important",
+        }
+    },
+
+    render() {
+        const arrow = ArrowExpander({
+            item: this.props.item,
+            expanded: this.props.expanded,
+            visible: this.props.hasChildren,
+            onExpand: this.props.onExpand,
+            onCollapse: this.props.onCollapse,
+        });
+
+        let classList = [ "tree-node", "div" ];
+        if (this.props.index % 2) {
+            classList.push("tree-node-odd");
+        }
+        if (this.props.first) {
+            classList.push("tree-node-first");
+        }
+        if (this.props.last) {
+            classList.push("tree-node-last");
+        }
+
+        return dom.div(
+            {
+                className: classList.join(" "),
+                onFocus: this.props.onFocus,
+                onClick: this.props.onFocus,
+                onBlur: this.props.onBlur,
+                "data-expanded": this.props.expanded ? "" : undefined,
+                "data-depth": this.props.depth,
+                style: {
+                    padding: 0,
+                    margin: 0
+                }
+            },
+
+            this.props.renderItem(this.props.item,
+                this.props.depth,
+                this.props.focused,
+                arrow,
+                this.props.expanded),
+
+            // XXX: OSX won't focus/blur regular elements even if you set tabindex
+            // unless there is an input/button child.
+            dom.button(this._buttonAttrs)
+        );
+    }
+}));
+
+/**
+ * Create a function that calls the given function `fn` only once per animation
+ * frame.
+ *
+ * @param {Function} fn
+ * @returns {Function}
+ */
+function oncePerAnimationFrame(fn) {
+    let animationId = null;
+    let argsToPass = null;
+    return function (...args) {
+        argsToPass = args;
+        if (animationId !== null) {
+            return;
+        }
+
+        animationId = requestAnimationFrame(() => {
+                fn.call(this, ...argsToPass);
+        animationId = null;
+        argsToPass = null;
+    });
+    };
+}
+},{"react":185}],210:[function(require,module,exports){
 const actions = Object.freeze({
   ADD_STACKING_CONTEXT: "add-stacking-context",
-  NEW_DOM_TEXT: "new-dom-text"
+  NEW_DOM_TEXT: "new-dom-text",
+  SELECT_NODE: 'select-node',
+  COMPUTE_RECT: 'compute-rect',
+  EXPAND_NODE: "expand-node",
+  COLLAPSE_NODE: "collapse-node"
 });
 
 module.exports = actions;
 
-},{}],207:[function(require,module,exports){
+},{}],211:[function(require,module,exports){
 const Redux = require("redux");
 
 module.exports = Redux.combineReducers({
   stackingContext: require("./stacking-context")
 });
 
-},{"./stacking-context":208,"redux":193}],208:[function(require,module,exports){
+},{"./stacking-context":212,"redux":193}],212:[function(require,module,exports){
 const constants = require("../constants");
 
 const DEFAULT_STATE = {
   tree: undefined,
   containerElement: undefined,
-  text: undefined
+  text: undefined,
+  selectedNode: undefined,
+  selElt: undefined,
+  displayRect: undefined,
+  expandedNodes: new Set(),
+  reasons: [],
+  url: "stacking-context-1.html"
 }
 
 const handlers = {};
 
 handlers[constants.NEW_DOM_TEXT] = function(state, action) {
   return Object.assign({}, state, {
-    text: action.text
+    text: action.text,
+    url: action.url,
+    //clear selected node
+    selectedNode: undefined,
+    selElt: undefined,
+    displayRect: undefined
   });
 };
 
@@ -22908,6 +24073,35 @@ handlers[constants.ADD_STACKING_CONTEXT] = function(state, action) {
   return Object.assign({}, state, {
     containerElement: action.containerElement,
     tree: action.tree
+  });
+};
+
+handlers[constants.SELECT_NODE] = function(state, action) {
+  return Object.assign({}, state, {
+    selectedNode: action.selectedNode,
+    selElt: action.selElt
+  });
+};
+
+handlers[constants.COMPUTE_RECT] = function(state, action) {
+  return Object.assign({}, state, {
+    displayRect: action.rect
+  });
+};
+
+handlers[constants.EXPAND_NODE] = function(state, action) {
+  const expandedNodes = new Set(state.expandedNodes);
+  expandedNodes.add(action.node);
+  return Object.assign({}, state, {
+    expandedNodes
+  });
+};
+
+handlers[constants.COLLAPSE_NODE] = function(state, action) {
+  const expandedNodes = new Set(state.expandedNodes);
+  expandedNodes.delete(action.node);
+  return Object.assign({}, state, {
+    expandedNodes
   });
 };
 
@@ -22921,7 +24115,7 @@ function update(state = DEFAULT_STATE, action) {
 
 module.exports = update;
 
-},{"../constants":206}],209:[function(require,module,exports){
+},{"../constants":210}],213:[function(require,module,exports){
 /**
  * https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Positioning/Understanding_z_index/The_stacking_context
  *
@@ -22944,17 +24138,13 @@ function getWin(el) {
   return el.ownerDocument.defaultView;
 }
 
-function isStacked(el) {
-  return getWin(el).getComputedStyle(el).zIndex !== "auto";
-}
-
 function isElement(el) {
   return el.nodeType && el.nodeType === Node.ELEMENT_NODE;
 }
 
-function isStackingContext(el) {
+function getStackingContextProperties(el) {
   if (!isElement(el)) {
-    return false;
+    return undefined;
   }
 
   let win = getWin(el);
@@ -22963,168 +24153,113 @@ function isStackingContext(el) {
   let parentStyle = parentEl && isElement(parentEl)
                     ? win.getComputedStyle(parentEl)
                     : {};
+  let nodeProperties = {
+    isStacked: style.zIndex !== "auto",
+    zindex: style.zIndex,
+    isRoot: el === el.ownerDocument.documentElement,
+    position: style.position,
+    isFlexItem: parentStyle.display === "flex" || parentStyle.display === "inline-flex",
+    opacity: style.opacity,
+    transform: style.transform,
+    mixBlendMode: style.mixBlendMode,
+    filter: style.filter,
+    perspective: style.perspective,
+    isIsolated: style.isolation === "isolate",
+    willChange: style.willChange,
+    hasTouchOverflowScrolling: style.WebkitOverflowScrolling === "touch"
+  }
 
-  let isRoot = el === el.ownerDocument.documentElement;
-  let isPositioned = style.position === "relative" || style.position === "absolute";
-  let hasNonAutoZIndex = isStacked(el);
-  let isFlexItem = parentStyle.display === "flex" || parentStyle.display === "inline-flex";
-  let isNotOpaque = style.opacity !== "1";
-  let isTransformed = style.transform !== "none";
-  let hasMixBlendMode = style.mixBlendMode !== "normal";
-  let isFiltered = style.filter !== "none";
-  let hasPerspective = style.perspective !== "none";
-  let isIsolated = style.isolation === "isolate";
-  let isFixed = style.position === "fixed";
-  let willChange = style.willChange.split(", ").some(p => {
+  nodeProperties.isStackingContext = isStackingContext(nodeProperties);
+
+  return nodeProperties;
+}
+
+function isStackingContext(properties) {
+  let willChange = properties.willChange.split(", ").some(p => {
     return p === "position" || p === "opacity" ||
            p === "transform" || p === "filter" ||
            p === "perspective" || p === "isolation";
   });
-  let hasTouchOverflowScrolling = style.WebkitOverflowScrolling === "touch";
-
-  return isRoot ||
-         (hasNonAutoZIndex && isPositioned) ||
-         (hasNonAutoZIndex && isFlexItem) ||
-         isNotOpaque ||
-         isTransformed ||
-         hasMixBlendMode ||
-         isFiltered ||
-         hasPerspective ||
-         isIsolated ||
-         isFixed ||
+  return properties.isRoot ||
+         (properties.isStacked && (properties.position === "relative" || properties.position === "absolute")) ||
+         (properties.isStacked && properties.isFlexItem) ||
+         properties.opacity !== "1"||
+         properties.transform !== "none"||
+         properties.mixBlendMode !== "normal"||
+         properties.filter !== "none"||
+         properties.perspective !== "none"||
+         properties.isIsolated ||
+         properties.position === "fixed" ||
          willChange ||
-         hasTouchOverflowScrolling;
+         properties.hasTouchOverflowScrolling;
 }
 
-function getStackingContextTree(root, treeNodes = [], parent) {
+function getStackingContextTree(root, treeNodes = [], parentElement) {
+  let counter = 0;
   for (let child of root.children) {
-    let isChildStacked = isStacked(child);
-    let isChildStackingContext = isStackingContext(child);
     let newNode;
-
-    if (isChildStacked || isChildStackingContext) {
+    // Filter for divs and spans only.
+    // Easily change to include others. (Maybe make it a configurable setting in the future)
+    if (child.tagName === "DIV" || child.tagName === "SPAN") {
+      let stackingContextProperties = getStackingContextProperties(child);
+      // Terminology: parentElement = parent element of the current element
+      //              parentStackingContext = the parent stacking order element
+      // Logic: If parent element is undefined, then the parent stacking element is undefined.
+      //        If the parent element is part of the stacking context, then the parent stacking
+      //        element is the parent element; otherwise, the parent stacking element of the
+      //        parent element is the stacking element for this element
+      let parentStackingContext = (parentElement === undefined) ? undefined :
+                                  (parentElement.properties.isStackingContext) ? parentElement :
+                                  parentElement.parentStackingContext;
       newNode = {
         el: child,
-        isStacked: isChildStacked,
-        index: isChildStacked ? parseInt(getComputedStyle(child).zIndex, 10) : undefined,
-        isStackingContext: isChildStackingContext,
+        key: (parentElement === undefined) ? counter++ : parentElement.key + "-" + counter++,
         nodes: [],
-        parent
+        stackingContextChildren: [],
+        parentElement,
+        parentStackingContext,
+        properties: stackingContextProperties
       };
       treeNodes.push(newNode);
     }
 
     // Recurse through children.
+    var childrenNodes;
     if (child.childElementCount) {
-      getStackingContextTree(child,
-                             newNode && isChildStackingContext ? newNode.nodes : treeNodes,
-                             newNode || parent);
+      childrenNodes = getStackingContextTree(child,
+                             (newNode && newNode.properties.isStackingContext) ? newNode.nodes : treeNodes,
+                             newNode || parentElement);
+      // Add the children nodes to newNode.stackingContextChildren.
+      // This is different from newNode.nodes which is the DOM children.
+      if (newNode && newNode.properties.isStackingContext) {
+         newNode.stackingContextChildren = childrenNodes;
+      }
     }
   }
 
+  treeNodes = sortNodesByZIndex(treeNodes);
   return treeNodes;
 }
 
-function outputNode({el, isStackingContext, isStacked, index}) {
-  return el.tagName.toLowerCase() +
-         (el.id.trim() !== "" ? "#" + el.id.trim() : "") +
-         (el.className && el.className.trim && el.className.trim() !== "" ? "." + el.className.trim().split(" ").join(".") : "") +
-         (isStackingContext ? " [CONTEXT]" : "") +
-         (isStacked ? ` [${index}]` : "");
-}
-
-function outputTree(tree, indent = "", output = []) {
-  for (let node of tree) {
-    let out = outputNode(node);
-    output.push(indent + outputNode(node));
-    if (node.nodes) {
-      outputTree(node.nodes, indent + "  ", output);
+// Sort nodes based on their zindex. "auto" is equivalent to 0
+function sortNodesByZIndex(tree) {
+  tree.sort(function(a, b){
+    if (a.properties.isStackingContext && b.properties.isStackingContext) {
+      var aZindex = (a.properties.zindex === "auto") ? 0 : a.properties.zindex;
+      var bZindex = (b.properties.zindex === "auto") ? 0 : b.properties.zindex;
+      return aZindex > bZindex;
+    } else {
+      return (a.properties.isStackingContext) ? 1 : 0;
     }
-  }
-  return output;
-}
-
-function findNode(tree, node) {
-  for (let item of tree) {
-    if (item.el === node) {
-      return item;
-    }
-    if (item.nodes) {
-      let candidate = findNode(item.nodes, node);
-      if (candidate) {
-        return candidate;
-      }
-    }
-  }
-}
-
-function compareNodes(tree, node1, node2) {
-  // Get the item in the stack tree corresponding to node1.
-  let item1 = findNode(tree, node1);
-  // And get the list of its parent leading up to the root.
-  let parents1 = [];
-  let item = item1;
-  while (item.parent) {
-    parents1.push(item.parent);
-    item = item.parent;
-  }
-
-  // Do the same for node2.
-  let item2 = findNode(tree, node2);
-  let parents2 = [];
-  item = item2;
-  while (item.parent) {
-    parents2.push(item.parent);
-    item = item.parent;
-  }
-
-  // Now find the common root in these 2 lists of parents and the sub branches from it.
-  let commonRoot;
-  let subParents1 = [];
-  let subParents2 = [];
-  for (let parent1 of parents1) {
-    subParents1.push(parent1);
-    subParents2 = [];
-    for (let parent2 of parents2) {
-      subParents2.push(parent2);
-      if (parent1 === parent2) {
-        commonRoot = parent1;
-        break;
-      }
-    }
-    if (commonRoot) {
-      break;
-    }
-  }
-  subParents1.reverse().push(item1);
-  subParents2.reverse().push(item2);
-
-  // And now display only these 2 sub branches, from the common
-  // root to node1 and node2.
-  console.log(subParents1.map(outputNode).join(" --> "));
-  console.log(subParents2.map(outputNode).join(" --> "));
-}
-
-function flattenTreeWithDepth(tree = [], depth = 0) {
-  return tree.reduce((previousValue, node) => {
-    return [
-      ...previousValue,
-      Object.assign({depth}, node),
-      ...flattenTreeWithDepth(node.nodes, depth + 1)
-    ];
-  }, [])
+  });
+  return tree;
 }
 
 module.exports = {
-  getStackingContextTree,
-  outputNode,
-  outputTree,
-  findNode,
-  compareNodes,
-  flattenTreeWithDepth
+  getStackingContextTree
 };
 
-},{}],210:[function(require,module,exports){
+},{}],214:[function(require,module,exports){
 const Redux = require("redux");
 const {default: thunkMiddleware} = require("redux-thunk");
 const loggerMiddleware = require("redux-logger")({logErrors: false});
@@ -23137,7 +24272,7 @@ module.exports = function getStore() {
   );
 };
 
-},{"./reducers":207,"redux":193,"redux-logger":186,"redux-thunk":187}],211:[function(require,module,exports){
+},{"./reducers":211,"redux":193,"redux-logger":186,"redux-thunk":187}],215:[function(require,module,exports){
 const React = require("react");
 const ReactDOM = require("react-dom");
 const {createFactory} = require("react");
@@ -23153,4 +24288,106 @@ function main() {
 
 main();
 
-},{"./components/app":199,"./store.js":210,"react":185,"react-dom":35,"react-redux":38}]},{},[211]);
+},{"./components/app":199,"./store.js":214,"react":185,"react-dom":35,"react-redux":38}],216:[function(require,module,exports){
+const parent1 = {
+  "el":{},
+  "key":0,
+  "index":0,
+  "nodes": [],
+  "parent": undefined,
+  "properties":{
+    "isStacked":true,
+    "zindex":"0",
+    "isRoot":false,
+    "position":"relative",
+    "isFlexItem":false,
+    "opacity":"1",
+    "transform":"none",
+    "mixBlendMode":"normal",
+    "filter":"none",
+    "perspective":"none",
+    "isIsolated":false,
+    "willChange":"auto",
+    "hasTouchOverflowScrolling":false,
+    "isStackingContext":true}
+};
+
+const parent2 = {
+  "el":{},
+  "key":1,
+  "index":1,
+  "nodes":[],
+  "parent": undefined,
+  "properties":{
+    "isStacked":true,
+    "zindex":"1",
+    "isRoot":false,
+    "position":"relative",
+    "isFlexItem":false,
+    "opacity":"1",
+    "transform":"none",
+    "mixBlendMode":"normal",
+    "filter":"none",
+    "perspective":"none",
+    "isIsolated":false,
+    "willChange":"auto",
+    "hasTouchOverflowScrolling":false,
+    "isStackingContext":true}
+};
+
+const child1 = {
+  "el":{},
+  "key":"0-0",
+  "index":1000,
+  "nodes":[],
+  "parent": parent1,
+  "properties":{
+    "isStacked":true,
+    "zindex":"1000",
+    "isRoot":false,
+    "position":"absolute",
+    "isFlexItem":false,
+    "opacity":"1",
+    "transform":"none",
+    "mixBlendMode":"normal",
+    "filter":"none",
+    "perspective":"none",
+    "isIsolated":false,
+    "willChange":"auto",
+    "hasTouchOverflowScrolling":false,
+    "isStackingContext":true}
+};
+
+const child2 = {
+  "el":{},
+  "key":"1-0",
+  "index":1000,
+  "nodes":[],
+  "parent":parent2,
+  "properties":{
+    "isStacked":true,
+    "zindex":"1000",
+    "isRoot":false,
+    "position":"absolute",
+    "isFlexItem":false,
+    "opacity":"1",
+    "transform":"none",
+    "mixBlendMode":"normal",
+    "filter":"none",
+    "perspective":"none",
+    "isIsolated":false,
+    "willChange":"auto",
+    "hasTouchOverflowScrolling":false,
+    "isStackingContext":true}
+};
+
+parent1.nodes.push(child1);
+parent2.nodes.push(child2);
+
+function getMockTree(){
+  return([parent1, parent2]);
+};
+
+module.exports = {getMockTree};
+
+},{}]},{},[215]);

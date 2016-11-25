@@ -8,7 +8,9 @@ const StackingContextTree = createClass({
       const {
         tree,
         expandedNodes,
-        selNode,
+        selectedNode,
+        selectNode,
+        computeBoundingRect,
         toggleNode
       } = this.props;
 
@@ -24,12 +26,14 @@ const StackingContextTree = createClass({
               {
                 node,
                 depth,
-                isFocused: selNode === node,
+                isFocused: selectedNode === node,
                 arrow,
                 isExpanded,
               }
             );
           },
+          focused: selectedNode,
+          onFocus: node => {selectNode(node); computeBoundingRect(node);},
           onExpand: toggleNode,
           onCollapse: toggleNode,
           itemHeight: 10
