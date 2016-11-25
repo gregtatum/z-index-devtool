@@ -29,7 +29,6 @@ const DomContainer = createClass({
         let element = document.elementFromPoint(event.clientX, event.clientY);
         let tree = store.getState().stackingContext.tree;
         let node = getTreeObject(element, tree);
-        console.log(node);
         if (node) {
           store.dispatch(selectStackingContextNode(node));
           let parent = node.parentStackingContext;
