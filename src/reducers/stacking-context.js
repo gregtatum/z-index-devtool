@@ -9,7 +9,8 @@ const DEFAULT_STATE = {
   displayRect: undefined,
   expandedNodes: new Set(),
   reasons: [],
-  url: "stacking-context-1.html"
+  url: "stacking-context-1.html",
+  isSelectorActive: false
 }
 
 const handlers = {};
@@ -58,6 +59,12 @@ handlers[constants.COLLAPSE_NODE] = function(state, action) {
   expandedNodes.delete(action.node);
   return Object.assign({}, state, {
     expandedNodes
+  });
+};
+
+handlers[constants.TOGGLE_SELECTOR] = function(state) {
+  return Object.assign({}, state, {
+    isSelectorActive: !state.isSelectorActive
   });
 };
 

@@ -4,7 +4,8 @@ const actions = Object.freeze({
   SELECT_NODE: 'select-node',
   COMPUTE_RECT: 'compute-rect',
   EXPAND_NODE: "expand-node",
-  COLLAPSE_NODE: "collapse-node"
+  COLLAPSE_NODE: "collapse-node",
+  TOGGLE_SELECTOR: "toggle-selector"
 });
 
 module.exports = actions;

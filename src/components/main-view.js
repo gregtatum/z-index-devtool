@@ -31,7 +31,7 @@ const MainView = createClass({
           text: text,
           newTextReceived: newTextReceived
         }),
-        DisplayRectangle({elt: elt})
+          DisplayRectangle({elt: elt})
       );
     }
 });

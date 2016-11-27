@@ -25,16 +25,19 @@ const DomContainer = createClass({
         store.dispatch(computeBoundingRect(store.getState().stackingContext.selElt))
       },
       onClick: (event) => {
-        event.persist();
-        let element = document.elementFromPoint(event.clientX, event.clientY);
-        let tree = store.getState().stackingContext.tree;
-        let node = getTreeObject(element, tree);
-        if (node) {
-          store.dispatch(selectStackingContextNode(node));
-          let parent = node.parentStackingContext;
-          while (parent) {
-            store.dispatch(expandNode(parent));
-            parent = parent.parentStackingContext;
+        // only allow 'click to select' if selector button is active
+        if (store.getState().stackingContext.isSelectorActive) {
+          event.persist();
+          let element = document.elementFromPoint(event.clientX, event.clientY);
+          let tree = store.getState().stackingContext.tree;
+          let node = getTreeObject(element, tree);
+          if (node) {
+            store.dispatch(selectStackingContextNode(node));
+            let parent = node.parentStackingContext;
+            while (parent) {
+              store.dispatch(expandNode(parent));
+              parent = parent.parentStackingContext;
+            }
           }
         }
       }

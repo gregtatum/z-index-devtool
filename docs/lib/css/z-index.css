@@ -53,6 +53,7 @@ html, body, #app {
 
 .devtools-toolbar {
   background-color: var(--theme-toolbar-background);
+  display: flex;
 }
 
 .selected-node-dom {
@@ -187,4 +188,15 @@ html, body, #app {
   padding: 0;
   position: absolute;
   border: 0;
+}
+#command-button-pick:focus {
+  outline: 0;
+}
+
+#command-button-pick::before {
+  background-image: url(../img/command-pick.svg);
+}
+
+.active {
+  filter: var(--checked-icon-filter);
 }

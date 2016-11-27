@@ -1,5 +1,5 @@
 const {DOM, createClass, createFactory} = require("react");
-const {div} = DOM;
+const {div, button} = DOM;
 const {connect} = require("react-redux");
 
 const StackingContextTree = createFactory(require("./stacking-context-tree"));
@@ -15,15 +15,26 @@ const StackingContextTreeView = createFactory(createClass({
 
   render() {
     const {
-      tree, expandedNodes, selectedNode, selectNode, computeBoundingRect, toggleNode
+      tree, expandedNodes, selectedNode, selectNode, computeBoundingRect, toggleNode, isSelectorActive
     } = this.props;
+
+    let buttonClass = "devtools-button command-button";
+    if (isSelectorActive)
+      buttonClass += " active";
 
     return div(
       {className: "tree-view"},
-      div({className: "devtools-toolbar"}, "Stacking Context Tree"),
+      div({className: "devtools-toolbar"},
+        button({
+          className: buttonClass,
+          id: "command-button-pick",
+          title: "Select an element on the page",
+          checked: isSelectorActive ? "true" : "",
+          onClick: this.props.toggleSelector
+        }),
+        "Stacking Context Tree"),
         StackingContextTreeHeader(),
-        StackingContextTree({tree, expandedNodes, selectedNode, selectNode, computeBoundingRect, toggleNode})/*,
-        StackingContextNodeInfo()*/
+        StackingContextTree({tree, expandedNodes, selectedNode, selectNode, computeBoundingRect, toggleNode})
     );
   }
 }));
