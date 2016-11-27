@@ -16,6 +16,9 @@
  * - specifying any attribute above in will-change even if you don't specify values for these attributes directly
  * - elements with -webkit-overflow-scrolling set to "touch"
  */
+
+const INCLUDE_HTML_TAGS = ["DIV", "SPAN", "STRONG", "IMG", "TITLE"];
+
 function getWin(el) {
   return el.ownerDocument.defaultView;
 }
@@ -82,7 +85,7 @@ function getStackingContextTree(root, treeNodes = [], parentElement) {
     let newNode;
     // Filter for divs and spans only.
     // Easily change to include others. (Maybe make it a configurable setting in the future)
-    if (child.tagName === "DIV" || child.tagName === "SPAN") {
+    if (INCLUDE_HTML_TAGS.indexOf(child.tagName) !== -1) {
       let stackingContextProperties = getStackingContextProperties(child);
       // Terminology: parentElement = parent element of the current element
       //              parentStackingContext = the parent stacking order element

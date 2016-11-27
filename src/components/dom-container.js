@@ -1,7 +1,7 @@
 const {DOM, createClass} = require("react");
 const {div} = DOM;
 const React = require("react");
-const {computeBoundingRect} = require("../actions/stacking-context");
+const {expandNode, selectStackingContextNode, computeBoundingRect} = require("../actions/stacking-context");
 
 /**
  * Container for the DOM. Takes in a single <div> element and displays it.
@@ -23,10 +23,37 @@ const DomContainer = createClass({
       dangerouslySetInnerHTML: {__html: text},
       onScroll: () => {
         store.dispatch(computeBoundingRect(store.getState().stackingContext.selElt))
+      },
+      onClick: (event) => {
+        event.persist();
+        let element = document.elementFromPoint(event.clientX, event.clientY);
+        let tree = store.getState().stackingContext.tree;
+        let node = getTreeObject(element, tree);
+        if (node) {
+          store.dispatch(selectStackingContextNode(node));
+          let parent = node.parentStackingContext;
+          while (parent) {
+            store.dispatch(expandNode(parent));
+            parent = parent.parentStackingContext;
+          }
+        }
       }
     });
   }
 });
+
+function getTreeObject(el, tree) {
+  let nodeObject;
+  for (let child of tree) {
+    if (child.el === el) {
+      nodeObject = child;
+    }
+    else if (nodeObject === undefined && child.stackingContextChildren) {
+      nodeObject = getTreeObject(el, child.stackingContextChildren);
+    }
+  }
+  return nodeObject;
+}
 
 DomContainer.contextTypes = {
   store: React.PropTypes.object
