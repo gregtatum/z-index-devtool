@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Behaviour Change</title>
+  </head>
+  <body>
+  <style>
+  div { font: 12px Arial; }
+
+	span.bold { font-weight: bold; }
+
+	#div2 { z-index: 2; }
+
+	#div1,#div3 {
+	   height: 80px;
+	   position: relative;
+	   border: 1px dashed #669966;
+	   background-color: #ccffcc;
+	   padding-left: 5px;
+	}
+
+	#div2 {
+	   opacity: 0.8;
+	   position: absolute;
+	   width: 150px;
+	   height: 200px;
+	   top: 20px;
+	   left: 170px;
+	   border: 1px dashed #990000;
+	   background-color: #ffdddd;
+	   text-align: center;
+	}
+	#div1:hover {
+		opacity: 0.5;
+	}
+  </style>
+    <br />
+
+    <div id="div1"><br />
+        <span class="bold">DIV #1</span><br />
+        position: relative;<br />
+		opacity: variable;
+        <div id="div2"><br />
+            <span class="bold">DIV #2</span><br />
+            position: absolute;<br />
+            z-index: 2;
+        </div>
+    </div>
+
+    <br />
+
+    <div id="div3"><br />
+        <span class="bold">DIV #3</span><br />
+        position: relative;<br />
+    </div>
+
+  </body>
+</html>
