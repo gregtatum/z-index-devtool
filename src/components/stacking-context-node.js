@@ -38,7 +38,7 @@ const StackingContextNode = createClass({
         key: node.key,
         onMouseOver: () => {
           store.dispatch(highlightElement(node.el));
-          store.dispatch(computeBoundingRect(node.el));
+          store.dispatch(computeBoundingRect(node));
         },
         onMouseLeave: () => {
           store.dispatch(highlightElement(undefined));
