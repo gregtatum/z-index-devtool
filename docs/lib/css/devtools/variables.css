@@ -72,7 +72,7 @@
   /* Command line */
   --theme-command-line-image: url(../img/commandline-icon.svg#light-theme);
   --theme-command-line-image-focus: url(../img/commandline-icon.svg#light-theme-focus);
-}
+  }
 
 :root.theme-dark {
   --theme-body-background: #393f4c;

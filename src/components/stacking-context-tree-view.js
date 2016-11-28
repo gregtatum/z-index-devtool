@@ -19,8 +19,15 @@ const StackingContextTreeView = createFactory(createClass({
     } = this.props;
 
     let buttonClass = "devtools-button command-button";
-    if (isSelectorActive)
-      buttonClass += " active";
+    // XXX: ugly hack. Using var() and url() to find a specific SVG filter was causing Chrome to freak out.
+    //  It would make infinite requests for the 'filters.svg' file, despite every request being fulfilled.
+    //  See: https://github.com/gregtatum/z-index-devtool/pull/76 for more information (@jreinlein)
+    if (isSelectorActive) {
+      if (document.getElementsByClassName("theme-light").length > 0)
+        buttonClass += " active-picker-light";
+      else
+        buttonClass += " active-picker-dark";
+    }
 
     return div(
       {className: "tree-view"},
@@ -29,12 +36,11 @@ const StackingContextTreeView = createFactory(createClass({
           className: buttonClass,
           id: "command-button-pick",
           title: "Select an element on the page",
-          checked: isSelectorActive ? "true" : "",
           onClick: this.props.toggleSelector
         }),
         "Stacking Context Tree"),
-        StackingContextTreeHeader(),
-        StackingContextTree({tree, expandedNodes, selectedNode, selectNode, computeBoundingRect, toggleNode})
+      StackingContextTreeHeader(),
+      StackingContextTree({tree, expandedNodes, selectedNode, selectNode, computeBoundingRect, toggleNode})
     );
   }
 }));

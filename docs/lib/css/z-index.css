@@ -197,6 +197,10 @@ html, body, #app {
   background-image: url(../img/command-pick.svg);
 }
 
-.active {
-  filter: var(--checked-icon-filter);
+.active-picker-light {
+  filter: url(/lib/img/filters.svg#checked-icon-state);
+}
+
+.active-picker-dark {
+  filter: url(/lib/img/filters.svg#dark-theme-checked-icon-state);
 }
