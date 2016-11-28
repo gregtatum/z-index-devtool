@@ -11,6 +11,7 @@ const {
 } = require("../actions/stacking-context");
 
 const MainView = createFactory(require("./main-view"));
+// const StackingContextTreeHeader = createFactory(require("./stacking-context-tree-header"));
 const StackingContextTreeView = createFactory(require("./stacking-context-tree-view"));
 const StackingContextNodeInfo = createFactory(require("./stacking-context-node-info"));
 
@@ -49,6 +50,8 @@ const App = createFactory(createClass({
         }),
         div(
           {className: "sidebar"},
+          div({className: "devtools-toolbar"}, "Stacking Context Tree"),
+          // StackingContextTreeHeader(),
           StackingContextTreeView({
             tree: stackingContext.tree,
             expandedNodes: stackingContext.expandedNodes,

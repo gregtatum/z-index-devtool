@@ -25,7 +25,6 @@ html, body, #app {
   flex: 1 0; /* 0 prevents shrinking when there's many elements */
   flex-direction: column;
   overflow-x: hidden;
-  overflow-y: auto;
 }
 
 .main-view {
@@ -41,6 +40,7 @@ html, body, #app {
   display: flex;
   flex-direction: column;
   flex: 1;
+  overflow-y: auto;
 }
 .dom-container {
   overflow: scroll;
@@ -82,6 +82,7 @@ html, body, #app {
   background-color: var(--theme-body-background);
   cursor: default;
   display: flex;
+  flex: 0 0 1.3em; /* force rows to have a minimum size to prevent shrinking */
 }
 .tree-node-odd {
   background-color: var(--row-alt-background-color);
