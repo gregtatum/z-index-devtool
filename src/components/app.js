@@ -33,8 +33,6 @@ const App = createFactory(createClass({
 
     return div(
         {id:"split-view"},
-        // App will only render SplitView, which will render DomContainer + dropdown on left
-        //  and the TreeView on right
         MainView({
           //props for dom container
           text: stackingContext.text,
