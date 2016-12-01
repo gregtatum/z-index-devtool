@@ -78,7 +78,7 @@
 /* Spinner (used for async fetch). Needs to have higher priority than
    theme toggle icons */
 .treeTable .treeRow.hasChildren.loading > .treeLabelCell > .treeIcon {
-    background-image: url(../img/spinner.png) !important;
+    background-image: url(../../img/spinner.png) !important;
     background-position: 2px 1px !important;
     background-size: 9px 9px !important;
 }

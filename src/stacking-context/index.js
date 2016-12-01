@@ -17,7 +17,7 @@
  * - elements with -webkit-overflow-scrolling set to "touch"
  */
 
-const INCLUDE_HTML_TAGS = ["DIV", "SPAN", "STRONG", "IMG", "TITLE"];
+const INCLUDE_HTML_TAGS = ["DIV", "SPAN", "P", "IMG", "TITLE"];
 
 function getWin(el) {
   return el.ownerDocument.defaultView;

@@ -96,6 +96,12 @@ function collapseNode(node) {
   }
 }
 
+function toggleSelector() {
+  return {
+    type: constants.TOGGLE_SELECTOR
+  }
+}
+
 module.exports = {
   fetchNewDomText,
   getStackingContext,
@@ -105,5 +111,6 @@ module.exports = {
   toggleNode,
   expandNode,
   collapseNode,
-  computeBoundingRect
+  computeBoundingRect,
+  toggleSelector
 }

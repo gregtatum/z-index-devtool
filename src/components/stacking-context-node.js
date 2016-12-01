@@ -1,5 +1,5 @@
 const {DOM, createClass} = require("react");
-const {div, button, span} = DOM;
+const {div, span} = DOM;
 const React = require("react");
 const {
   selectStackingContextNode,

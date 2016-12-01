@@ -8,6 +8,7 @@ const {
   selectStackingContextNode,
   computeBoundingRect,
   toggleNode,
+  toggleSelector
 } = require("../actions/stacking-context");
 
 const MainView = createFactory(require("./main-view"));
@@ -32,8 +33,6 @@ const App = createFactory(createClass({
 
     return div(
         {id:"split-view"},
-        // App will only render SplitView, which will render DomContainer + dropdown on left
-        //  and the TreeView on right
         MainView({
           //props for dom container
           text: stackingContext.text,
@@ -53,9 +52,11 @@ const App = createFactory(createClass({
             tree: stackingContext.tree,
             expandedNodes: stackingContext.expandedNodes,
             selectedNode: stackingContext.selectedNode,
+            isSelectorActive: stackingContext.isSelectorActive,
             selectNode: node => dispatch(selectStackingContextNode(node)),
             computeBoundingRect: node => dispatch(computeBoundingRect(node)),
-            toggleNode: node => dispatch(toggleNode(node))
+            toggleNode: node => dispatch(toggleNode(node)),
+            toggleSelector: node => dispatch(toggleSelector())
           }),
           StackingContextNodeInfo()
         )
