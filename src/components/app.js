@@ -1,6 +1,6 @@
-const {DOM, createClass, createFactory} = require("react");
-const {div} = DOM;
-const {connect} = require("react-redux");
+const { DOM, createClass, createFactory } = require("react");
+const { div } = DOM;
+const { connect } = require("react-redux");
 
 const {
   fetchNewDomText,
@@ -12,42 +12,42 @@ const {
 } = require("../actions/stacking-context");
 
 const MainView = createFactory(require("./main-view"));
-const StackingContextTreeView = createFactory(require("./stacking-context-tree-view"));
-const StackingContextNodeInfo = createFactory(require("./stacking-context-node-info"));
+const StackingContextTreeView = createFactory(
+  require("./stacking-context-tree-view")
+);
+const StackingContextNodeInfo = createFactory(
+  require("./stacking-context-node-info")
+);
 
-const { todo } = require("../actions/stacking-context");
+const App = createFactory(
+  createClass({
+    displayName: "App",
 
-const App = createFactory(createClass({
-  displayName: "App",
+    componentWillMount() {
+      const { dispatch } = this.props;
+      dispatch(fetchNewDomText("examples/absolute-occluded-by-relative.html"));
+    },
 
-  componentWillMount() {
-    const {dispatch} = this.props;
-    dispatch(fetchNewDomText("examples/absolute-occluded-by-relative.html"));
-  },
+    render() {
+      const { dispatch, stackingContext } = this.props;
 
-  render() {
-    const {
-      dispatch,
-      stackingContext
-    } = this.props;
-
-    return div(
-        {id:"split-view"},
+      return div(
+        { id: "split-view" },
         MainView({
           //props for dom container
           text: stackingContext.text,
-          newTextReceived: (div) => {
-            dispatch(getStackingContext(div))
+          newTextReceived: div => {
+            dispatch(getStackingContext(div));
           },
           //props for example dropdown
-          fetchNewExampleHtml: (url) => {
-            dispatch(fetchNewDomText(url))
+          fetchNewExampleHtml: url => {
+            dispatch(fetchNewDomText(url));
           },
           //props for display rectangle
           elt: stackingContext.selElt
         }),
         div(
-          {className: "sidebar"},
+          { className: "sidebar" },
           StackingContextTreeView({
             tree: stackingContext.tree,
             expandedNodes: stackingContext.expandedNodes,
@@ -60,9 +60,10 @@ const App = createFactory(createClass({
           }),
           StackingContextNodeInfo()
         )
-    );
-  }
-}));
+      );
+    }
+  })
+);
 
 function mapStateToProps(state) {
   return state;

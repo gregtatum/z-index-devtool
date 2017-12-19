@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 229);
+/******/ 	return __webpack_require__(__webpack_require__.s = 228);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -25580,33 +25580,15 @@ const StackingContextTreeHeader = createClass({
 module.exports = StackingContextTreeHeader;
 
 /***/ }),
-/* 228 */,
-/* 229 */
+/* 228 */
 /***/ (function(module, exports, __webpack_require__) {
 
 const React = __webpack_require__(6);
 const ReactDOM = __webpack_require__(106);
-const { createFactory } = __webpack_require__(6);
-const { Provider } = __webpack_require__(58);
-const createStore = __webpack_require__(216);
-
-const app = React.createElement(__webpack_require__(230));
-
-function main() {
-  const reduxApp = React.createElement(Provider, { store: createStore() }, app);
-  ReactDOM.render(reduxApp, document.querySelector("#app"));
-}
-
-main();
-
-
-/***/ }),
-/* 230 */
-/***/ (function(module, exports, __webpack_require__) {
-
-const { DOM, createClass, createFactory } = __webpack_require__(6);
+const { DOM, createFactory, createClass, createElement } = __webpack_require__(6);
 const { div } = DOM;
-const { connect } = __webpack_require__(58);
+const { Provider, connect } = __webpack_require__(58);
+const createStore = __webpack_require__(216);
 
 const {
   fetchNewDomText,
@@ -25617,7 +25599,6 @@ const {
   toggleSelector
 } = __webpack_require__(61);
 
-const MainView = createFactory(__webpack_require__(231));
 const StackingContextTreeView = createFactory(
   __webpack_require__(223)
 );
@@ -25625,337 +25606,39 @@ const StackingContextNodeInfo = createFactory(
   __webpack_require__(100)
 );
 
-const App = createFactory(
+let Panel = createFactory(
   createClass({
-    displayName: "App",
-
-    componentWillMount() {
-      const { dispatch } = this.props;
-      dispatch(fetchNewDomText("examples/absolute-occluded-by-relative.html"));
-    },
-
+    displayName: "Panel",
     render() {
       const { dispatch, stackingContext } = this.props;
-
       return div(
-        { id: "split-view" },
-        MainView({
-          //props for dom container
-          text: stackingContext.text,
-          newTextReceived: div => {
-            dispatch(getStackingContext(div));
-          },
-          //props for example dropdown
-          fetchNewExampleHtml: url => {
-            dispatch(fetchNewDomText(url));
-          },
-          //props for display rectangle
-          elt: stackingContext.selElt
+        { className: "sidebar" },
+        StackingContextTreeView({
+          tree: stackingContext.tree,
+          expandedNodes: stackingContext.expandedNodes,
+          selectedNode: stackingContext.selectedNode,
+          isSelectorActive: stackingContext.isSelectorActive,
+          selectNode: node => dispatch(selectStackingContextNode(node)),
+          computeBoundingRect: node => dispatch(computeBoundingRect(node)),
+          toggleNode: node => dispatch(toggleNode(node)),
+          toggleSelector: node => dispatch(toggleSelector())
         }),
-        div(
-          { className: "sidebar" },
-          StackingContextTreeView({
-            tree: stackingContext.tree,
-            expandedNodes: stackingContext.expandedNodes,
-            selectedNode: stackingContext.selectedNode,
-            isSelectorActive: stackingContext.isSelectorActive,
-            selectNode: node => dispatch(selectStackingContextNode(node)),
-            computeBoundingRect: node => dispatch(computeBoundingRect(node)),
-            toggleNode: node => dispatch(toggleNode(node)),
-            toggleSelector: node => dispatch(toggleSelector())
-          }),
-          StackingContextNodeInfo()
-        )
+        StackingContextNodeInfo()
       );
     }
   })
 );
 
-function mapStateToProps(state) {
+Panel = connect(function(state) {
   return state;
-}
+})(Panel);
 
-module.exports = connect(mapStateToProps)(App);
-
-
-/***/ }),
-/* 231 */
-/***/ (function(module, exports, __webpack_require__) {
-
-const {DOM, createClass, createFactory} = __webpack_require__(6);
-const {div} = DOM;
-const {connect} = __webpack_require__(58);
-
-const DomContainer = createFactory(__webpack_require__(232));
-const ExamplesDropdown = createFactory(__webpack_require__(233));
-const DisplayRectangle = createFactory(__webpack_require__(234));
-
-const MainView = createClass({
-  displayName: "MainView",
-
-  render() {
-    const {
-      text,
-      newTextReceived,
-      fetchNewExampleHtml,
-      elt
-    } = this.props;
-
-    return div(
-      {className: "main-view"},
-      ExamplesDropdown({fetchNewExampleHtml}),
-      DomContainer({text, newTextReceived}),
-      DisplayRectangle({elt: elt})
-    );
-  }
-});
-
-module.exports = MainView;
-
-
-/***/ }),
-/* 232 */
-/***/ (function(module, exports, __webpack_require__) {
-
-const {DOM, createClass} = __webpack_require__(6);
-const {div} = DOM;
-const React = __webpack_require__(6);
-const {
-  expandNode,
-  selectStackingContextNode,
-  computeBoundingRect,
-  toggleSelector
-} = __webpack_require__(61);
-
-/**
- * Container for the DOM. Takes in a single <div> element and displays it.
- */
-const DomContainer = createClass({
-
-  componentDidUpdate(prevProps, prevState) {
-    if (this.props.text !== prevProps.text) {
-      this.props.newTextReceived(this._div);
-    }
-  },
-
-  render() {
-    const {text} = this.props;
-    const {store} = this.context;
-    let isSelectorActive = store.getState().stackingContext.isSelectorActive;
-    return div({
-      className: "dom-container",
-      ref: (div) => this._div = div,
-      style: isSelectorActive ? {cursor: "pointer"} : {},
-      dangerouslySetInnerHTML: {__html: text},
-      onScroll: () => {
-        store.dispatch(computeBoundingRect(store.getState().stackingContext.selElt))
-      },
-      onClick: (event) => {
-        // only allow 'click to select' if selector button is active
-        if (isSelectorActive) {
-          event.persist();
-          let element = document.elementFromPoint(event.clientX, event.clientY);
-          let tree = store.getState().stackingContext.tree;
-          let node = getTreeObject(element, tree);
-          if (node) {
-            store.dispatch(selectStackingContextNode(node));
-            let parent = node.parentStackingContext;
-            while (parent) {
-              store.dispatch(expandNode(parent));
-              parent = parent.parentStackingContext;
-            }
-            store.dispatch(toggleSelector()); // disable selector
-          }
-        }
-      }
-    });
-  }
-});
-
-function getTreeObject(el, tree) {
-  let nodeObject;
-  for (let child of tree) {
-    if (child.el === el) {
-      nodeObject = child;
-    }
-    else if (nodeObject === undefined && child.stackingContextChildren) {
-      nodeObject = getTreeObject(el, child.stackingContextChildren);
-    }
-  }
-  return nodeObject;
-}
-
-DomContainer.contextTypes = {
-  store: React.PropTypes.object
-};
-
-module.exports = DomContainer;
-
-
-/***/ }),
-/* 233 */
-/***/ (function(module, exports, __webpack_require__) {
-
-const {DOM, createClass} = __webpack_require__(6);
-const {div, select, option, label, span} = DOM;
-const React = __webpack_require__(6);
-const {getText} = __webpack_require__(101);
-
-const ExamplesDropdown = createClass({
-  displayName: "ExamplesDropdown",
-
-  render() {
-    const {store} = this.context;
-    const {url} = store.getState().stackingContext;
-    return div({className: "examples-dropdown devtools-toolbar"},
-      label({title: "Change the markup example"},
-        span({}, "Example: "),
-        select(
-          {
-            value: url,
-            onChange: (event) => {
-              this.props.fetchNewExampleHtml(event.target.value);
-            }
-          },
-          files.map(file => option(
-            {key:file.name, value: file.path},
-            file.name
-          ))
-        )
-      )
-    );
-  }
-})
-
-// No native JavaScript way to get the list of html files
-const files = [{
-    name: "absolute-occluded-by-relative",
-    path: "examples/absolute-occluded-by-relative.html"
-}, {
-    name: "adding-z-index",
-    path: "examples/adding-z-index.html"
-}, {
-    name: "fixed-occluded-by-relative",
-    path: "examples/fixed-occluded-by-relative.html"
-}, {
-    name: "stacking-and-float",
-    path: "examples/stacking-and-float.html"
-}, {
-    name: "stacking-context-1",
-    path: "examples/stacking-context-1.html"
-}, {
-    name: "stacking-context-2",
-    path: "examples/stacking-context-2.html"
-}, {
-    name: "stacking-context-3",
-    path: "examples/stacking-context-3.html"
-}, {
-    name: "stacking-context",
-    path: "examples/stacking-context.html"
-}, {
-    name: "stacking-without-z-index",
-    path: "examples/stacking-without-z-index.html"
-}, {
-    name: "z-index-onclick",
-    path: "examples/z-index-onclick.html"
-}];
-
-ExamplesDropdown.contextTypes = {
-  store: React.PropTypes.object
-};
-
-module.exports = ExamplesDropdown;
-
-
-/***/ }),
-/* 234 */
-/***/ (function(module, exports, __webpack_require__) {
-
-const {DOM, createClass} = __webpack_require__(6);
-const {div, canvas} = DOM;
-const React = __webpack_require__(6);
-const {computeBoundingRect} = __webpack_require__(61);
-
-const DisplayRectangle = createClass({
-    getBoundingRect(elt) {
-      const {store} = this.context;
-      this.setState({
-        boundingRect: store.getState().stackingContext.displayRect
-      })
-    },
-
-    //called when receive new element
-    updateMutationObserver(elt) {
-      //disconnect any old observer
-      if (this.state.observer){
-        this.state.observer.disconnect();
-      }
-      //if there is an element add a new observer
-      if (elt){
-        const me = this;
-        const observer = new MutationObserver(function(){
-          //when mutation observed, recompute rectangle
-          const {store} = me.context;
-          store.dispatch(computeBoundingRect(elt));
-        });
-        observer.observe(elt, {attributes:true, childList: true, subtree: true});
-        this.setState({
-          observer: observer
-        });
-      }
-    },
-
-    handleResize() {
-      const {store} = this.context;
-      store.dispatch(computeBoundingRect(this.props.elt));
-    },
-
-    getInitialState(){
-      return {
-        observer: undefined
-      };
-    },
-
-    componentWillReceiveProps(props) {
-      this.getBoundingRect(props.elt);
-      this.updateMutationObserver(props.elt);
-    },
-
-    componentWillMount() {
-      window.addEventListener('resize', this.state.handleResize);
-      this.getBoundingRect(this.props.elt);
-      this.updateMutationObserver(this.props.elt);
-    },
-
-    componentWillUnmount() {
-      window.removeEventListener('resize', this.state.handleResize);
-      this.updateMutationObserver(undefined);
-    },
-
-    render: function() {
-      const boundingRect = this.state.boundingRect;
-      //not really used right now, but if introduce toggling behaviour could
-      //be useful...
-      const hasNodeClass = (boundingRect) ? 'has-node' : 'no-node';
-      return div(
-        {
-            className: "display-rectangle "+hasNodeClass,
-            style:{
-              width:(boundingRect)? boundingRect.width +'px' : 0,
-              height:(boundingRect)? boundingRect.height +'px' : 0,
-              top: (boundingRect)? boundingRect.top +'px' : 0,
-              left: (boundingRect)? boundingRect.left +'px' : 0
-            }
-        }
-      );
-  }
-});
-
-DisplayRectangle.contextTypes = {
-  store: React.PropTypes.object
-};
-
-module.exports = DisplayRectangle;
+const reduxApp = createElement(
+  Provider,
+  { store: createStore() },
+  createElement(Panel)
+);
+ReactDOM.render(reduxApp, document.querySelector("#panel"));
 
 
 /***/ })

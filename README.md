@@ -1,5 +1,7 @@
 # z-index-devtool
+
 ## Context
+
 This project is a part of [UCOSP](http://ucosp.ca/) and is being steered by Greg Tatum ([@gregtatum](https://github.com/gregtatum/)).
 
 It is intended to be a _prototype_. Additional documentation will be added to the `docs/` directory.
@@ -12,4 +14,38 @@ The goal of this project would be to create a tool that intuitively lets users u
 
 ## Starting the Project
 
-Clone this repo, then from the terminal run `npm install` to install the dependencies then `npm start`. This will start a live-reloading server.
+Clone this repo, then from the terminal run
+
+```js
+npm install or yarn install
+```
+
+to install the dependencies.
+
+##### Bundling the source files
+
+To bundle the `./src` files for both the web app and the extension panel run
+
+```js
+npm build or yarn build
+```
+
+this will also watch for changes to the `./src` directory and rebundle
+
+##### Running the Firefox extension
+
+To run the firefox extension, do
+
+```js
+yarn start-ext
+```
+
+This should start up firefox and load the extension from the `./extension` folder, it will also watch for changes to the folder and auto-reload the extension.
+
+##### Running the Web app
+
+To run the web app, do
+
+```js
+yarn start-app
+```
