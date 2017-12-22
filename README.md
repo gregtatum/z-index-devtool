@@ -17,20 +17,20 @@ The goal of this project would be to create a tool that intuitively lets users u
 Clone this repo, then from the terminal run
 
 ```js
-npm install or yarn install
+yarn install
 ```
 
 to install the dependencies.
 
 ##### Bundling the source files
 
-To bundle the `./src` files for both the web app and the extension panel run
+To bundle the `./src` files for both the _demo web app_ and the _extension panel_ run
 
 ```js
-npm build or yarn build
+yarn build
 ```
 
-this will also watch for changes to the `./src` directory and rebundle
+this will also watch for changes to the `./src` directory and re-bundle
 
 ##### Running the Firefox extension
 
