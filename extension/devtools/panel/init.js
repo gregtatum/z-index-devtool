@@ -1,5 +1,8 @@
-function setTheme() {
-  document.documentElement.className = "theme-dark";
+function setTheme(name) {
+  document.documentElement.className = `theme-${name}`;
 }
 
-setTheme();
+browser.devtools.panels.onThemeChanged.addListener(theme => {
+  setTheme(theme);
+});
+setTheme(browser.devtools.panels.themeName);
