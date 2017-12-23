@@ -1,0 +1,27 @@
+{
+  "name": "z-index-devtool",
+  "description": "A z-index devtool",
+  "manifest_version": 2,
+  "version": "1.0",
+  "homepage_url": "https://github.com/gregtatum/z-index-devtool",
+
+  "background": {
+    "scripts": ["background_scripts/background.js"]
+  },
+
+  "icons": {
+    "48": "icons/stack.png"
+  },
+
+  "permissions": ["<all_urls>"],
+
+  "devtools_page": "devtools/devtools-page.html",
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content_scripts/content.js"],
+      "css": ["content_scripts/content.css"]
+    }
+  ]
+}

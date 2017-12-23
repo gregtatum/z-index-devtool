@@ -7,3 +7,7 @@ npm-debug.log
 # IntelliJ / IDEA
 *.iml
 .idea/*
+yarn-error.log
+
+extension/devtools/panel/bundle.js
+docs/bundle.js
