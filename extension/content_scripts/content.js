@@ -165,9 +165,7 @@ function sendMessage(message) {
 // Connection to the background script
 const port = browser.runtime.connect({ name: "cs-port" });
 
-port.onMessage.addListener(message => {
-  console.log("content script: ", message.connectMessage);
-});
+port.onMessage.addListener(message => {});
 
 console.log(
   "stacking context tree",
