@@ -1,10 +1,9 @@
 var path = require("path");
 var webpack = require("webpack");
 module.exports = {
-  context: path.join(__dirname),
   entry: {
     "extension/devtools/panel/bundle": "./extension/src/panel.js",
-    "/docs/bundle": "./index.js"
+    "/docs/bundle": "./src/index.js"
   },
   output: {
     filename: "[name].js",
