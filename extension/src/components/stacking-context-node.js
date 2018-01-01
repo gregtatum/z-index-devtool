@@ -1,5 +1,5 @@
-const {DOM, createClass} = require("react");
-const {div, span} = DOM;
+const { DOM, createClass } = require("react");
+const { div, span } = DOM;
 const React = require("react");
 const {
   selectStackingContextNode,
@@ -16,7 +16,7 @@ const StackingContextNode = createClass({
       arrow,
       isExpanded // used automagically in 'arrow'
     } = this.props;
-    const {store} = this.context;
+    const { store } = this.context;
 
     let className = "stacking-context-node";
     if (isFocused) {
@@ -27,7 +27,7 @@ const StackingContextNode = createClass({
       className += " not-in-context";
     }
 
-    let nodeZ = {className: "stacking-context-node-z"};
+    let nodeZ = { className: "stacking-context-node-z" };
     if (node.properties.zindex === "auto") {
       nodeZ.title = "'auto' is equivalent to having a Z-Index of 0";
     }
@@ -36,52 +36,57 @@ const StackingContextNode = createClass({
       {
         className,
         key: node.key,
-        onMouseOver: () => {
-          store.dispatch(highlightElement(node.el));
-          store.dispatch(computeBoundingRect(node));
-        },
-        onMouseLeave: () => {
-          store.dispatch(highlightElement(undefined));
-          store.dispatch(computeBoundingRect(undefined));
-        },
+        onMouseOver: () => highlightElement(node.key),
+        onMouseLeave: () => highlightElement(undefined),
         onClick: () => {
           store.dispatch(selectStackingContextNode(node));
-          store.dispatch(computeBoundingRect(node));
+          highlightElement(node.key);
         }
       },
 
-      span({className: "stacking-context-node-context"},
-          node.properties.isStackingContext ? "✔" : "✘"
+      span(
+        { className: "stacking-context-node-context" },
+        node.properties.isStackingContext ? "✔" : "✘"
       ),
 
-      span(nodeZ,
-        node.properties.zindex
-      ),
+      span(nodeZ, node.properties.zindex),
 
       span(
         {
           className: "stacking-context-node-name",
-          style: {paddingLeft: depth * 10 + "px"},
+          style: { paddingLeft: depth * 10 + "px" }
         },
         arrow,
-        span({
-          onClick: () => {
-            store.dispatch(selectStackingContextNode(node));
-            store.dispatch(computeBoundingRect(node.el));
+        span(
+          {
+            onClick: () => {
+              store.dispatch(selectStackingContextNode(node));
+              store.dispatch(computeBoundingRect(node.el));
+            },
+            title: node.properties.isStackingContext
+              ? ""
+              : "This element is not part of the stacking context."
           },
-          title: node.properties.isStackingContext? "" : "This element is not part of the stacking context."
-        },
-        getNodeContainerName(node.el))
+          getNodeContainerName(node.el)
+        )
       )
     );
   }
 });
 
 function getNodeContainerName(el) {
-  return el.tagName.toLowerCase() +
+  return (
+    el.tagName.toLowerCase() +
     (el.id.trim() !== "" ? "#" + el.id.trim() : "") +
-    (el.className && el.className.trim && el.className.trim() !== "" ? "." + el.className.trim().split(" ").join(".") : "");
-};
+    (el.className && el.className.trim && el.className.trim() !== ""
+      ? "." +
+        el.className
+          .trim()
+          .split(" ")
+          .join(".")
+      : "")
+  );
+}
 
 StackingContextNode.contextTypes = {
   store: React.PropTypes.object

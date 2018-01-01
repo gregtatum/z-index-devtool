@@ -11,7 +11,7 @@ const DEFAULT_STATE = {
   reasons: [],
   url: "stacking-context-1.html",
   isSelectorActive: false
-}
+};
 
 const handlers = {};
 
@@ -40,19 +40,6 @@ handlers[constants.SELECT_NODE] = function(state, action) {
   });
 };
 
-handlers[constants.HIGHLIGHT_ELEMENT] = function(state, action) {
-  return Object.assign({}, state, {
-    selElt: action.selElt
-  });
-};
-
-
-handlers[constants.COMPUTE_RECT] = function(state, action) {
-  return Object.assign({}, state, {
-    displayRect: action.rect
-  });
-};
-
 handlers[constants.EXPAND_NODE] = function(state, action) {
   const expandedNodes = new Set(state.expandedNodes);
   expandedNodes.add(action.node);
@@ -77,6 +64,7 @@ handlers[constants.TOGGLE_SELECTOR] = function(state) {
 
 function update(state = DEFAULT_STATE, action) {
   const handle = handlers[action.type];
+  console.log("xxxxxxxxxx", action);
   if (handle) {
     return handle(state, action);
   }

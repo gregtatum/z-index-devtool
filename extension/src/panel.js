@@ -7,7 +7,8 @@ const createStore = require("./store.js");
 
 const {
   fetchNewDomText,
-  getStackingContext,
+  getStackingContextTree,
+  addStackingContext,
   selectStackingContextNode,
   computeBoundingRect,
   toggleNode,
@@ -25,7 +26,18 @@ let Panel = createFactory(
   createClass({
     displayName: "Panel",
     componentDidMount() {
-      getStackingContext;
+      const { dispatch } = this.props;
+      // Handle messages from the background script
+      browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        if (request.tabId !== browser.devtools.inspectedWindow.tabId) {
+          return;
+        }
+        switch (request.action) {
+          case "SET_STACKING_CONTEXT_TREE":
+            dispatch(addStackingContext(request.data.tree));
+        }
+      });
+      getStackingContextTree(".dom-container");
     },
     render() {
       const { dispatch, stackingContext } = this.props;
@@ -50,13 +62,6 @@ let Panel = createFactory(
 Panel = connect(function(state) {
   return state;
 })(Panel);
-
-// Handle messages from the background script
-browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.tabId !== browser.devtools.inspectedWindow.tabId) {
-    return;
-  }
-});
 
 const reduxApp = createElement(
   Provider,

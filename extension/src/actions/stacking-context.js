@@ -1,25 +1,13 @@
 const { getText: getTextModule } = require("@tatumcreative/get");
 const constants = require("../constants");
-const { getStackingContextTree } = require("../stacking-context");
 
-function sendMessage(action, options) {
+function sendMessage(action, data) {
   browser.runtime.sendMessage({
     tabId: browser.devtools.inspectedWindow.tabId,
     action,
-    options
+    data
   });
 }
-
-// actions for the extension
-function getStackingCnxtTree() {
-  sendMessage("GET_STACKING_CONTEXT_TREE");
-}
-
-function setStackingCntxtTree(tree) {
-  return function() {};
-}
-
-// old actions
 
 function fetchNewDomText(url, getText = getTextModule) {
   return function(dispatch, getState) {
@@ -33,13 +21,16 @@ function fetchNewDomText(url, getText = getTextModule) {
   };
 }
 
-function getStackingContext(containerElement) {
+function getStackingContextTree(elememtSelector) {
+  sendMessage("GET_STACKING_CONTEXT_TREE", { selector: elememtSelector });
+}
+
+function addStackingContext(tree) {
   return function(dispatch, getState) {
-    const tree = getStackingContextTree(containerElement);
     dispatch({
       type: constants.ADD_STACKING_CONTEXT,
-      containerElement,
-      tree
+      containerElement: ".dom-container",
+      tree: JSON.parse(tree)
     });
   };
 }
@@ -54,25 +45,8 @@ function selectStackingContextNode(node) {
   };
 }
 
-function highlightElement(elt) {
-  return function(dispatch, getState) {
-    dispatch({
-      type: constants.HIGHLIGHT_ELEMENT,
-      selElt: elt
-    });
-  };
-}
-
-function computeBoundingRect(node) {
-  let elt = node ? node.el : undefined;
-  return function(dispatch, getState) {
-    dispatch({
-      type: constants.COMPUTE_RECT,
-      //getBoundingClientRect is doing something strange
-      //for the z-index onclick example
-      rect: elt ? elt.getBoundingClientRect() : undefined
-    });
-  };
+function highlightElement(nodeKey) {
+  sendMessage("HIGHLIGHT_ELEMENT", { nodeKey: nodeKey });
 }
 
 function toggleNode(node) {
@@ -106,12 +80,12 @@ function toggleSelector() {
 
 module.exports = {
   fetchNewDomText,
-  getStackingContext,
+  getStackingContextTree,
+  addStackingContext,
   selectStackingContextNode,
   highlightElement,
   toggleNode,
   expandNode,
   collapseNode,
-  computeBoundingRect,
   toggleSelector
 };

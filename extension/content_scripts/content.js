@@ -157,6 +157,88 @@ function getStackingContextTree(root, treeNodes = [], parentElement) {
   treeNodes = sortNodesByZIndex(treeNodes);
   return treeNodes;
 }
+// Representation of the current stacking context tree
+let currentStackingContextTree = null;
+let currentNode = null;
+// map of the stacked elements
+const stackedElements = {};
+
+function serialize(obj) {
+  return JSON.stringify(obj, null, 2);
+}
+
+// Transforms the tree by transversing throough the tree nodes
+// generating new nodes.
+function transformTree(tree, transform, parentNode = null) {
+  let index = 0;
+  let newTree = [];
+  while (index < tree.length) {
+    const node = tree[index];
+    let newNode = transform(Object.assign({}, node), parentNode);
+    let childNodes = [];
+    if (node.nodes && node.nodes.length) {
+      childNodes = transformTree(node.nodes, transform, node);
+    }
+    newNode.nodes = childNodes;
+
+    newTree.push(newNode);
+    index++;
+  }
+  return newTree;
+}
+
+function getCurrentStackingContextTree(selector) {
+  currentNode = document.querySelector(selector);
+  currentStackingContextTree = getStackingContextTree(currentNode);
+  // condense the tree to enable serialization transfer
+  const condensed = transformTree(
+    currentStackingContextTree,
+    (node, parent) => {
+      const condensedNode = {
+        el: {
+          tagName: node.el.tagName,
+          id: node.el.id,
+          className: node.el.className
+        },
+        key: node.key,
+        properties: node.properties,
+        parentElement: parent ? parent.key : "",
+        parentStackingContext: null
+      };
+      stackedElements[node.key] = {
+        el: node.el,
+        node: condensedNode
+      };
+      return condensedNode;
+    }
+  );
+
+  console.log("stacking context -> ", currentStackingContextTree, condensed);
+  console.log("stacked elements -> ", stackedElements);
+
+  sendMessage({
+    action: "SET_STACKING_CONTEXT_TREE",
+    data: {
+      tree: serialize(condensed)
+    }
+  });
+}
+
+function highlightElement(key) {
+  if (!stackedElements || !stackedElements[key]) {
+    return;
+  }
+
+  const el = stackedElements[key].el;
+  const domRect = el.getBoundingClientRect();
+
+  const overlay = document.querySelector(".zindex-tool-overlay");
+
+  overlay.style.width = domRect ? `${domRect.width}px` : 0;
+  overlay.style.height = domRect ? `${domRect.height}px` : 0;
+  overlay.style.top = domRect ? `${domRect.top}px` : 0;
+  overlay.style.left = domRect ? `${domRect.left}px` : 0;
+}
 
 function sendMessage(message) {
   port.postMessage(message);
@@ -165,9 +247,16 @@ function sendMessage(message) {
 // Connection to the background script
 const port = browser.runtime.connect({ name: "cs-port" });
 
-port.onMessage.addListener(message => {});
+port.onMessage.addListener(message => {
+  switch (message.action) {
+    case "GET_STACKING_CONTEXT_TREE":
+      getCurrentStackingContextTree(message.data.selector);
+    case "HIGHLIGHT_ELEMENT":
+      highlightElement(message.data.nodeKey);
+  }
+});
 
-console.log(
-  "stacking context tree",
-  getStackingContextTree(document.querySelector(".dom-container"))
-);
+// Add the overlay for highlighting
+const overlay = document.createElement("DIV");
+overlay.className = "zindex-tool-overlay";
+document.body.appendChild(overlay);
