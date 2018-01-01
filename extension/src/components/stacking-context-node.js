@@ -38,10 +38,7 @@ const StackingContextNode = createClass({
         key: node.key,
         onMouseOver: () => highlightElement(node.key),
         onMouseLeave: () => highlightElement(undefined),
-        onClick: () => {
-          store.dispatch(selectStackingContextNode(node));
-          highlightElement(node.key);
-        }
+        onClick: () => store.dispatch(selectStackingContextNode(node))
       },
 
       span(
@@ -61,7 +58,6 @@ const StackingContextNode = createClass({
           {
             onClick: () => {
               store.dispatch(selectStackingContextNode(node));
-              store.dispatch(computeBoundingRect(node.el));
             },
             title: node.properties.isStackingContext
               ? ""

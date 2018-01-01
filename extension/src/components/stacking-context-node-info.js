@@ -10,14 +10,14 @@ const StackingContextNodeInfo = createClass({
     if (selectedNode) {
       return div(
         {
-          className: "node-info footer"
+          className: "node-info"
         },
         div({ className: "devtools-toolbar" }, "Stacking Context Node Info"),
         createHeader(),
         getStackingContextInfo(selectedNode)
       );
     } else {
-      return div({ className: "node-info footer" });
+      return null;
     }
   }
 });
