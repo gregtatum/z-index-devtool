@@ -64,7 +64,6 @@ handlers[constants.TOGGLE_SELECTOR] = function(state) {
 
 function update(state = DEFAULT_STATE, action) {
   const handle = handlers[action.type];
-  console.log("xxxxxxxxxx", action);
   if (handle) {
     return handle(state, action);
   }
