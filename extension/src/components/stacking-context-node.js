@@ -3,7 +3,6 @@ const { div, span } = DOM;
 const React = require("react");
 const {
   selectStackingContextNode,
-  computeBoundingRect,
   highlightElement
 } = require("../actions/stacking-context");
 

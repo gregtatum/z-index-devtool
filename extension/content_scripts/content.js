@@ -158,8 +158,8 @@ function getStackingContextTree(root, treeNodes = [], parentElement) {
   return treeNodes;
 }
 // Representation of the current stacking context tree
-let currentStackingContextTree = null;
-let currentNode = null;
+let stackingContextTree = null;
+let containerNode = null;
 // map of the stacked elements
 const stackedElements = {};
 
@@ -167,14 +167,13 @@ function serialize(obj) {
   return JSON.stringify(obj, null, 2);
 }
 
-// Transforms the tree by transversing throough the tree nodes
-// generating new nodes.
-function transformTree(tree, transform, parentNode = null) {
+// Walks the tree, transfoming the nodes.
+function transformTree(tree, transform, parent = null) {
   let index = 0;
   let newTree = [];
   while (index < tree.length) {
     const node = tree[index];
-    let newNode = transform(Object.assign({}, node), parentNode);
+    let newNode = transform(Object.assign({}, node), parent);
     let childNodes = [];
     if (node.nodes && node.nodes.length) {
       childNodes = transformTree(node.nodes, transform, node);
@@ -188,13 +187,16 @@ function transformTree(tree, transform, parentNode = null) {
 }
 
 function getCurrentStackingContextTree(selector) {
-  currentNode = document.querySelector(selector);
-  currentStackingContextTree = getStackingContextTree(currentNode);
-  // condense the tree to enable serialization transfer
-  const condensed = transformTree(
-    currentStackingContextTree,
+  containerNode = document.querySelector(selector);
+  stackingContextTree = getStackingContextTree(containerNode);
+
+  // condense the stacking context tree down to a lighter
+  // version (which contains only what is need by the panel)
+  // for serialization and transfer to the panel.
+  const lightStackingContextTree = transformTree(
+    stackingContextTree,
     (node, parent) => {
-      const condensedNode = {
+      const newNode = {
         el: {
           tagName: node.el.tagName,
           id: node.el.id,
@@ -205,21 +207,30 @@ function getCurrentStackingContextTree(selector) {
         parentElement: parent ? parent.key : "",
         parentStackingContext: null
       };
+      // a lookup for easy access to all the stacked dom elments
       stackedElements[node.key] = {
         el: node.el,
-        node: condensedNode
+        node: newNode
       };
-      return condensedNode;
+
+      return newNode;
     }
   );
 
-  console.log("stacking context -> ", currentStackingContextTree, condensed);
+  console.log(
+    "stacking context -> ",
+    stackingContextTree,
+    lightStackingContextTree
+  );
   console.log("stacked elements -> ", stackedElements);
 
+  // A ligher version of the stacking context tree
+  // is transferred and communication is done using the
+  // keys
   sendMessage({
     action: "SET_STACKING_CONTEXT_TREE",
     data: {
-      tree: serialize(condensed)
+      tree: serialize(lightStackingContextTree)
     }
   });
 }

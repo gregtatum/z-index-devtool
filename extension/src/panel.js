@@ -10,7 +10,6 @@ const {
   getStackingContextTree,
   addStackingContext,
   selectStackingContextNode,
-  computeBoundingRect,
   toggleNode,
   toggleSelector
 } = require("./actions/stacking-context");
@@ -49,7 +48,6 @@ let Panel = createFactory(
           selectedNode: stackingContext.selectedNode,
           isSelectorActive: stackingContext.isSelectorActive,
           selectNode: node => dispatch(selectStackingContextNode(node)),
-          computeBoundingRect: node => dispatch(computeBoundingRect(node)),
           toggleNode: node => dispatch(toggleNode(node)),
           toggleSelector: node => dispatch(toggleSelector())
         }),
