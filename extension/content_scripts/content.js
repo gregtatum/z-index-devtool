@@ -160,6 +160,7 @@ function getStackingContextTree(root, treeNodes = [], parentElement) {
 // Representation of the current stacking context tree
 let stackingContextTree = null;
 let containerNode = null;
+let observer = null;
 // map of the stacked elements
 const stackedElements = {};
 
@@ -186,8 +187,24 @@ function transformTree(tree, transform, parent = null) {
   return newTree;
 }
 
-function getCurrentStackingContextTree(selector) {
-  containerNode = document.querySelector(selector);
+function observeChanges(containerNode) {
+  if (!containerNode) {
+    return;
+  }
+  // Set up a mutation obsever for changes
+  if (!observer) {
+    const observer = new MutationObserver(mutations => {
+      getCurrentStackingContextTree(containerNode);
+    });
+    observer.observe(containerNode, {
+      attribute: true,
+      childList: true,
+      subtree: true
+    });
+  }
+}
+
+function getCurrentStackingContextTree(containerNode) {
   stackingContextTree = getStackingContextTree(containerNode);
 
   // condense the stacking context tree down to a lighter
@@ -224,7 +241,7 @@ function getCurrentStackingContextTree(selector) {
   );
   console.log("stacked elements -> ", stackedElements);
 
-  // A ligher version of the stacking context tree
+  // A lighter version of the stacking context tree
   // is transferred and communication is done using the
   // keys
   sendMessage({
@@ -261,7 +278,10 @@ const port = browser.runtime.connect({ name: "cs-port" });
 port.onMessage.addListener(message => {
   switch (message.action) {
     case "GET_STACKING_CONTEXT_TREE":
-      getCurrentStackingContextTree(message.data.selector);
+      containerNode = document.querySelector(message.data.selector);
+      getCurrentStackingContextTree(containerNode);
+      observeChanges(containerNode);
+      break;
     case "HIGHLIGHT_ELEMENT":
       highlightElement(message.data.nodeKey);
   }
