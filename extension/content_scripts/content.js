@@ -162,7 +162,7 @@ let stackingContextTree = null;
 let containerNode = null;
 let observer = null;
 // map of the stacked elements
-const stackedElements = {};
+let stackedElements = {};
 
 function serialize(obj) {
   return JSON.stringify(obj, null, 2);
@@ -206,7 +206,7 @@ function observeChanges(containerNode) {
 
 function getCurrentStackingContextTree(containerNode) {
   stackingContextTree = getStackingContextTree(containerNode);
-
+  stackedElements = {};
   // condense the stacking context tree down to a lighter
   // version (which contains only what is need by the panel)
   // for serialization and transfer to the panel.
