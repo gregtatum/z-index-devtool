@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "NODE_ENV=development webpack --watch",
-    "start-app": "http-serve ./docs",
+    "start-app": "http-serve ./docs -p 8082",
     "start-ext": "web-ext run --source-dir ./extension",
     "test":
       "mocha --compilers js:babel-register test/stacking-context-actions.js"

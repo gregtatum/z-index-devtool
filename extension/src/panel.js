@@ -7,9 +7,9 @@ const createStore = require("./store.js");
 
 const {
   fetchNewDomText,
-  getStackingContext,
+  getStackingContextTree,
+  addStackingContext,
   selectStackingContextNode,
-  computeBoundingRect,
   toggleNode,
   toggleSelector
 } = require("./actions/stacking-context");
@@ -24,6 +24,20 @@ const StackingContextNodeInfo = createFactory(
 let Panel = createFactory(
   createClass({
     displayName: "Panel",
+    componentDidMount() {
+      const { dispatch } = this.props;
+      // Handle messages from the background script
+      browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        if (request.tabId !== browser.devtools.inspectedWindow.tabId) {
+          return;
+        }
+        switch (request.action) {
+          case "SET_STACKING_CONTEXT_TREE":
+            dispatch(addStackingContext(request.data.tree));
+        }
+      });
+      getStackingContextTree(".dom-container");
+    },
     render() {
       const { dispatch, stackingContext } = this.props;
       return div(
@@ -34,7 +48,6 @@ let Panel = createFactory(
           selectedNode: stackingContext.selectedNode,
           isSelectorActive: stackingContext.isSelectorActive,
           selectNode: node => dispatch(selectStackingContextNode(node)),
-          computeBoundingRect: node => dispatch(computeBoundingRect(node)),
           toggleNode: node => dispatch(toggleNode(node)),
           toggleSelector: node => dispatch(toggleSelector())
         }),
