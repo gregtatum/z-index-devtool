@@ -13,7 +13,11 @@ browser.runtime.onConnect.addListener(port => {
 
 // Connection to the devtools Panel
 browser.runtime.onMessage.addListener((request, sender, send) => {
-  if (sender.url != browser.runtime.getURL("/devtools/panel/panel.html")) {
+  const urls = [
+    browser.runtime.getURL("/devtools/devtools-page.html"),
+    browser.runtime.getURL("/devtools/panel/panel.html")
+  ];
+  if (!urls.includes(sender.url)) {
     return;
   }
 
