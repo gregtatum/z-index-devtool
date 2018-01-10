@@ -263,7 +263,6 @@ function highlightElement(key) {
 }
 
 function blurElement(key) {
-  consolre.log("asdfasfdfasdfasdfs");
   clearOverlay();
 }
 
@@ -319,8 +318,9 @@ port.onMessage.addListener(message => {
     case "HIGHLIGHT_ELEMENT":
       highlightElement(message.data.nodeKey);
       break;
-    case "BLUR_ElEMENT":
+    case "BLUR_ELEMENT":
       blurElement(message.data.nodeKey);
+      break;
     case "INIT":
       createOverlay();
       break;

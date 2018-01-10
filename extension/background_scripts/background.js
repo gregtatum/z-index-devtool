@@ -20,7 +20,6 @@ browser.runtime.onMessage.addListener((request, sender, send) => {
   if (!urls.includes(sender.url)) {
     return;
   }
-
   sendToContentScript(request);
 });
 
