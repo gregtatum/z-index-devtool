@@ -9,7 +9,8 @@ function connectToInspectedWindow({ dispatch }) {
     }
     switch (request.action) {
       case "SET_STACKING_CONTEXT_TREE":
-        dispatch(addStackingContext(request.data.tree));
+        const { tree, selector } = request.data;
+        dispatch(addStackingContext(tree, selector));
     }
   });
 }

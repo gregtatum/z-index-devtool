@@ -157,6 +157,7 @@ function getStackingContextTree(root, treeNodes = [], parentElement) {
   treeNodes = sortNodesByZIndex(treeNodes);
   return treeNodes;
 }
+
 // map of the stacked elements
 let stackedElements = {};
 let observer = null;
@@ -184,16 +185,13 @@ function transformTree(tree, transform, parent = null) {
   return newTree;
 }
 
-function observeChanges(containerNode) {
-  if (!containerNode) {
-    return;
-  }
+function addObserver(selector) {
   // Set up a mutation obsever for changes
   if (!observer) {
-    const observer = new MutationObserver(mutations => {
-      getCurrentStackingContextTree(containerNode);
+    observer = new MutationObserver(mutations => {
+      getCurrentStackingContextTree(selector);
     });
-    observer.observe(containerNode, {
+    observer.observe(document.querySelector(selector), {
       attribute: true,
       childList: true,
       subtree: true
@@ -201,8 +199,17 @@ function observeChanges(containerNode) {
   }
 }
 
-function getCurrentStackingContextTree(containerNode) {
-  const stackingContextTree = getStackingContextTree(containerNode);
+function removeObserver() {
+  if (observer) {
+    observer.disconnect();
+    observer = null;
+  }
+}
+
+function getCurrentStackingContextTree(selector) {
+  const stackingContextTree = getStackingContextTree(
+    document.querySelector(selector)
+  );
   stackedElements = {};
   // condense the stacking context tree down to a lighter
   // version (which contains only what is need by the panel)
@@ -237,7 +244,8 @@ function getCurrentStackingContextTree(containerNode) {
   sendMessage({
     action: "SET_STACKING_CONTEXT_TREE",
     data: {
-      tree: serialize(condensedTree)
+      tree: serialize(condensedTree),
+      selector
     }
   });
 }
@@ -252,6 +260,11 @@ function highlightElement(key) {
   const { width, height, top, left } = domRect;
 
   positionOverlay(width, height, top, left);
+}
+
+function blurElement(key) {
+  consolre.log("asdfasfdfasdfasdfs");
+  clearOverlay();
 }
 
 // overlay for highlighting
@@ -299,18 +312,21 @@ const port = browser.runtime.connect({ name: "cs-port" });
 port.onMessage.addListener(message => {
   switch (message.action) {
     case "GET_STACKING_CONTEXT_TREE":
-      const containerNode = document.querySelector(message.data.selector);
-      getCurrentStackingContextTree(containerNode);
-      observeChanges(containerNode);
+      const { selector } = message.data;
+      getCurrentStackingContextTree(selector);
+      addObserver(selector);
       break;
     case "HIGHLIGHT_ELEMENT":
       highlightElement(message.data.nodeKey);
       break;
+    case "BLUR_ElEMENT":
+      blurElement(message.data.nodeKey);
     case "INIT":
       createOverlay();
       break;
     case "DESTROY":
       removeOverlay();
+      removeObserver();
       break;
   }
 });
