@@ -3,7 +3,8 @@ const { div, span } = DOM;
 const React = require("react");
 const {
   selectStackingContextNode,
-  highlightElement
+  highlightElement,
+  blurElement
 } = require("../actions/stacking-context");
 
 const StackingContextNode = createClass({
@@ -36,7 +37,7 @@ const StackingContextNode = createClass({
         className,
         key: node.key,
         onMouseOver: () => highlightElement(node.key),
-        onMouseLeave: () => highlightElement(undefined),
+        onMouseLeave: () => blurElement(node.key),
         onClick: () => store.dispatch(selectStackingContextNode(node))
       },
 

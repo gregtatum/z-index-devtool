@@ -4,11 +4,11 @@ const { DOM, createFactory, createClass, createElement } = require("react");
 const { div } = DOM;
 const { Provider, connect } = require("react-redux");
 const createStore = require("./store.js");
+const { connectToInspectedWindow } = require("./bootstrap");
 
 const {
   fetchNewDomText,
   getStackingContextTree,
-  addStackingContext,
   selectStackingContextNode,
   toggleNode,
   toggleSelector
@@ -26,17 +26,8 @@ let Panel = createFactory(
     displayName: "Panel",
     componentDidMount() {
       const { dispatch } = this.props;
-      // Handle messages from the background script
-      browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
-        if (request.tabId !== browser.devtools.inspectedWindow.tabId) {
-          return;
-        }
-        switch (request.action) {
-          case "SET_STACKING_CONTEXT_TREE":
-            dispatch(addStackingContext(request.data.tree));
-        }
-      });
-      getStackingContextTree(".dom-container");
+      connectToInspectedWindow({ dispatch });
+      getStackingContextTree("body");
     },
     render() {
       const { dispatch, stackingContext } = this.props;

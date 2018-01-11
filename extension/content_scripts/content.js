@@ -157,12 +157,10 @@ function getStackingContextTree(root, treeNodes = [], parentElement) {
   treeNodes = sortNodesByZIndex(treeNodes);
   return treeNodes;
 }
-// Representation of the current stacking context tree
-let stackingContextTree = null;
-let containerNode = null;
-let observer = null;
+
 // map of the stacked elements
 let stackedElements = {};
+let observer = null;
 
 function serialize(obj) {
   return JSON.stringify(obj, null, 2);
@@ -187,16 +185,13 @@ function transformTree(tree, transform, parent = null) {
   return newTree;
 }
 
-function observeChanges(containerNode) {
-  if (!containerNode) {
-    return;
-  }
+function addObserver(selector) {
   // Set up a mutation obsever for changes
   if (!observer) {
-    const observer = new MutationObserver(mutations => {
-      getCurrentStackingContextTree(containerNode);
+    observer = new MutationObserver(mutations => {
+      getCurrentStackingContextTree(selector);
     });
-    observer.observe(containerNode, {
+    observer.observe(document.querySelector(selector), {
       attribute: true,
       childList: true,
       subtree: true
@@ -204,41 +199,43 @@ function observeChanges(containerNode) {
   }
 }
 
-function getCurrentStackingContextTree(containerNode) {
-  stackingContextTree = getStackingContextTree(containerNode);
+function removeObserver() {
+  if (observer) {
+    observer.disconnect();
+    observer = null;
+  }
+}
+
+function getCurrentStackingContextTree(selector) {
+  const stackingContextTree = getStackingContextTree(
+    document.querySelector(selector)
+  );
   stackedElements = {};
   // condense the stacking context tree down to a lighter
   // version (which contains only what is need by the panel)
   // for serialization and transfer to the panel.
-  const lightStackingContextTree = transformTree(
-    stackingContextTree,
-    (node, parent) => {
-      const newNode = {
-        el: {
-          tagName: node.el.tagName,
-          id: node.el.id,
-          className: node.el.className
-        },
-        key: node.key,
-        properties: node.properties,
-        parentElement: parent ? parent.key : "",
-        parentStackingContext: null
-      };
-      // a lookup for easy access to all the stacked dom elments
-      stackedElements[node.key] = {
-        el: node.el,
-        node: newNode
-      };
+  const condensedTree = transformTree(stackingContextTree, (node, parent) => {
+    const newNode = {
+      el: {
+        tagName: node.el.tagName,
+        id: node.el.id,
+        className: node.el.className
+      },
+      key: node.key,
+      properties: node.properties,
+      parentElement: parent ? parent.key : "",
+      parentStackingContext: null
+    };
+    // a lookup for easy access to all the stacked dom elments
+    stackedElements[node.key] = {
+      el: node.el,
+      node: newNode
+    };
 
-      return newNode;
-    }
-  );
+    return newNode;
+  });
 
-  console.log(
-    "stacking context -> ",
-    stackingContextTree,
-    lightStackingContextTree
-  );
+  console.log("stacking context -> ", stackingContextTree, condensedTree);
   console.log("stacked elements -> ", stackedElements);
 
   // A lighter version of the stacking context tree
@@ -247,7 +244,8 @@ function getCurrentStackingContextTree(containerNode) {
   sendMessage({
     action: "SET_STACKING_CONTEXT_TREE",
     data: {
-      tree: serialize(lightStackingContextTree)
+      tree: serialize(condensedTree),
+      selector
     }
   });
 }
@@ -259,13 +257,48 @@ function highlightElement(key) {
 
   const el = stackedElements[key].el;
   const domRect = el.getBoundingClientRect();
+  const { width, height, top, left } = domRect;
 
+  positionOverlay(width, height, top, left);
+}
+
+function blurElement(key) {
+  clearOverlay();
+}
+
+// overlay for highlighting
+function positionOverlay(width, height, top, left) {
+  let overlay = document.querySelector(".zindex-tool-overlay");
+
+  if (!overlay) {
+    overlay = createOverlay();
+  }
+
+  overlay.style.width = width ? `${width}px` : 0;
+  overlay.style.height = height ? `${height}px` : 0;
+  overlay.style.top = top ? `${top}px` : 0;
+  overlay.style.left = left ? `${left}px` : 0;
+}
+
+function clearOverlay() {
+  positionOverlay(null, null, null, null);
+}
+
+function createOverlay() {
+  const overlay = document.createElement("DIV");
+
+  overlay.className = "zindex-tool-overlay";
+  // add to the html element so its not added to the
+  // stacking context tree
+  document.documentElement.appendChild(overlay);
+  return overlay;
+}
+
+function removeOverlay() {
   const overlay = document.querySelector(".zindex-tool-overlay");
-
-  overlay.style.width = domRect ? `${domRect.width}px` : 0;
-  overlay.style.height = domRect ? `${domRect.height}px` : 0;
-  overlay.style.top = domRect ? `${domRect.top}px` : 0;
-  overlay.style.left = domRect ? `${domRect.left}px` : 0;
+  if (overlay) {
+    overlay.parentNode.removeChild(overlay);
+  }
 }
 
 function sendMessage(message) {
@@ -278,16 +311,22 @@ const port = browser.runtime.connect({ name: "cs-port" });
 port.onMessage.addListener(message => {
   switch (message.action) {
     case "GET_STACKING_CONTEXT_TREE":
-      containerNode = document.querySelector(message.data.selector);
-      getCurrentStackingContextTree(containerNode);
-      observeChanges(containerNode);
+      const { selector } = message.data;
+      getCurrentStackingContextTree(selector);
+      addObserver(selector);
       break;
     case "HIGHLIGHT_ELEMENT":
       highlightElement(message.data.nodeKey);
+      break;
+    case "BLUR_ELEMENT":
+      blurElement(message.data.nodeKey);
+      break;
+    case "INIT":
+      createOverlay();
+      break;
+    case "DESTROY":
+      removeOverlay();
+      removeObserver();
+      break;
   }
 });
-
-// Add the overlay for highlighting
-const overlay = document.createElement("DIV");
-overlay.className = "zindex-tool-overlay";
-document.body.appendChild(overlay);

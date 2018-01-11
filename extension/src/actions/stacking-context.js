@@ -25,11 +25,11 @@ function getStackingContextTree(elememtSelector) {
   sendMessage("GET_STACKING_CONTEXT_TREE", { selector: elememtSelector });
 }
 
-function addStackingContext(tree) {
+function addStackingContext(tree, selector) {
   return function(dispatch, getState) {
     dispatch({
       type: constants.ADD_STACKING_CONTEXT,
-      containerElement: ".dom-container",
+      containerElement: selector,
       tree: JSON.parse(tree)
     });
   };
@@ -46,7 +46,11 @@ function selectStackingContextNode(node) {
 }
 
 function highlightElement(nodeKey) {
-  sendMessage("HIGHLIGHT_ELEMENT", { nodeKey: nodeKey });
+  sendMessage("HIGHLIGHT_ELEMENT", { nodeKey });
+}
+
+function blurElement(nodeKey) {
+  sendMessage("BLUR_ELEMENT", { nodeKey });
 }
 
 function toggleNode(node) {
@@ -84,6 +88,7 @@ module.exports = {
   addStackingContext,
   selectStackingContextNode,
   highlightElement,
+  blurElement,
   toggleNode,
   expandNode,
   collapseNode,
