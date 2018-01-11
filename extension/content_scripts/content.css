@@ -1,7 +1,8 @@
 .zindex-tool-overlay {
   position: absolute;
-  opacity: 0.8;
+  opacity: 0.5;
   z-index: 1;
   background-color: orange;
   pointer-events: none;
+  outline: 1px dashed orange;
 }
