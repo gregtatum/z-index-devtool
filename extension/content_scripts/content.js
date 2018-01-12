@@ -326,7 +326,6 @@ port.onMessage.addListener(message => {
       break;
     case "DESTROY":
       removeOverlay();
-      removeObserver();
       break;
   }
 });
