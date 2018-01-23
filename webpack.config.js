@@ -9,5 +9,14 @@ module.exports = {
     filename: "[name].js",
     path: path.resolve(__dirname, ".")
   },
-  plugins: [new webpack.EnvironmentPlugin(["NODE_ENV"])]
+  devtool: "inline-source-map",
+  plugins: [new webpack.EnvironmentPlugin(["NODE_ENV"])],
+  module: {
+    loaders: [
+      {
+        test: /.js$/,
+        loader: "babel-loader"
+      }
+    ]
+  }
 };

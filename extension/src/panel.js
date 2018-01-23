@@ -1,25 +1,24 @@
-const React = require("react");
-const ReactDOM = require("react-dom");
-const { DOM, createFactory, createClass, createElement } = require("react");
-const { div } = DOM;
-const { Provider, connect } = require("react-redux");
-const createStore = require("./store.js");
-const { connectToInspectedWindow } = require("./bootstrap");
+import React, { DOM, createFactory, createClass, createElement } from "react";
+import ReactDOM from "react-dom";
+import { Provider, connect } from "react-redux";
+import createStore from "./store.js";
 
-const {
+import { connectToInspectedWindow } from "./bootstrap";
+
+const { div } = DOM;
+
+import {
   fetchNewDomText,
   getStackingContextTree,
   selectStackingContextNode,
   toggleNode,
   toggleSelector
-} = require("./actions/stacking-context");
+} from "./actions/stacking-context";
 
-const StackingContextTreeView = createFactory(
-  require("./components/stacking-context-tree-view")
-);
-const StackingContextNodeInfo = createFactory(
-  require("./components/stacking-context-node-info")
-);
+import SCTreeView from "./components/stacking-context-tree-view";
+import SCNodeInfo from "./components/stacking-context-node-info";
+const StackingContextTreeView = createFactory(SCTreeView);
+const StackingContextNodeInfo = createFactory(SCNodeInfo);
 
 let Panel = createFactory(
   createClass({

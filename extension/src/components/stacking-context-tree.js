@@ -1,7 +1,10 @@
-const { DOM, createClass, createFactory } = require("react");
+import { DOM, createClass, createFactory } from "react";
+import SCNode from "./stacking-context-node";
+import _Tree from "./tree";
+
 const { div } = DOM;
-const StackingContextNode = createFactory(require("./stacking-context-node"));
-const Tree = createFactory(require("./tree"));
+const StackingContextNode = createFactory(SCNode);
+const Tree = createFactory(_Tree);
 
 const StackingContextTree = createClass({
   render() {
@@ -43,4 +46,4 @@ const StackingContextTree = createClass({
   }
 });
 
-module.exports = StackingContextTree;
+export default StackingContextTree;

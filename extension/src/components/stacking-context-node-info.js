@@ -1,6 +1,5 @@
-const { DOM, createClass, createFactory } = require("react");
+import React, { DOM, createClass, createFactory } from "react";
 const { div, span } = DOM;
-const React = require("react");
 
 const StackingContextNodeInfo = createClass({
   // USING selectedNode TO DISPLAY THE STACKING CONTEXT INFO BASED ON SELECTED NODE
@@ -88,4 +87,4 @@ StackingContextNodeInfo.contextTypes = {
   store: React.PropTypes.object
 };
 
-module.exports = StackingContextNodeInfo;
+export default StackingContextNodeInfo;

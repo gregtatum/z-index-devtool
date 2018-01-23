@@ -1,14 +1,15 @@
-const { DOM, createClass, createFactory } = require("react");
+import { DOM, createClass, createFactory } from "react";
 const { div, button } = DOM;
-const { connect } = require("react-redux");
+import { connect } from "react-redux";
 
-const StackingContextTree = createFactory(require("./stacking-context-tree"));
-const StackingContextNodeInfo = createFactory(
-  require("./stacking-context-node-info")
-);
-const StackingContextTreeHeader = createFactory(
-  require("./stacking-context-tree-header")
-);
+import SCTree from "./stacking-context-tree";
+import SCNodeInfo from "./stacking-context-node-info";
+import SCTreeHeader from "./stacking-context-tree-header";
+
+const StackingContextTree = createFactory(SCTree);
+const StackingContextNodeInfo = createFactory(SCNodeInfo);
+
+const StackingContextTreeHeader = createFactory(SCTreeHeader);
 
 const StackingContextTreeView = createFactory(
   createClass({
@@ -63,4 +64,4 @@ const StackingContextTreeView = createFactory(
   })
 );
 
-module.exports = StackingContextTreeView;
+export default StackingContextTreeView;

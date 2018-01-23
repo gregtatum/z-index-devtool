@@ -1,11 +1,12 @@
-const Redux = require("redux");
-const {default: thunkMiddleware} = require("redux-thunk");
-const loggerMiddleware = require("redux-logger")({logErrors: false});
-const reducers = require("./reducers");
+import { applyMiddleware, createStore } from "redux";
+import thunkMiddleware from "redux-thunk";
+import logger from "redux-logger";
+const loggerMiddleware = logger({ logErrors: false });
+import reducers from "./reducers";
 
-module.exports = function getStore() {
-  return Redux.createStore(
+export default function getStore() {
+  return createStore(
     reducers,
-    Redux.applyMiddleware(thunkMiddleware, loggerMiddleware)
+    applyMiddleware(thunkMiddleware, loggerMiddleware)
   );
-};
+}

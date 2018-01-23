@@ -1,5 +1,5 @@
-const {DOM, createClass} = require("react");
-const {div, span} = DOM;
+import { DOM, createClass } from "react";
+const { div, span } = DOM;
 
 const StackingContextTreeHeader = createClass({
   displayName: "StackingContextTreeHeader",
@@ -33,9 +33,8 @@ const StackingContextTreeHeader = createClass({
         },
         "Stacking Context Node"
       )
-
     );
   }
 });
 
-module.exports = StackingContextTreeHeader;
+export default StackingContextTreeHeader;

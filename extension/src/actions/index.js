@@ -1,3 +1,4 @@
-module.exports = {
-  stackingContext: require("./stacking-context")
-}
+import stackingContextAction from "./stacking-context";
+export default {
+  stackingContext: stackingContextAction
+};

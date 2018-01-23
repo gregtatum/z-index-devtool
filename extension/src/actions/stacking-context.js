@@ -1,5 +1,5 @@
-const { getText: getTextModule } = require("@tatumcreative/get");
-const constants = require("../constants");
+import { getText as getTextModule } from "@tatumcreative/get";
+import constants from "../constants";
 
 function sendMessage(action, data) {
   browser.runtime.sendMessage({
@@ -82,7 +82,7 @@ function toggleSelector() {
   };
 }
 
-module.exports = {
+export {
   fetchNewDomText,
   getStackingContextTree,
   addStackingContext,

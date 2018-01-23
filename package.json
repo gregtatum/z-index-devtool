@@ -7,8 +7,7 @@
     "build": "NODE_ENV=development webpack --watch",
     "start-app": "http-serve ./docs -p 8082",
     "start-ext": "web-ext run --source-dir ./extension",
-    "test":
-      "mocha --compilers js:babel-register test/stacking-context-actions.js"
+    "test": "mocha --compilers js:babel-register test/stacking-context-actions.js"
   },
   "repository": {
     "type": "git",
@@ -22,6 +21,7 @@
   "devDependencies": {
     "@tatumcreative/get": "1.0.0",
     "babel": "^6.5.2",
+    "babel-loader": "^7.1.2",
     "babel-preset-es2015": "^6.18.0",
     "babel-preset-react": "^6.16.0",
     "babel-register": "^6.18.0",
