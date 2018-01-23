@@ -1,4 +1,4 @@
-const constants = require("../constants");
+import constants from "../constants";
 
 const DEFAULT_STATE = {
   tree: undefined,
@@ -62,12 +62,10 @@ handlers[constants.TOGGLE_SELECTOR] = function(state) {
   });
 };
 
-function update(state = DEFAULT_STATE, action) {
+export default function update(state = DEFAULT_STATE, action) {
   const handle = handlers[action.type];
   if (handle) {
     return handle(state, action);
   }
   return state;
 }
-
-module.exports = update;

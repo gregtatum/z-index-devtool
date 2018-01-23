@@ -1,11 +1,11 @@
-const { DOM, createClass } = require("react");
+import React, { DOM, createClass } from "react";
 const { div, span } = DOM;
-const React = require("react");
-const {
+
+import {
   selectStackingContextNode,
   highlightElement,
   blurElement
-} = require("../actions/stacking-context");
+} from "../actions/stacking-context";
 
 const StackingContextNode = createClass({
   render() {
@@ -88,4 +88,4 @@ StackingContextNode.contextTypes = {
   store: React.PropTypes.object
 };
 
-module.exports = StackingContextNode;
+export default StackingContextNode;

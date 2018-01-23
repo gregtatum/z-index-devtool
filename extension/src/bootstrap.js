@@ -1,6 +1,6 @@
 // listen and handle messages from the content script
 // via the background script
-const { addStackingContext } = require("./actions/stacking-context");
+import { addStackingContext } from "./actions/stacking-context";
 
 function connectToInspectedWindow({ dispatch }) {
   browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -14,4 +14,4 @@ function connectToInspectedWindow({ dispatch }) {
     }
   });
 }
-module.exports = { connectToInspectedWindow };
+export { connectToInspectedWindow };

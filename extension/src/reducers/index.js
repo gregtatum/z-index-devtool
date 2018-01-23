@@ -1,5 +1,6 @@
-const Redux = require("redux");
+import { combineReducers } from "redux";
 
-module.exports = Redux.combineReducers({
-  stackingContext: require("./stacking-context")
+import stackingContextReducer from "./stacking-context";
+export default combineReducers({
+  stackingContext: stackingContextReducer
 });
